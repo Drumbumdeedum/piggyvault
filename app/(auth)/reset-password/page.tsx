@@ -10,7 +10,7 @@ export default async function ResetPassword({
   searchParams: Message;
 }) {
   return (
-    <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
+    <form className="flex-1 flex flex-col w-full gap-2 text-foreground [&>input]:mb-6 min-w-64 max-w-64 mx-auto">
       <h1 className="text-2xl font-medium">Reset password</h1>
       <p className="text-sm text-foreground/60">
         Please enter your new password below.
