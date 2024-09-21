@@ -1,16 +1,6 @@
 import "../globals.css";
 import Navbar from "../../components/Navbar";
 
-const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
-  ? `https://${process.env.NEXT_PUBLIC_SITE_URL}`
-  : "http://localhost:3000";
-
-export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "Piggyvault",
-  description: "Personal finance, simplified.",
-};
-
 export default function RootLayout({
   children,
 }: {
