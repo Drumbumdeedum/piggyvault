@@ -3,8 +3,10 @@
 import SidebarFooter from "./SidebarFooter";
 import { sidebarLinks } from "@/constants";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const pathName = usePathname();
@@ -18,14 +20,21 @@ const Sidebar = () => {
             (sidebarLink.route !== "/" &&
               pathName.startsWith(`${sidebarLink.route}`));
           return (
-            <Button
-              variant={isActive ? "secondary" : "ghost"}
-              className="w-full justify-start"
-            >
-              <Link key={sidebarLink.label} href={sidebarLink.route}>
+            <Link key={sidebarLink.label} href={sidebarLink.route}>
+              <Button
+                variant={isActive ? "secondary" : "ghost"}
+                className="w-full justify-start items-center gap-2"
+              >
+                <div className="relative size-4">
+                  <Image
+                    src={sidebarLink.iconUrl}
+                    alt={sidebarLink.label}
+                    fill
+                  />
+                </div>
                 <p className="text-foreground">{sidebarLink.label}</p>
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           );
         })}
       </nav>
