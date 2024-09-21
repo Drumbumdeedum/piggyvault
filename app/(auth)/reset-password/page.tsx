@@ -1,13 +1,13 @@
 import { resetPasswordAction } from "@/app/actions";
-import { FormMessage, Message } from "@/components/form-message";
-import { SubmitButton } from "@/components/submit-button";
+import FormError from "@/components/FormError";
+import FormSubmitButton from "@/components/FormSubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default async function ResetPassword({
   searchParams,
 }: {
-  searchParams: Message;
+  searchParams: FormResponse;
 }) {
   return (
     <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
@@ -29,10 +29,10 @@ export default async function ResetPassword({
         placeholder="Confirm password"
         required
       />
-      <SubmitButton formAction={resetPasswordAction}>
+      <FormSubmitButton formAction={resetPasswordAction}>
         Reset password
-      </SubmitButton>
-      <FormMessage message={searchParams} />
+      </FormSubmitButton>
+      <FormError response={searchParams} />
     </form>
   );
 }

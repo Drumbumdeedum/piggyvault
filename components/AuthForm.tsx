@@ -3,7 +3,6 @@
 import Link from "next/link";
 import React from "react";
 import FormSubmitButton from "./FormSubmitButton";
-import FormInput from "./FormInput";
 import { authFormSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +10,7 @@ import { signInAction, signUpAction } from "@/app/actions";
 import { useForm } from "react-hook-form";
 import { Form } from "./ui/form";
 import FormError from "./FormError";
+import AuthFormInput from "./AuthFormInput";
 
 const AuthForm = ({ type, searchParams }: AuthFormParams) => {
   const formSchema = authFormSchema(type);
@@ -46,14 +46,14 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
           </h1>
           <FormError response={searchParams} />
           <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
-            <FormInput
+            <AuthFormInput
               id="form_email_input"
               control={form.control}
               name="email"
               label="Email"
               placeholder="your.name@provider.com"
             />
-            <FormInput
+            <AuthFormInput
               id="form_password_input"
               control={form.control}
               name="password"
@@ -62,14 +62,14 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
             />
             {type === "sign-up" && (
               <>
-                <FormInput
+                <AuthFormInput
                   id="form_first_name_input"
                   control={form.control}
                   name="firstName"
                   label="First name"
                   placeholder="First name"
                 />
-                <FormInput
+                <AuthFormInput
                   id="form_last_name_input"
                   control={form.control}
                   name="lastName"

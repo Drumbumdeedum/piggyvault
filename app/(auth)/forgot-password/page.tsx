@@ -1,8 +1,14 @@
 "use client";
 
-import FormInput from "@/components/FormInput";
 import FormSubmitButton from "@/components/FormSubmitButton";
-import { Form, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { forgotPasswordFormSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -24,12 +30,26 @@ export default function ForgotPassword() {
         <Form {...form}>
           <form className="space-y-8">
             <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
-              <FormInput
-                id="form_email_input"
+              <FormField
                 control={form.control}
                 name="email"
-                label="Email"
-                placeholder="your.name@provider.com"
+                render={({ field }) => (
+                  <div>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input
+                          id="reset_passwort_email_input"
+                          type="text"
+                          placeholder="your.name@provider.com"
+                          autoComplete="on"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  </div>
+                )}
               />
               <FormSubmitButton>Reset Password</FormSubmitButton>
               <FormMessage />

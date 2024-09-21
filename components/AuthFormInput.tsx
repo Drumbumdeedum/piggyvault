@@ -7,23 +7,18 @@ import {
 import { Control, FieldPath } from "react-hook-form";
 import { Input } from "./ui/input";
 import { z } from "zod";
-import { authFormSchema, forgotPasswordFormSchema } from "@/validations/auth";
+import { authFormSchema } from "@/validations/auth";
 
-const authFormSchemaType = authFormSchema("sign-up");
-const forgotPasswordFormSchemaType = forgotPasswordFormSchema();
+const formSchema = authFormSchema("sign-up");
 type FormInputProps = {
   id: string;
-  control: Control<
-    z.infer<typeof authFormSchemaType | typeof forgotPasswordFormSchemaType>
-  >;
-  name: FieldPath<
-    z.infer<typeof authFormSchemaType | typeof forgotPasswordFormSchemaType>
-  >;
+  control: Control<z.infer<typeof formSchema>>;
+  name: FieldPath<z.infer<typeof formSchema>>;
   label: string;
   placeholder: string;
 };
 
-const FormInput = ({
+const AuthFormInput = ({
   id,
   control,
   name,
@@ -55,4 +50,4 @@ const FormInput = ({
   );
 };
 
-export default FormInput;
+export default AuthFormInput;
