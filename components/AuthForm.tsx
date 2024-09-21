@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "./ui/form";
 import FormError from "./FormError";
 import AuthFormInput from "./AuthFormInput";
+import { motion } from "framer-motion";
 
 const AuthForm = ({ type, searchParams }: AuthFormParams) => {
   const formSchema = authFormSchema(type);
@@ -38,7 +39,12 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
   }
 
   return (
-    <section className="flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-5 py-10 md:gap-8">
+    <motion.section
+      className="flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-5 py-10 md:gap-8 transition-transform will-change-transform"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ style: "tween", duration: 0.3 }}
+    >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <h1 className="text-2xl font-medium">
@@ -101,7 +107,7 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
           {type === "sign-in" ? "Sign up" : "Sign in"}
         </Link>
       </footer>
-    </section>
+    </motion.section>
   );
 };
 

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import ProductPreviewImage from "@/components/ProductPreviewImage";
 
 export default async function Layout({
   children,
@@ -9,14 +9,7 @@ export default async function Layout({
     <main className="flex min-h-screen w-full justify-between font-inter">
       {children}
       <div className="flex h-screen w-full sticky top-0 items-center justify-end bg-blue-100 max-lg:hidden">
-        <div>
-          <Image
-            src="/images/placeholders/product_placeholder.svg"
-            width={600}
-            height={600}
-            alt="Product preview"
-          />
-        </div>
+        <ProductPreviewImage />
       </div>
     </main>
   );
