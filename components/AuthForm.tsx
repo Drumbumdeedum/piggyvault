@@ -10,8 +10,10 @@ import { z } from "zod";
 import { signInAction, signUpAction } from "@/app/actions";
 import { useForm } from "react-hook-form";
 import { Form } from "./ui/form";
+import FormError from "./FormError";
 
-const AuthForm = ({ type }: AuthFormParams) => {
+const AuthForm = ({ type, searchParams }: AuthFormParams) => {
+  console.log(searchParams);
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,6 +45,7 @@ const AuthForm = ({ type }: AuthFormParams) => {
           <h1 className="text-2xl font-medium">
             {type === "sign-in" ? "Sign in" : "Sign up"}
           </h1>
+          <FormError response={searchParams} />
           <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
             <FormInput
               id="form_email_input"

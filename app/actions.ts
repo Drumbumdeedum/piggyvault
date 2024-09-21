@@ -27,7 +27,11 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
 
   if (error) {
     console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
+    const errorMessage =
+      error.code === "user_already_exists"
+        ? "An account with this email address already exists"
+        : error.message;
+    return encodedRedirect("error", "/sign-up", errorMessage);
   } else {
     return encodedRedirect("success", "/", "Thanks for signing up!");
   }

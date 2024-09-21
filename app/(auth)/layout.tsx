@@ -11,9 +11,9 @@ export default async function Layout({
       <div className="flex h-screen w-full sticky top-0 items-center justify-end bg-blue-100 max-lg:hidden">
         <div>
           <Image
-            src="/images/placeholders/product_image_placeholder.svg"
-            width={500}
-            height={500}
+            src="/images/placeholders/product_placeholder.svg"
+            width={600}
+            height={600}
             alt="Product preview"
           />
         </div>
