@@ -13,7 +13,6 @@ import { Form } from "./ui/form";
 import FormError from "./FormError";
 
 const AuthForm = ({ type, searchParams }: AuthFormParams) => {
-  console.log(searchParams);
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

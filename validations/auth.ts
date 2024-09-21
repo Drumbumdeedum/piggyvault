@@ -20,3 +20,8 @@ export const authFormSchema = (type: string) =>
       message: "Password must contain at least 8 characters",
     }),
   });
+
+export const forgotPasswordFormSchema = () =>
+  z.object({
+    email: z.string().email(),
+  });
