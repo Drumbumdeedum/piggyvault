@@ -37,12 +37,9 @@ const AuthForm = ({ type }: AuthFormParams) => {
   }
 
   return (
-    <>
+    <section className="flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-5 py-10 md:gap-8">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col min-w-64 max-w-64 mx-auto"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <h1 className="text-2xl font-medium">
             {type === "sign-in" ? "Sign in" : "Sign up"}
           </h1>
@@ -102,7 +99,7 @@ const AuthForm = ({ type }: AuthFormParams) => {
           {type === "sign-in" ? "Sign up" : "Sign in"}
         </Link>
       </footer>
-    </>
+    </section>
   );
 };
 
