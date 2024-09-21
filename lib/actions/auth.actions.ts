@@ -6,10 +6,12 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { authFormSchema } from "@/validations/auth";
+import { subscribe } from "diagnostics_channel";
+import { parseStringify } from "../utils";
 const formSchema = authFormSchema("sign-up");
 
 export const signUpAction = async (values: z.infer<typeof formSchema>) => {
-  const { email, password } = values;
+  const { email, password, firstName, lastName } = values;
   const supabase = createClient();
   const origin = headers().get("origin");
 
@@ -32,9 +34,24 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
         ? "An account with this email address already exists"
         : error.message;
     return encodedRedirect("error", "/sign-up", errorMessage);
-  } else {
-    return encodedRedirect("success", "/", "Thanks for signing up!");
   }
+
+  const { error: dbUserError } = await supabase.from("users").insert({
+    email,
+    firstName,
+    lastName,
+  });
+
+  if (dbUserError) {
+    console.error(dbUserError.code + " " + dbUserError.message);
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "Database error, please contact maintainer"
+    );
+  }
+
+  return encodedRedirect("success", "/", "Thanks for signing up!");
 };
 
 export const signInAction = async (values: z.infer<typeof formSchema>) => {
@@ -82,6 +99,30 @@ export const forgotPasswordAction = async (formData: FormData) => {
 
   return redirect("/");
 };
+
+export async function getLoggedInUser() {
+  const supabase = createClient();
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const dbUser = await supabase
+        .from("users")
+        .select()
+        .eq("email", user.email);
+      if (dbUser && dbUser.data) {
+        return parseStringify(dbUser.data[0]);
+      }
+      return null;
+    }
+    return null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
 
 export const resetPasswordAction = async (formData: FormData) => {
   const supabase = createClient();

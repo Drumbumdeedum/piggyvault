@@ -1,8 +1,8 @@
 "use client";
 
-import { signOutAction } from "@/app/actions";
 import { Button } from "./ui/button";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { signOutAction } from "@/lib/actions/auth.actions";
 
 const SidebarFooter = () => {
   const signout = async () => {
@@ -16,7 +16,7 @@ const SidebarFooter = () => {
             <svg
               stroke="currentColor"
               fill="currentColor"
-              stroke-width="0"
+              strokeWidth="0"
               viewBox="0 0 256 256"
               height="20px"
               width="20px"

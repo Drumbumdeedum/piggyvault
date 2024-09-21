@@ -5,12 +5,12 @@ import FormSubmitButton from "./FormSubmitButton";
 import { authFormSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { signInAction, signUpAction } from "@/app/actions";
 import { useForm } from "react-hook-form";
 import { Form } from "./ui/form";
 import FormError from "./FormError";
 import AuthFormInput from "./AuthFormInput";
 import { motion } from "framer-motion";
+import { signInAction, signUpAction } from "@/lib/actions/auth.actions";
 
 const AuthForm = ({ type, searchParams }: AuthFormParams) => {
   const formSchema = authFormSchema(type);
