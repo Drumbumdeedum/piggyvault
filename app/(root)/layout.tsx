@@ -1,5 +1,5 @@
 import "../globals.css";
-import Navbar from "../../components/navbar";
+import Navbar from "../../components/Navbar";
 
 const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
   ? `https://${process.env.NEXT_PUBLIC_SITE_URL}`

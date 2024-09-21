@@ -4,10 +4,12 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { z } from "zod";
+import { authFormSchema } from "@/validations/auth";
+const formSchema = authFormSchema("sign-up");
 
-export const signUpAction = async (formData: FormData) => {
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+export const signUpAction = async (values: z.infer<typeof formSchema>) => {
+  const { email, password } = values;
   const supabase = createClient();
   const origin = headers().get("origin");
 
@@ -31,9 +33,8 @@ export const signUpAction = async (formData: FormData) => {
   }
 };
 
-export const signInAction = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+export const signInAction = async (values: z.infer<typeof formSchema>) => {
+  const { email, password } = values;
   const supabase = createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
