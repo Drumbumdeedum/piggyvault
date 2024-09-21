@@ -5,6 +5,6 @@ export const sidebarLinks = [
   },
   {
     route: "/account",
-    label: "My Banks",
+    label: "Account",
   },
 ];

@@ -1,7 +1,7 @@
 export default async function Index() {
   return (
     <>
-      <main>HELLO</main>
+      <main>Home page</main>
     </>
   );
 }
