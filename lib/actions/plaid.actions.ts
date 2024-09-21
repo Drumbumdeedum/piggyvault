@@ -9,6 +9,7 @@ import {
   Products,
 } from "plaid";
 import { plaidClient } from "../plaid";
+import { createClient } from "@/utils/supabase/server";
 
 const { PLAID_CLIENT_ID, PLAID_SECRET, PLAID_COUNTRY_CODES } = process.env;
 
@@ -54,36 +55,116 @@ export const exchangePublicToken = async ({
       secret: PLAID_SECRET,
       access_token: accessToken,
     });
-
     const accountData = accountsResponse.data.accounts[0];
-
-    // Create a processor token for Dwolla using the access token and account ID
-    const request: ProcessorTokenCreateRequest = {
-      client_id: PLAID_CLIENT_ID,
-      secret: PLAID_SECRET,
-      access_token: accessToken,
-      account_id: accountData.account_id,
-      processor: "dwolla" as ProcessorTokenCreateRequestProcessorEnum,
-    };
-
-    // Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareableId ID
-    /* await createBankAccount({
-        userId: user.userId,
-        bankId: itemId,
-        accountId: accountData.account_id,
-        accessToken,
-        fundingSourceUrl,
-        shareableId: encryptId(accountData.account_id),
-      }); */
-
-    // Revalidate the path to reflect the changes
-    revalidatePath("/");
-
-    // Return a success message
+    await createBankAccount({
+      userId: user.id,
+      bankId: itemId,
+      accountId: accountData.account_id,
+      accessToken,
+    });
     return parseStringify({
       publicTokenExchange: "complete",
     });
   } catch (error) {
     console.error("An error occurred while creating exchanging token:", error);
+  }
+};
+
+export const createBankAccount = async ({
+  userId,
+  bankId,
+  accountId,
+  accessToken,
+}: CreateBankAccountProps) => {
+  try {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("banks")
+      .insert({
+        userId,
+        bankId,
+        accountId,
+        accessToken,
+      })
+      .select("*");
+
+    if (error) {
+      console.error(error.code + " " + error.message);
+      return;
+    }
+
+    console.log(data);
+    return parseStringify(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getBanks = async ({ userId }: GetBanksProps) => {
+  try {
+    const supabase = createClient();
+    const banks = await supabase.from("banks").select().eq("userId", userId);
+    return parseStringify(banks.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getInstitution = async ({
+  institutionId,
+}: GetInstitutionProps) => {
+  try {
+    const institutionResponse = await plaidClient.institutionsGetById({
+      client_id: PLAID_CLIENT_ID,
+      secret: PLAID_SECRET,
+      institution_id: institutionId,
+      country_codes: PLAID_COUNTRY_CODES!.split(",") as CountryCode[],
+    });
+    const intitution = institutionResponse.data.institution;
+    return parseStringify(intitution);
+  } catch (error) {
+    console.error("An error occurred while getting the institutions:", error);
+  }
+};
+
+export const getAccounts = async ({ userId }: GetAccountsProps) => {
+  try {
+    // get banks from db
+    const banks = await getBanks({ userId });
+    const accounts = await Promise.all(
+      banks?.map(async (bank: Bank) => {
+        // get each account info from plaid
+        const accountsResponse = await plaidClient.accountsGet({
+          client_id: PLAID_CLIENT_ID,
+          secret: PLAID_SECRET,
+          access_token: bank.accessToken,
+        });
+        const accountData = accountsResponse.data.accounts[0];
+        // get institution info from plaid
+        const institution = await getInstitution({
+          institutionId: accountsResponse.data.item.institution_id!,
+        });
+        const account = {
+          id: accountData.account_id,
+          availableBalance: accountData.balances.available!,
+          currentBalance: accountData.balances.current!,
+          institutionId: institution.institution_id,
+          name: accountData.name,
+          officialName: accountData.official_name,
+          mask: accountData.mask!,
+          type: accountData.type as string,
+          subtype: accountData.subtype! as string,
+        };
+        return account;
+      })
+    );
+    const totalBanks = accounts.length;
+    const totalCurrentBalance = accounts.reduce((total, account) => {
+      return total + account.currentBalance;
+    }, 0);
+    return parseStringify({ data: accounts, totalBanks, totalCurrentBalance });
+  } catch (error) {
+    console.error("An error occurred while getting the accounts:", error);
   }
 };
