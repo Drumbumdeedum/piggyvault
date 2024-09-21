@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 import FormSubmitButton from "./FormSubmitButton";
 import { authFormSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";

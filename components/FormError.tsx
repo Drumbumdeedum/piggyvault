@@ -1,5 +1,3 @@
-import React from "react";
-
 export function FormError({ response }: { response: FormResponse }) {
   const displayMessage: boolean =
     response &&
