@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { parseStringify } from "../utils";
 import {
+  AccountBase,
   CountryCode,
   ProcessorTokenCreateRequest,
   ProcessorTokenCreateRequestProcessorEnum,
@@ -55,13 +56,23 @@ export const exchangePublicToken = async ({
       secret: PLAID_SECRET,
       access_token: accessToken,
     });
-    const accountData = accountsResponse.data.accounts[0];
-    await createBankAccount({
-      userId: user.id,
-      bankId: itemId,
-      accountId: accountData.account_id,
-      accessToken,
-    });
+    await Promise.all(
+      accountsResponse.data.accounts.map(async (account: AccountBase) => {
+        console.log("CREATING BANK FROM ACCOUNT: ", account);
+        await createBankAccount({
+          userId: user.id,
+          bankId: itemId,
+          accountId: account.account_id,
+          accessToken,
+          mask: account.mask,
+          name: account.name,
+          officialName: account.official_name,
+          persistentAccountId: account.persistent_account_id,
+          subtype: account.subtype,
+          type: account.type,
+        });
+      })
+    );
     return parseStringify({
       publicTokenExchange: "complete",
     });
@@ -75,6 +86,12 @@ export const createBankAccount = async ({
   bankId,
   accountId,
   accessToken,
+  mask,
+  name,
+  officialName,
+  persistentAccountId,
+  subtype,
+  type,
 }: CreateBankAccountProps) => {
   try {
     const supabase = createClient();
@@ -86,6 +103,12 @@ export const createBankAccount = async ({
         bankId,
         accountId,
         accessToken,
+        mask,
+        name,
+        officialName,
+        persistentAccountId,
+        subtype,
+        type,
       })
       .select("*");
 
@@ -94,7 +117,7 @@ export const createBankAccount = async ({
       return;
     }
 
-    console.log(data);
+    console.log("CREATED BANK: ", data);
     return parseStringify(data);
   } catch (error) {
     console.log(error);
@@ -132,33 +155,42 @@ export const getAccounts = async ({ userId }: GetAccountsProps) => {
   try {
     // get banks from db
     const banks = await getBanks({ userId });
-    const accounts = await Promise.all(
+    const resultAccounts = await Promise.all(
       banks?.map(async (bank: Bank) => {
         // get each account info from plaid
         const accountsResponse = await plaidClient.accountsGet({
           client_id: PLAID_CLIENT_ID,
           secret: PLAID_SECRET,
           access_token: bank.accessToken,
+          options: {
+            account_ids: [bank.accountId],
+          },
         });
-        const accountData = accountsResponse.data.accounts[0];
-        // get institution info from plaid
-        const institution = await getInstitution({
-          institutionId: accountsResponse.data.item.institution_id!,
-        });
-        const account = {
-          id: accountData.account_id,
-          availableBalance: accountData.balances.available!,
-          currentBalance: accountData.balances.current!,
-          institutionId: institution.institution_id,
-          name: accountData.name,
-          officialName: accountData.official_name,
-          mask: accountData.mask!,
-          type: accountData.type as string,
-          subtype: accountData.subtype! as string,
-        };
-        return account;
+        const accountData = accountsResponse.data.accounts;
+        const result = await Promise.all(
+          accountData.map(async (accountData) => {
+            // get institution info from plaid
+            const institution = await getInstitution({
+              institutionId: accountsResponse.data.item.institution_id!,
+            });
+            const account = {
+              id: accountData.account_id,
+              availableBalance: accountData.balances.available!,
+              currentBalance: accountData.balances.current!,
+              institutionId: institution.institution_id,
+              name: accountData.name,
+              officialName: accountData.official_name,
+              mask: accountData.mask!,
+              type: accountData.type as string,
+              subtype: accountData.subtype! as string,
+            };
+            return account;
+          })
+        );
+        return result;
       })
     );
+    const accounts = resultAccounts.flat();
     const totalBanks = accounts.length;
     const totalCurrentBalance = accounts.reduce((total, account) => {
       return total + account.currentBalance;
