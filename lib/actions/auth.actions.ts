@@ -6,8 +6,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { authFormSchema } from "@/validations/auth";
-import { subscribe } from "diagnostics_channel";
 import { parseStringify } from "../utils";
+import { getAccessToken } from "./gocardless.actions";
 const formSchema = authFormSchema("sign-up");
 
 export const signUpAction = async (values: z.infer<typeof formSchema>) => {
@@ -16,7 +16,7 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
   const origin = headers().get("origin");
 
   if (!email || !password) {
-    return { error: "Email and password are required" };
+    return { error: "Email and password are required." };
   }
 
   const { error } = await supabase.auth.signUp({
@@ -31,15 +31,23 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     console.error(error.code + " " + error.message);
     const errorMessage =
       error.code === "user_already_exists"
-        ? "An account with this email address already exists"
+        ? "An account with this email address already exists."
         : error.message;
     return encodedRedirect("error", "/sign-up", errorMessage);
   }
+
+  const accessTokenResponseBody = await getAccessToken();
+  const { access, access_expires, refresh, refresh_expires } =
+    accessTokenResponseBody;
 
   const { error: dbUserError } = await supabase.from("users").insert({
     email,
     firstName,
     lastName,
+    accessToken: access,
+    accessTokenExpires: access_expires,
+    refreshToken: refresh,
+    refreshTokenExpires: refresh_expires,
   });
 
   if (dbUserError) {
@@ -47,7 +55,7 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "Database error, please contact maintainer"
+      "Database error, please contact maintainer."
     );
   }
 
@@ -89,7 +97,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/forgot-password",
-      "Could not reset password"
+      "Could not reset password."
     );
   }
 
@@ -134,7 +142,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password and confirm password are required"
+      "Password and confirm password are required."
     );
   }
 
@@ -142,7 +150,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Passwords do not match"
+      "Passwords do not match."
     );
   }
 
@@ -154,7 +162,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password update failed"
+      "Password update failed."
     );
   }
 
