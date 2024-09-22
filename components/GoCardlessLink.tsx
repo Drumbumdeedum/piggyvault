@@ -15,7 +15,6 @@ import {
 import { goCardlessCountries } from "@/constants";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import Link from "next/link";
 
 const GoCardlessLink = ({ user }: { user: User }) => {
   const [banks, setBanks] = useState([]);
@@ -26,7 +25,6 @@ const GoCardlessLink = ({ user }: { user: User }) => {
   const selectCountry = async (country: Country) => {
     setSelectedCountry(country);
     const banks = await getAllBanks(user.accessToken, country.code);
-    console.log(banks);
     setBanks(banks);
   };
 

@@ -1,4 +1,5 @@
 import GoCardlessLink from "@/components/GoCardlessLink";
+import PageHeader from "@/components/PageHeader";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
 const page = async ({ searchParams }: { searchParams: ConnectionResponse }) => {
@@ -7,7 +8,7 @@ const page = async ({ searchParams }: { searchParams: ConnectionResponse }) => {
   console.log(searchParams.ref);
   return (
     <div>
-      <h1 className="text-3xl font-semibold mb-6">Account page</h1>
+      <PageHeader title="Account" />
       <GoCardlessLink user={user} />
     </div>
   );

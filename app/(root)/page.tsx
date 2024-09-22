@@ -1,4 +1,5 @@
 import HomeHeader from "@/components/HomeHeader";
+import PageHeader from "@/components/PageHeader";
 import TotalBalanceBox from "@/components/TotalBalanceBox";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
@@ -18,7 +19,10 @@ export default async function Index() {
   return (
     <>
       <main>
-        <HomeHeader userName={`${user.firstName} ${user.lastName}`} />
+        <PageHeader
+          title={`Welcome ${user.firstName} ${user.lastName}`}
+          subtitle="Access and manage your account and transactions"
+        />
         <main>
           <Card>
             <CardHeader>

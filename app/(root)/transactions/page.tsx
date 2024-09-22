@@ -1,5 +1,7 @@
+import PageHeader from "@/components/PageHeader";
+
 const page = () => {
-  return <div>Transactions page</div>;
+  return <PageHeader title="Transactions" />;
 };
 
 export default page;
