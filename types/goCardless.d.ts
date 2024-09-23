@@ -40,7 +40,13 @@ declare type SaveRequisitionRequest = {
   accounts: string[];
 };
 
-declare type createOrGetRequisitionRequest = {
+declare type CreateOrGetRequisitionRequest = {
+  userId: string;
+  accessToken: string;
+  institutionId: string;
+};
+
+declare type ConnectNewAccountRequest = {
   userId: string;
   accessToken: string;
   institutionId: string;

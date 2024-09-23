@@ -1,77 +1,28 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { parseStringify } from "../utils";
 
 const { GOCARDLESS_SECRET_ID, GOCARDLESS_SECRET_KEY, GOCARDLESS_REDIRECT_URI } =
   process.env;
 
 export const getBanks = () => {};
 
-export const createOrGetRequisition = async ({
+export const connectNewAccount = async ({
   userId,
   accessToken,
   institutionId,
-}: createOrGetRequisitionRequest) => {
-  try {
-    let result;
-    const requisitions = await findRequisitionsForUserByInstitution({
-      userId,
-      institutionId,
-    });
-
-    if (!requisitions) {
-      const requisition = await createRequisition({
-        userId,
-        accessToken,
-        institutionId,
-      });
-      result = saveRequisition({
-        id: requisition.id,
-        accountSelection: requisition.account_selection,
-        agreement: requisition.agreement,
-        institutionId: requisition.institution_id,
-        link: requisition.link,
-        redirect: requisition.redirect,
-        redirectImmediate: requisition.redirect_immediate,
-        reference: requisition.reference,
-        status: requisition.status,
-        ssn: requisition.ssn,
-        accounts: requisition.accounts,
-      });
-    } else {
-      const requisition = await getRequistion({
-        requisitionId: requisitions[0].id,
-        accessToken,
-      });
-      if (requisition.status === "CR") {
-        result = requisition;
-      } else {
-        const requisition = await createRequisition({
-          userId,
-          accessToken,
-          institutionId,
-        });
-        result = saveRequisition({
-          id: requisition.id,
-          accountSelection: requisition.account_selection,
-          agreement: requisition.agreement,
-          institutionId: requisition.institution_id,
-          link: requisition.link,
-          redirect: requisition.redirect,
-          redirectImmediate: requisition.redirect_immediate,
-          reference: requisition.reference,
-          status: requisition.status,
-          ssn: requisition.ssn,
-          accounts: requisition.accounts,
-        });
-      }
-    }
-
-    return result;
-  } catch (error) {
-    console.log("Error making requisition request.", error);
+}: ConnectNewAccountRequest) => {
+  const requisition = await createOrRetrieveRequisition({
+    userId,
+    accessToken,
+    institutionId,
+  });
+  if (!requisition) {
+    console.log("Error while connecting new account.");
     return;
   }
+  return parseStringify(requisition);
 };
 
 export const listAccounts = async ({
@@ -195,36 +146,56 @@ export const getAllBanks = async (accessToken: string, country: string) => {
   }
 };
 
-export const createRequisition = async ({
+export const createOrRetrieveRequisition = async ({
   userId,
   accessToken,
   institutionId,
-}: createOrGetRequisitionRequest) => {
-  try {
-    const response = await fetch(
-      "https://bankaccountdata.gocardless.com/api/v2/requisitions/",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          redirect: GOCARDLESS_REDIRECT_URI,
-          institution_id: institutionId,
-          reference: userId,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    if (!response.ok) {
-      console.log("Error creating requisition.");
+}: CreateOrGetRequisitionRequest) => {
+  const response = await fetch(
+    "https://bankaccountdata.gocardless.com/api/v2/requisitions/",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        redirect: GOCARDLESS_REDIRECT_URI,
+        institution_id: institutionId,
+        reference: userId,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+  const body = await response.json();
+  if (!response.ok && body.status_code === 400) {
+    const savedRequisition = await findRequisitionsForUserByInstitution({
+      userId,
+      institutionId,
+    });
+    if (!savedRequisition) {
+      console.log("Error while fetching requisition");
       return;
     }
-    return await response.json();
-  } catch (error) {
-    console.log("Error creating requisition.", error);
-    return;
+    const fetchedRequisition = await getRequistion({
+      accessToken,
+      requisitionId: savedRequisition[0].id,
+    });
+    return fetchedRequisition;
   }
+  saveRequisition({
+    id: body.id,
+    accountSelection: body.account_selection,
+    agreement: body.agreement,
+    institutionId: body.institution_id,
+    link: body.link,
+    redirect: body.redirect,
+    redirectImmediate: body.redirect_immediate,
+    reference: body.reference,
+    status: body.status,
+    ssn: body.ssn,
+    accounts: body.accounts,
+  });
+  return body;
 };
 
 export const saveRequisition = async ({

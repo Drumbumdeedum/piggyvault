@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 const AccountsList = () => {
   const router = useRouter();
   const onClick = () => {
-    console.log("CLICKED");
     router.push("/linked-accounts/country");
   };
   return (

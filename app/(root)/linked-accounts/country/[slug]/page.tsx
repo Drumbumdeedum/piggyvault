@@ -11,7 +11,7 @@ const page = async () => {
         title="Select bank"
         subtitle="Select the financial institution to link to your account"
       />
-      <SelectBank accessToken={user.accessToken} />
+      <SelectBank userId={user.id} accessToken={user.accessToken} />
     </>
   );
 };
