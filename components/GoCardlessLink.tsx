@@ -1,6 +1,9 @@
 "use client";
 
-import { connectAccount, getAllBanks } from "@/lib/actions/gocardless.actions";
+import {
+  createOrGetRequisition,
+  getAllBanks,
+} from "@/lib/actions/gocardless.actions";
 import React, { useState } from "react";
 import Image from "next/image";
 
@@ -30,19 +33,18 @@ const GoCardlessLink = ({ user }: { user: User }) => {
 
   const selectBank = async (bank: Bank) => {
     setSelectedBank(bank);
-    const result = await connectAccount({
+    const result = await createOrGetRequisition({
       userId: user.id,
       accessToken: user.accessToken,
       institutionId: bank.id,
     });
-    console.log(result);
     setConnectionLink(result.link);
   };
   return (
     <div className="flex gap-6">
       <div>
         <Command className="rounded-lg border shadow-md h-[300px]">
-          <CommandInput placeholder="Search..." />
+          <CommandInput placeholder="Select country" />
           <CommandList>
             <CommandEmpty>Country not found.</CommandEmpty>
             <CommandGroup heading="Countries">
@@ -81,7 +83,7 @@ const GoCardlessLink = ({ user }: { user: User }) => {
       {!!banks.length && (
         <div>
           <Command className="rounded-lg border shadow-md h-[300px]">
-            <CommandInput placeholder="Search..." />
+            <CommandInput placeholder="Select bank" />
             <CommandList>
               <CommandEmpty>Bank not found.</CommandEmpty>
               <CommandGroup heading="Banks">

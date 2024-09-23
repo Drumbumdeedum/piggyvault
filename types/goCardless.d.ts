@@ -10,7 +10,37 @@ declare type Bank = {
   name: string;
 };
 
-declare type ConnectBankaccountRequest = {
+declare type Requisition = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  accountSelection: boolean;
+  agreement: string;
+  institutionId: string;
+  link: string;
+  redirect: string;
+  redirectImmediate: boolean;
+  reference: string;
+  status: string;
+  ssn: string;
+  accounts: string[];
+};
+
+declare type SaveRequisitionRequest = {
+  id: string;
+  accountSelection: boolean;
+  agreement: string;
+  institutionId: string;
+  link: string;
+  redirect: string;
+  redirectImmediate: boolean;
+  reference: string;
+  status: string;
+  ssn: string;
+  accounts: string[];
+};
+
+declare type createOrGetRequisitionRequest = {
   userId: string;
   accessToken: string;
   institutionId: string;

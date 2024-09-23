@@ -1,4 +1,3 @@
-import HomeHeader from "@/components/HomeHeader";
 import PageHeader from "@/components/PageHeader";
 import TotalBalanceBox from "@/components/TotalBalanceBox";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -10,12 +9,9 @@ export default async function Index() {
   if (!user) return;
 
   const accounts = await listAccounts({
-    reference: user.id,
+    userId: user.id,
     accessToken: user.accessToken,
   });
-  if (accounts) {
-    console.log(accounts);
-  }
   return (
     <>
       <main>
