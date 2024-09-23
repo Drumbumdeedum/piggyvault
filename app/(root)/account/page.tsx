@@ -1,14 +1,9 @@
-import GoCardlessLink from "@/components/GoCardlessLink";
 import PageHeader from "@/components/PageHeader";
-import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
 const page = async ({ searchParams }: { searchParams: ConnectionResponse }) => {
-  const user = await getLoggedInUser();
-  // TODO USE REF FOR CONNECTION SUCCESS MESSAGE
   return (
     <div>
-      <PageHeader title="Account" />
-      <GoCardlessLink user={user} />
+      <PageHeader title="Account" subtitle="Manage your account" />
     </div>
   );
 };

@@ -8,8 +8,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const DoughnutChart = ({ accounts }: DoughnutChartProps) => {
-  const mappedChartData = accounts.map((account, index) => {
+const DoughnutChart = () => {
+  /* const mappedChartData = accounts.map((account, index) => {
     return {
       name: account.name,
       balance: account.currentBalance,
@@ -24,10 +24,10 @@ const DoughnutChart = ({ accounts }: DoughnutChartProps) => {
       label: account.name,
       color: `hsl(var(--chart-${index + 1}))`,
     };
-  });
+  }); */
   return (
     <div className="w-64 h-64">
-      <ChartContainer
+      {/*  <ChartContainer
         config={mappedChartConfig}
         className="mx-auto aspect-square max-h-[250px]"
       >
@@ -44,7 +44,7 @@ const DoughnutChart = ({ accounts }: DoughnutChartProps) => {
             strokeWidth={5}
           />
         </PieChart>
-      </ChartContainer>
+      </ChartContainer> */}
     </div>
   );
 };

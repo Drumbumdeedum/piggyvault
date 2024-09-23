@@ -1,8 +1,8 @@
-import { resetPasswordAction } from "@/app/actions";
 import FormError from "@/components/FormError";
 import FormSubmitButton from "@/components/FormSubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resetPasswordAction } from "@/lib/actions/auth.actions";
 
 export default async function ResetPassword({
   searchParams,

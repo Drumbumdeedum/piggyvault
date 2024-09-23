@@ -13,14 +13,13 @@ export const createOrGetRequisition = async ({
   institutionId,
 }: createOrGetRequisitionRequest) => {
   try {
-    const supabase = createClient();
     let result;
-    const { data, error } = await supabase
-      .from("requisitions")
-      .select("*")
-      .eq("institutionId", institutionId)
-      .eq("reference", userId);
-    if (error || !data.length) {
+    const requisitions = await findRequisitionsForUserByInstitution({
+      userId,
+      institutionId,
+    });
+
+    if (!requisitions) {
       const requisition = await createRequisition({
         userId,
         accessToken,
@@ -40,11 +39,38 @@ export const createOrGetRequisition = async ({
         accounts: requisition.accounts,
       });
     } else {
-      result = data[0];
+      const requisition = await getRequistion({
+        requisitionId: requisitions[0].id,
+        accessToken,
+      });
+      if (requisition.status === "CR") {
+        result = requisition;
+      } else {
+        const requisition = await createRequisition({
+          userId,
+          accessToken,
+          institutionId,
+        });
+        result = saveRequisition({
+          id: requisition.id,
+          accountSelection: requisition.account_selection,
+          agreement: requisition.agreement,
+          institutionId: requisition.institution_id,
+          link: requisition.link,
+          redirect: requisition.redirect,
+          redirectImmediate: requisition.redirect_immediate,
+          reference: requisition.reference,
+          status: requisition.status,
+          ssn: requisition.ssn,
+          accounts: requisition.accounts,
+        });
+      }
     }
+
     return result;
   } catch (error) {
-    throw new Error("Error making requisition request.");
+    console.log("Error making requisition request.", error);
+    return;
   }
 };
 
@@ -61,10 +87,13 @@ export const listAccounts = async ({
       .from("requisitions")
       .select()
       .eq("reference", userId);
-    if (error || !data.length) throw new Error("Error fetching requisitions.");
+    if (error || !data.length) {
+      console.log("Error fetching requisitions.", error);
+      return;
+    }
     // TODO! loop over all requisitions if there are multiple
     const requisitionId = data[0].id;
-    const bankResponse = await fetch(
+    const requisitionResponse = await fetch(
       `https://bankaccountdata.gocardless.com/api/v2/requisitions/${requisitionId}`,
       {
         method: "GET",
@@ -74,12 +103,12 @@ export const listAccounts = async ({
         },
       }
     );
-    const bankResponseBody = await bankResponse.json();
+    const requisitionResponseBody = await requisitionResponse.json();
     console.log("------------------");
-    console.log(bankResponseBody);
+    console.log(requisitionResponseBody);
 
     // TODO! loop over all accounts if there are multiple
-    const accountId = bankResponseBody.accounts[0];
+    const accountId = requisitionResponseBody.accounts[0];
     const transactionsResponse = await fetch(
       `https://bankaccountdata.gocardless.com/api/v2/accounts/${accountId}/transactions/`,
       {
@@ -110,9 +139,10 @@ export const listAccounts = async ({
     console.log("------------------");
     console.log(balancesResponseBody);
 
-    return bankResponseBody;
+    return requisitionResponseBody;
   } catch (error) {
-    throw new Error("Error while fetching accounts.");
+    console.log("Error while fetching accounts.");
+    return;
   }
 };
 
@@ -131,10 +161,14 @@ export const getAccessToken = async () => {
         },
       }
     );
-    if (!response.ok) throw new Error("Error fetching access token.");
+    if (!response.ok) {
+      console.log("Error fetching access token.");
+      return;
+    }
     return await response.json();
   } catch (error) {
-    throw new Error("Error fetching access token.");
+    console.log("Error fetching access token.");
+    return;
   }
 };
 
@@ -150,10 +184,14 @@ export const getAllBanks = async (accessToken: string, country: string) => {
         },
       }
     );
-    if (!response.ok) throw new Error("Error fetching bank institution data.");
+    if (!response.ok) {
+      console.log("Error fetching bank institution data.");
+      return;
+    }
     return await response.json();
   } catch (error) {
-    throw new Error("Error fetching bank institution data.");
+    console.log("Error fetching bank institution data.");
+    return;
   }
 };
 
@@ -178,10 +216,14 @@ export const createRequisition = async ({
         },
       }
     );
-    if (!response.ok) throw new Error("Error creating requisition.");
+    if (!response.ok) {
+      console.log("Error creating requisition.");
+      return;
+    }
     return await response.json();
   } catch (error) {
-    throw new Error("Error creating requisition.");
+    console.log("Error creating requisition.", error);
+    return;
   }
 };
 
@@ -216,10 +258,68 @@ export const saveRequisition = async ({
         accounts,
       })
       .select("*");
-    if (error || !data || !data.length)
-      throw new Error("Error saving requisition.");
+    if (error || !data || !data.length) {
+      console.log("Error saving requisition.");
+      return;
+    }
     return data[0];
   } catch (error) {
-    throw new Error("Error saving requisition.");
+    console.log("Error saving requisition.");
+    return;
+  }
+};
+
+export const findRequisitionsForUserByInstitution = async ({
+  userId,
+  institutionId,
+}: {
+  userId: string;
+  institutionId: string;
+}) => {
+  try {
+    const supabase = createClient();
+    const { data, error: dbError } = await supabase
+      .from("requisitions")
+      .select("*")
+      .eq("institutionId", institutionId)
+      .eq("reference", userId);
+
+    if (dbError) {
+      console.log("Error querying requisitions.", dbError);
+      return;
+    }
+    return data;
+  } catch (error) {
+    console.log("Error querying requisitions.", error);
+    return;
+  }
+};
+
+export const getRequistion = async ({
+  requisitionId,
+  accessToken,
+}: {
+  requisitionId: string;
+  accessToken: string;
+}) => {
+  try {
+    const response = await fetch(
+      `https://bankaccountdata.gocardless.com/api/v2/requisitions/${requisitionId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      console.log("Error fetching requisition.");
+      return;
+    }
+    return await response.json();
+  } catch (error) {
+    console.log("Error fetching requisition.", error);
+    return;
   }
 };

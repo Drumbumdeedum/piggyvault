@@ -1,4 +1,3 @@
-import "../globals.css";
 import Sidebar from "@/components/Sidebar";
 
 export default function RootLayout({
@@ -9,7 +8,7 @@ export default function RootLayout({
   return (
     <main className="flex h-screen w-full">
       <Sidebar />
-      <div className="flex flex-col gap-20 max-w-5xl p-5">{children}</div>
+      <div className="flex flex-col max-w-6xl p-5">{children}</div>
     </main>
   );
 }

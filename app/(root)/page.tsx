@@ -8,10 +8,10 @@ export default async function Index() {
   const user = await getLoggedInUser();
   if (!user) return;
 
-  const accounts = await listAccounts({
+  /*  const accounts = await listAccounts({
     userId: user.id,
     accessToken: user.accessToken,
-  });
+  }); */
   return (
     <>
       <main>
