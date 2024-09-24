@@ -1,12 +1,10 @@
 "use client";
 
 import SidebarFooter from "./SidebarFooter";
-import { sidebarLinks } from "@/constants";
+import { sidebarLinks } from "@/constants/sidebarLinks";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const pathName = usePathname();

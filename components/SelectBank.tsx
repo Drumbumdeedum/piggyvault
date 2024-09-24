@@ -15,6 +15,9 @@ import {
   getAllBanks,
 } from "@/lib/actions/gocardless.actions";
 import { usePathname } from "next/navigation";
+import { ghostBanks } from "@/constants/placeholders";
+import { Divide } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const SelectBank = ({
   userId,
@@ -26,13 +29,16 @@ const SelectBank = ({
   const pathName = usePathname();
   const countryCode = pathName.split("/").pop();
   if (!countryCode) return;
-  const [banks, setBanks] = useState([]);
+  const [banks, setBanks] = useState<Bank[]>(ghostBanks);
+  const [loading, setLoading] = useState<boolean>(false);
   const [bankFilter, setBankFilter] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const getBanks = async () => {
+      setLoading(true);
       const results = await getAllBanks(accessToken, countryCode);
       setBanks(results);
+      setLoading(false);
     };
     getBanks();
   }, [accessToken, countryCode]);
@@ -44,7 +50,7 @@ const SelectBank = ({
       institutionId: bank.id,
     });
     if (result) {
-      window.open(result.link, "_blank")!.focus();
+      window.open(result.link, "_self");
     }
   };
 
@@ -55,31 +61,51 @@ const SelectBank = ({
         onValueChange={setBankFilter}
         className="text-2xl p-3 h-16"
         placeholder="Select a bank"
+        disabled={loading}
       />
       <CommandList className="w-full max-h-full">
-        <CommandEmpty>Bank not found.</CommandEmpty>
+        {loading && <CommandEmpty>Bank not found.</CommandEmpty>}
         <CommandGroup className="space-y-2">
           {banks.map((bank: Bank, index) => {
             return (
               <CommandItem
                 key={index}
-                className="cursor-pointer gap-2 p-0 border my-1 rounded-sm shadow-none pl-2"
+                className={cn(
+                  !bank.name && !bank.logo && !bank.id
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer",
+                  "gap-2 p-0 border my-1 rounded-sm shadow-none pl-2"
+                )}
               >
                 <div
                   className="flex items-center gap-2 p-2 w-full"
                   onClick={() => selectBank(bank)}
                 >
-                  <Image
-                    className="size-12 flex justify-center items-center rounded-full border-[1px] border-slate-200"
-                    src={bank.logo}
-                    alt={bank.name}
-                    width={300}
-                    height={300}
-                  />
-                  <span className="text-xl flex justify-center items-center">
-                    {bank.name}
-                  </span>
-                  <div className="flex-1 flex justify-end pr-2">
+                  {bank.logo ? (
+                    <Image
+                      className="size-12 flex justify-center items-center rounded-full border-[1px] border-slate-200"
+                      src={bank.logo}
+                      alt={bank.name}
+                      width={300}
+                      height={300}
+                    />
+                  ) : (
+                    <div className="h-12 w-12 bg-muted rounded-full" />
+                  )}
+                  {bank.name ? (
+                    <span className="text-xl flex justify-center items-center">
+                      {bank.name}
+                    </span>
+                  ) : (
+                    <span className="bg-muted h-6 w-56 rounded-sm" />
+                  )}
+
+                  <div
+                    className={cn(
+                      !bank.name && !bank.logo && !bank.id && "text-muted",
+                      "flex-1 flex justify-end pr-2"
+                    )}
+                  >
                     <svg
                       stroke="currentColor"
                       fill="currentColor"
