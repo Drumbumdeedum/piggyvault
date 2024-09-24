@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 const AccountSettingsSidebar = () => {
   const pathName: string = usePathname();
   return (
-    <div className="w-64 pr-4">
+    <div className="w-64 pr-4 flex flex-col gap-4">
       {accountSettingsSidebarLinks.map((link, index) => {
         const path: string = pathName.split("/").pop()!;
         const isActive =
