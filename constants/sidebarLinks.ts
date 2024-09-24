@@ -23,8 +23,8 @@ export const sidebarLinks = [
 
 export const accountSettingsSidebarLinks = [
   {
-    route: "log-in-details",
-    label: "Log in details",
+    route: "login-details",
+    label: "Login details",
   },
   {
     route: "personal-data",

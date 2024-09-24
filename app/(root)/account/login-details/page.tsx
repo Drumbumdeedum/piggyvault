@@ -10,8 +10,8 @@ const page = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl">Log in details</CardTitle>
-        <CardDescription>Update your log in email or password</CardDescription>
+        <CardTitle className="text-2xl">Login details</CardTitle>
+        <CardDescription>Update your login email or password</CardDescription>
       </CardHeader>
       <CardContent></CardContent>
     </Card>
