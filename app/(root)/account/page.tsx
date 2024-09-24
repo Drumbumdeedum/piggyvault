@@ -1,11 +1,9 @@
-import PageHeader from "@/components/PageHeader";
+"use client";
 
-const page = async ({ searchParams }: { searchParams: ConnectionResponse }) => {
-  return (
-    <div>
-      <PageHeader title="Account" subtitle="Manage your account" />
-    </div>
-  );
+import { redirect } from "next/navigation";
+
+const page = () => {
+  redirect("account/log-in-details");
 };
 
 export default page;

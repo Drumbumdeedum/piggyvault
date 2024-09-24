@@ -55,7 +55,3 @@ declare type ConnectNewAccountRequest = {
 declare type ConnectionLink = {
   link: string;
 };
-
-declare type ConnectionResponse = {
-  ref: string;
-};

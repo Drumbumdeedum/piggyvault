@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body className="bg-background text-foreground max-w-screen-2xl mx-auto">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
