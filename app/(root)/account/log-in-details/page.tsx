@@ -13,7 +13,7 @@ const page = () => {
         <CardTitle className="text-2xl">Log in details</CardTitle>
         <CardDescription>Update your log in email or password</CardDescription>
       </CardHeader>
-      <CardContent>CONTENT</CardContent>
+      <CardContent></CardContent>
     </Card>
   );
 };
