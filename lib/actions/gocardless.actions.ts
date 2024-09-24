@@ -25,7 +25,122 @@ export const connectNewAccount = async ({
   return parseStringify(requisition);
 };
 
+export const updateAccounts = async ({
+  userId,
+  accessToken,
+}: {
+  userId: string;
+  accessToken: string;
+}) => {
+  const supabase = createClient();
+  const { data: dbRequisitions, error } = await supabase
+    .from("requisitions")
+    .select()
+    .eq("reference", userId);
+  if (error || !dbRequisitions.length) {
+    console.log("Error fetching requisitions.", error);
+    return;
+  }
+
+  const accounts = await Promise.all(
+    dbRequisitions.map(async (dbRequisition) => {
+      const requisition = await getRequistion({
+        accessToken,
+        requisitionId: dbRequisition.id,
+      });
+      const accountsForRequisition = await Promise.all(
+        requisition.accounts.map(async (accountId: string) => {
+          const accountDetailsResponse = await fetch(
+            `https://bankaccountdata.gocardless.com/api/v2/accounts/${accountId}/details/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+          const accountDetailsResponseBody =
+            await accountDetailsResponse.json();
+          if (!accountDetailsResponse.ok) {
+            console.log(
+              "Error while fetching account details:",
+              accountDetailsResponse.statusText
+            );
+            return;
+          }
+          return accountDetailsResponseBody;
+        })
+      );
+      return accountsForRequisition;
+    })
+  );
+  console.log(accounts.flat());
+  return parseStringify("WATTT");
+};
+
 export const listAccounts = async ({
+  userId,
+  accessToken,
+}: {
+  userId: string;
+  accessToken: string;
+}) => {
+  const supabase = createClient();
+  const { data: dbRequisitions, error } = await supabase
+    .from("requisitions")
+    .select()
+    .eq("reference", userId);
+  if (error) {
+    console.log("Error fetching requisitions.", error);
+    return;
+  }
+  const accounts = await Promise.all(
+    dbRequisitions.map(async (dbRequisition) => {
+      const requisition = await getRequistion({
+        accessToken,
+        requisitionId: dbRequisition.id,
+      });
+
+      if (
+        requisition.status !== dbRequisition.status ||
+        requisition.accounts.length !== dbRequisition.accounts.length
+      ) {
+        const { data: updatedRequisition, error: updateRequisitionError } =
+          await supabase
+            .from("requisitions")
+            .upsert({
+              id: requisition.id,
+              createdAt: dbRequisition.createdAt,
+              updatedAt: new Date().toISOString(),
+              accountSelection: requisition.account_selection,
+              agreement: requisition.agreement,
+              institutionId: requisition.institution_id,
+              link: requisition.link,
+              redirect: requisition.redirect,
+              redirectImmediate: requisition.redirect_immediate,
+              reference: requisition.reference,
+              status: requisition.status,
+              ssn: requisition.ssn,
+              accounts: requisition.accounts,
+            })
+            .select();
+        if (updateRequisitionError || !updatedRequisition.length) {
+          console.log("Error updating requisitions.", updateRequisitionError);
+          return;
+        }
+      }
+      return requisition.accounts;
+    })
+  );
+
+  // console.log(accounts);
+  // TODO GET ACCOUNT DETAILS FROM ACCOUNT IDS
+
+  return ["egy", "kettő"];
+};
+
+export const listAccountsV1 = async ({
   userId,
   accessToken,
 }: {

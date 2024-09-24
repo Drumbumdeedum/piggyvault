@@ -3,7 +3,7 @@ import PageHeader from "@/components/PageHeader";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
 const page = async () => {
-  const user = await getLoggedInUser();
+  const user: User = await getLoggedInUser();
   if (!user) return;
   return (
     <>
@@ -11,7 +11,7 @@ const page = async () => {
         title="Linked accounts"
         subtitle="Manage your linked bank accounts"
       />
-      <AccountsList />
+      <AccountsList userId={user.id} accessToken={user.accessToken} />
     </>
   );
 };
