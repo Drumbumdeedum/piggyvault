@@ -1,15 +1,29 @@
 "use client";
 
-import { accountSettingsSidebarLinks } from "@/constants/sidebarLinks";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
+import { KeyRound, CircleUser } from "lucide-react";
+
+export const sidebarLinks = [
+  {
+    route: "personal-data",
+    label: "Personal",
+    icon: <CircleUser size="18" />,
+  },
+  {
+    route: "login-details",
+    label: "Login details",
+    icon: <KeyRound size="18" />,
+  },
+];
+
 const AccountSettingsSidebar = () => {
   const pathName: string = usePathname();
   return (
-    <div className="w-64 pr-4 flex flex-col gap-4">
-      {accountSettingsSidebarLinks.map((link, index) => {
+    <div className="pr-5 flex flex-col gap-3">
+      {sidebarLinks.map((link, index) => {
         const path: string = pathName.split("/").pop()!;
         const isActive =
           path === link.route ||
@@ -20,6 +34,7 @@ const AccountSettingsSidebar = () => {
               variant={isActive ? "default" : "ghost"}
               className="w-full justify-start items-center gap-2"
             >
+              <div>{link.icon}</div>
               <p>{link.label}</p>
             </Button>
           </Link>

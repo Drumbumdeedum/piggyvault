@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 const page = () => {
-  redirect("account/login-details");
+  redirect("account/personal-data");
 };
 
 export default page;
