@@ -22,7 +22,7 @@ export const sidebarLinks = [
 const AccountSettingsSidebar = () => {
   const pathName: string = usePathname();
   return (
-    <div className="pr-5 flex flex-col gap-3">
+    <div className="pr-5 min-w-56 flex flex-col gap-3">
       {sidebarLinks.map((link, index) => {
         const path: string = pathName.split("/").pop()!;
         const isActive =
