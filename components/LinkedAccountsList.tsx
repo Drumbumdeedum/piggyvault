@@ -67,6 +67,9 @@ const AccountsList = () => {
         />
       </div>
       {accounts.map((account, index) => {
+        const cardName = account.product
+          ? account.product.toLowerCase()
+          : account.name.toLowerCase();
         return (
           <div
             key={index}
@@ -74,9 +77,7 @@ const AccountsList = () => {
           >
             {account.currency && account.account_id.iban ? (
               <div className="flex flex-col gap-2 h-full p-6">
-                <h3 className="font-semibold flex-1">
-                  {account.product ? account.product : account.name}
-                </h3>
+                <h3 className="font-semibold flex-1 capitalize">{cardName}</h3>
                 <div className="flex">
                   <p className="text-sm grow">{account.currency}</p>
                   <div className="flex items-center justify-end gap-1 text-green-400/90">
