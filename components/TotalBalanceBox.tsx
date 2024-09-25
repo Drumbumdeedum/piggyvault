@@ -45,7 +45,7 @@ export const TotalBalanceBox = () => {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2 w-full h-full bg-muted-foreground/5 rounded-xl">
               <p>Loading data</p>
               <p>
-                <LoaderPinwheel size="18" className="animate-spin" />
+                <LoaderPinwheel size="24" className="animate-spin" />
               </p>
             </div>
           )}
