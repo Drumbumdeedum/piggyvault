@@ -14,22 +14,26 @@ import {
 
 const sidebarLinks = [
   {
+    base: "/",
     route: "/",
     label: "Home",
     icon: <House size="18" />,
   },
   {
+    base: "/transactions",
     route: "/transactions",
     label: "Transactions",
     icon: <ArrowRightLeft size="18" />,
   },
   {
+    base: "/linked-accounts",
     route: "/linked-accounts",
     label: "Linked accounts",
     icon: <LinkIcon size="18" />,
   },
   {
-    route: "/account",
+    base: "/account",
+    route: "/account/personal-data",
     label: "Account",
     icon: <Settings size="18" />,
   },
@@ -43,9 +47,9 @@ const Sidebar = () => {
       <nav className="flex flex-col gap-3">
         {sidebarLinks.map((sidebarLink) => {
           const isActive =
-            pathName === sidebarLink.route ||
-            (sidebarLink.route !== "/" &&
-              pathName.startsWith(`${sidebarLink.route}`));
+            pathName === sidebarLink.base ||
+            (sidebarLink.base !== "/" &&
+              pathName.startsWith(`${sidebarLink.base}`));
           return (
             <Link key={sidebarLink.label} href={sidebarLink.route}>
               <Button

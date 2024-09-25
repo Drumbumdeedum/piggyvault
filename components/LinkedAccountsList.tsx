@@ -21,7 +21,6 @@ const AccountsList = () => {
   useEffect(() => {
     const getAccounts = async () => {
       const accounts = await listAccounts();
-      console.log(accounts);
       setAccounts(accounts!);
     };
     getAccounts();
