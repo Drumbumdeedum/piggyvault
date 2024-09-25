@@ -8,6 +8,7 @@ import {
 import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const AccountsList = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const AccountsList = () => {
   return (
     <div className="flex gap-3">
       <div
-        className="border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 flex flex-col items-center justify-center cursor-pointer hover:scale-[101%] active:scale-[99%]"
+        className="relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 flex flex-col items-center justify-center cursor-pointer hover:scale-[101%] active:scale-[99%]"
         onClick={onClick}
       >
         <div className="w-56 flex flex-col gap-2">
@@ -57,12 +58,19 @@ const AccountsList = () => {
             </p>
           </div>
         </div>
+        <Image
+          className="absolute top-0 left-0 opacity-50"
+          src="/images/lines.png"
+          width={316}
+          height={190}
+          alt="lines"
+        />
       </div>
       {accounts.map((account, index) => {
         return (
           <div
             key={index}
-            className="border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
+            className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
           >
             {account.currency && account.account_id.iban ? (
               <div className="flex flex-col gap-2 h-full p-6">
@@ -91,6 +99,13 @@ const AccountsList = () => {
                 <p className="bg-background/20 h-6 w-56 rounded-sm" />
               </div>
             )}
+            <Image
+              className="absolute top-0 left-0 opacity-50"
+              src="/images/lines.png"
+              width={316}
+              height={190}
+              alt="lines"
+            />
           </div>
         );
       })}
