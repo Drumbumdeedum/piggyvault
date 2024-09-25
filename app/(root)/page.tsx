@@ -13,12 +13,8 @@ export default async function Index() {
           title={`Welcome ${user.firstName} ${user.lastName}`}
           subtitle="Access and manage your account and transactions"
         />
-        <Card className="flex flex-col lg:flex-row gap-5 p-6 min-h-[404px]">
-          <Card className="min-w-[306px]">
-            <CardContent>
-              <TotalBalanceBox />
-            </CardContent>
-          </Card>
+        <Card className="flex flex-col lg:flex-row gap-5 p-6">
+          <TotalBalanceBox />
           <Card>
             <div className="p-6">Expenses this month</div>
           </Card>
