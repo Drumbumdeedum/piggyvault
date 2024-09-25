@@ -4,9 +4,8 @@ import { ghostAccounts } from "@/constants/placeholders";
 import { listAccounts } from "@/lib/actions/enablebanking.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 
-const AccountsList = ({ userId }: { userId: string }) => {
+const AccountsList = () => {
   const router = useRouter();
   const onClick = () => {
     router.push("/linked-accounts/country");
@@ -18,11 +17,8 @@ const AccountsList = ({ userId }: { userId: string }) => {
       const accounts = await listAccounts();
       setAccounts(accounts);
     };
-
-    if (userId) {
-      getAccounts();
-    }
-  }, [userId]);
+    getAccounts();
+  }, []);
 
   /* const sp = useSearchParams();
   useEffect(() => {
@@ -86,7 +82,7 @@ const AccountsList = ({ userId }: { userId: string }) => {
                     <svg
                       stroke="currentColor"
                       fill="currentColor"
-                      stroke-width="0"
+                      strokeWidth="0"
                       viewBox="0 0 512 512"
                       height="20px"
                       width="20px"
@@ -94,15 +90,15 @@ const AccountsList = ({ userId }: { userId: string }) => {
                     >
                       <path
                         fill="none"
-                        stroke-miterlimit="10"
-                        stroke-width="32"
+                        strokeMiterlimit="10"
+                        strokeWidth="32"
                         d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
                       ></path>
                       <path
                         fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="32"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="32"
                         d="M352 176 217.6 336 160 272"
                       ></path>
                     </svg>

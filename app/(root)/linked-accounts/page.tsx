@@ -1,4 +1,4 @@
-import AccountsList from "@/components/AccountsList";
+import LinkedAccountsList from "@/components/LinkedAccountsList";
 import PageHeader from "@/components/PageHeader";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
@@ -11,7 +11,7 @@ const page = async () => {
         title="Linked accounts"
         subtitle="Manage your linked bank accounts"
       />
-      <AccountsList userId={user.id} />
+      <LinkedAccountsList />
     </>
   );
 };
