@@ -6,7 +6,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { goCardlessCountries } from "@/constants/goCardlessCountries";
+import { enablebankingCountries } from "@/constants/enablebankingCountries";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -29,7 +29,7 @@ const SelectCountry = () => {
       <CommandList className="w-full max-h-full">
         <CommandEmpty>Country not found.</CommandEmpty>
         <CommandGroup>
-          {goCardlessCountries.map((country, index) => {
+          {enablebankingCountries.map((country, index) => {
             return (
               <CommandItem
                 key={index}

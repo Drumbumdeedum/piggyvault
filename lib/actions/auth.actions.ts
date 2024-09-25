@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { authFormSchema } from "@/validations/auth";
 import { parseStringify } from "../utils";
-import { getAccessToken } from "./gocardless.actions";
 const formSchema = authFormSchema("sign-up");
 
 export const signUpAction = async (values: z.infer<typeof formSchema>) => {
@@ -36,18 +35,10 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     return encodedRedirect("error", "/sign-up", errorMessage);
   }
 
-  const accessTokenResponseBody = await getAccessToken();
-  const { access, access_expires, refresh, refresh_expires } =
-    accessTokenResponseBody;
-
   const { error: dbUserError } = await supabase.from("users").insert({
     email,
     firstName,
     lastName,
-    accessToken: access,
-    accessTokenExpires: access_expires,
-    refreshToken: refresh,
-    refreshTokenExpires: refresh_expires,
   });
 
   if (dbUserError) {

@@ -1,4 +1,4 @@
-export const goCardlessCountries = [
+export const enablebankingCountries = [
   {
     code: "AT",
     name: "Austria",

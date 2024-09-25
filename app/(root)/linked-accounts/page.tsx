@@ -11,7 +11,7 @@ const page = async () => {
         title="Linked accounts"
         subtitle="Manage your linked bank accounts"
       />
-      <AccountsList userId={user.id} accessToken={user.accessToken} />
+      <AccountsList userId={user.id} />
     </>
   );
 };

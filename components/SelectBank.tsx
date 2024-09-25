@@ -10,22 +10,12 @@ import {
   CommandList,
 } from "./ui/command";
 import Image from "next/image";
-import {
-  connectNewAccount,
-  getAllBanks,
-} from "@/lib/actions/gocardless.actions";
 import { usePathname } from "next/navigation";
 import { ghostBanks } from "@/constants/placeholders";
-import { Divide } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { connectAccount, listBanks } from "@/lib/actions/enablebanking.actions";
 
-const SelectBank = ({
-  userId,
-  accessToken,
-}: {
-  userId: string;
-  accessToken: string;
-}) => {
+const SelectBank = ({ userId }: { userId: string }) => {
   const pathName = usePathname();
   const countryCode = pathName.split("/").pop();
   if (!countryCode) return;
@@ -36,21 +26,23 @@ const SelectBank = ({
   useEffect(() => {
     const getBanks = async () => {
       setLoading(true);
-      const results = await getAllBanks(accessToken, countryCode);
-      setBanks(results);
-      setLoading(false);
+      const banks = await listBanks({ countryCode });
+      if (banks) {
+        setBanks(banks);
+        setLoading(false);
+      }
     };
     getBanks();
-  }, [accessToken, countryCode]);
+  }, [countryCode]);
 
   const selectBank = async (bank: Bank) => {
-    const result = await connectNewAccount({
+    const result = await connectAccount({
       userId: userId,
-      accessToken: accessToken,
-      institutionId: bank.id,
+      bankName: bank.name,
+      countryCode: countryCode,
     });
     if (result) {
-      window.open(result.link, "_self");
+      window.open(result.url, "_self");
     }
   };
 
@@ -71,7 +63,7 @@ const SelectBank = ({
               <CommandItem
                 key={index}
                 className={cn(
-                  !bank.name && !bank.logo && !bank.id
+                  !bank.name && !bank.logo
                     ? "cursor-not-allowed"
                     : "cursor-pointer",
                   "gap-2 p-0 border my-1 rounded-sm shadow-none pl-2"
@@ -83,11 +75,11 @@ const SelectBank = ({
                 >
                   {bank.logo ? (
                     <Image
-                      className="size-12 flex justify-center items-center rounded-full border-[1px] border-slate-200"
+                      className="size-12 flex justify-center items-center object-contain rounded-sm"
                       src={bank.logo}
                       alt={bank.name}
-                      width={300}
-                      height={300}
+                      width={20}
+                      height={20}
                     />
                   ) : (
                     <div className="h-12 w-12 bg-muted rounded-full" />
@@ -102,7 +94,7 @@ const SelectBank = ({
 
                   <div
                     className={cn(
-                      !bank.name && !bank.logo && !bank.id && "text-muted",
+                      !bank.name && !bank.logo && "text-muted",
                       "flex-1 flex justify-end pr-2"
                     )}
                   >
