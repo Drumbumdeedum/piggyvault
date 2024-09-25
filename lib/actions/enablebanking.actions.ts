@@ -3,6 +3,8 @@
 import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "./auth.actions";
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
@@ -63,43 +65,128 @@ export const connectAccount = async ({
   return startAuthorizationData;
 };
 
+export const completeAccountConnection = async ({ code }: { code: string }) => {
+  const supabase = createClient();
+  const user = await getLoggedInUser();
+
+  const { data, error } = await supabase
+    .from("accountConnections")
+    .insert({ userId: user.id, authCode: code })
+    .select();
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+  revalidatePath("/linked-accounts");
+  return;
+};
+
 export const listAccounts = async () => {
   const baseHeaders = getBaseHeaders();
   const user: User = await getLoggedInUser();
 
-  const createSessionBody = {
-    code: user.enablebankingSessionCodes[0],
-  };
-  let createSessionResponse = await fetch(
-    `https://api.enablebanking.com/sessions`,
-    {
-      method: "POST",
-      headers: baseHeaders,
-      body: JSON.stringify(createSessionBody),
-    }
-  );
-  let sessionBody = await createSessionResponse.json();
-  if (sessionBody.code === 422 && sessionBody.error === "ALREADY_AUTHORIZED") {
-    const sessionId = user.enablebankingSessionIds[0];
-    createSessionResponse = await fetch(
-      `https://api.enablebanking.com/sessions/${sessionId}`,
-      {
-        method: "GET",
-        headers: baseHeaders,
-      }
-    );
-    sessionBody = await createSessionResponse.json();
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("accountConnections")
+    .select("*")
+    .eq("userId", user.id);
+
+  if (error) {
+    console.log(error);
+    return;
   }
-  const accountId = sessionBody.accounts[0];
-  const accountDetailsResponse = await fetch(
-    `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/details`,
-    {
-      headers: baseHeaders,
-    }
+
+  const allAccounts = await Promise.all(
+    data.map(async (accountConnection) => {
+      let sessionBody;
+      if (accountConnection.sessionId) {
+        const getSessionRequest = await fetch(
+          `https://api.enablebanking.com/sessions/${accountConnection.sessionId}`,
+          {
+            method: "GET",
+            headers: baseHeaders,
+          }
+        );
+        sessionBody = await getSessionRequest.json();
+      } else {
+        const createSessionBody = {
+          code: accountConnection.authCode,
+        };
+        const createSessionResponse = await fetch(
+          `https://api.enablebanking.com/sessions`,
+          {
+            method: "POST",
+            headers: baseHeaders,
+            body: JSON.stringify(createSessionBody),
+          }
+        );
+        sessionBody = await createSessionResponse.json();
+        await supabase
+          .from("accountConnections")
+          .update({
+            sessionId: sessionBody.session_id,
+          })
+          .eq("userId", user.id)
+          .eq("authCode", accountConnection.authCode)
+          .select();
+      }
+      const accounts = await Promise.all(
+        sessionBody.accounts.map(async (accountId: any) => {
+          const accountDetailsResponse = await fetch(
+            `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/details`,
+            {
+              headers: baseHeaders,
+            }
+          );
+          return await accountDetailsResponse.json();
+        })
+      );
+
+      return accounts;
+    })
   );
-  const details = await accountDetailsResponse.json();
-  const accounts = [details];
-  return accounts;
+  return allAccounts.flat() as Account[];
+};
+
+export const getTotalBalance = async () => {
+  const baseHeaders = getBaseHeaders();
+  const user: User = await getLoggedInUser();
+
+  const supabase = createClient();
+  const { data: accountConnections, error } = await supabase
+    .from("accountConnections")
+    .select("*")
+    .eq("userId", user.id);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  const totalBalances = await Promise.all(
+    accountConnections.map(async (accountConnection) => {
+      const session = await createOrRetrieveSession({
+        userId: user.id,
+        baseHeaders,
+        accountConnection,
+      });
+
+      const accountId = session.accounts[0];
+      const accountBalancesResponse = await fetch(
+        `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/balances`,
+        {
+          headers: baseHeaders,
+        }
+      );
+      const result = await accountBalancesResponse.json();
+      return result.balances;
+    })
+  );
+
+  console.log(totalBalances.flat());
+
+  return totalBalances.flat();
 };
 
 /* // 10 days ahead
@@ -156,3 +243,47 @@ const accountTransactionsResponse = await fetch(
 );
 const transactions = await accountTransactionsResponse.json();
 console.log(transactions); */
+
+const createOrRetrieveSession = async ({
+  userId,
+  baseHeaders,
+  accountConnection,
+}: {
+  userId: string;
+  baseHeaders: any;
+  accountConnection: { sessionId: string; authCode: string };
+}) => {
+  let sessionBody;
+  if (accountConnection.sessionId) {
+    const getSessionRequest = await fetch(
+      `https://api.enablebanking.com/sessions/${accountConnection.sessionId}`,
+      {
+        method: "GET",
+        headers: baseHeaders,
+      }
+    );
+    sessionBody = await getSessionRequest.json();
+  } else {
+    const createSessionBody = {
+      code: accountConnection.authCode,
+    };
+    const createSessionResponse = await fetch(
+      `https://api.enablebanking.com/sessions`,
+      {
+        method: "POST",
+        headers: baseHeaders,
+        body: JSON.stringify(createSessionBody),
+      }
+    );
+    sessionBody = await createSessionResponse.json();
+    const supabase = createClient();
+    await supabase
+      .from("accountConnections")
+      .update({
+        sessionId: sessionBody.session_id,
+      })
+      .eq("userId", userId)
+      .select();
+  }
+  return sessionBody;
+};

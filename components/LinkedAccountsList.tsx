@@ -1,12 +1,16 @@
 "use client";
 
 import { ghostAccounts } from "@/constants/placeholders";
-import { listAccounts } from "@/lib/actions/enablebanking.actions";
+import {
+  completeAccountConnection,
+  listAccounts,
+} from "@/lib/actions/enablebanking.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const AccountsList = () => {
   const router = useRouter();
+  const sp = useSearchParams();
   const onClick = () => {
     router.push("/linked-accounts/country");
   };
@@ -15,21 +19,21 @@ const AccountsList = () => {
   useEffect(() => {
     const getAccounts = async () => {
       const accounts = await listAccounts();
-      setAccounts(accounts);
+      setAccounts(accounts!);
     };
     getAccounts();
   }, []);
 
-  /* const sp = useSearchParams();
   useEffect(() => {
-    if (sp.has("ref")) {
-      const updateAndFetchAccounts = async () => {
-        const result = await updateAccounts({ userId, accessToken });
-        router.push("/linked-accounts");
+    if (sp.has("code")) {
+      const connectAccount = async () => {
+        await completeAccountConnection({
+          code: sp.get("code")!,
+        });
       };
-      updateAndFetchAccounts();
+      connectAccount();
     }
-  }, [sp]); */
+  }, [sp]);
 
   return (
     <div className="flex gap-3">
@@ -72,9 +76,11 @@ const AccountsList = () => {
             key={index}
             className="border bg-gradient-to-br from-purple-500/80 to-pink-500/80 text-background shadow-lg rounded w-72 h-44 "
           >
-            {account.product && account.currency && account.account_id.iban ? (
+            {account.currency && account.account_id.iban ? (
               <div className="flex flex-col gap-2 h-full p-6">
-                <h3 className="font-semibold flex-1">{account.product}</h3>
+                <h3 className="font-semibold flex-1">
+                  {account.product ? account.product : account.name}
+                </h3>
                 <div className="flex">
                   <p className="text-sm grow">{account.currency}</p>
                   <div className="flex items-center justify-end gap-1">
@@ -109,14 +115,14 @@ const AccountsList = () => {
             ) : (
               <div className="flex flex-col gap-2 h-full relative p-6">
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2 bg-primary/50 w-full h-full">
-                  <div>Loading data</div>
-                  <div className="h-6 w-6 border-t-2 border-r-2 animate-spin border-background rounded-full" />
+                  <div className="text-background/70">Loading data</div>
+                  <div className="h-6 w-6 border-t-2 border-r-2 animate-spin border-background/70 rounded-full" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="bg-background h-6 w-32 rounded-sm " />
+                  <h3 className="bg-background/20 h-6 w-32 rounded-sm " />
                 </div>
-                <p className="bg-background h-6 w-12 rounded-sm" />
-                <p className="bg-background h-6 w-56 rounded-sm" />
+                <p className="bg-background/20 h-6 w-12 rounded-sm" />
+                <p className="bg-background/20 h-6 w-56 rounded-sm" />
               </div>
             )}
           </div>

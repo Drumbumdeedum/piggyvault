@@ -1,5 +1,5 @@
 import PageHeader from "@/components/PageHeader";
-import TotalBalanceBox from "@/components/TotalBalanceBox";
+import { TotalBalanceBox } from "@/components/TotalBalanceBox";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 

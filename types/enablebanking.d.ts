@@ -44,3 +44,18 @@ declare type AccountId = {
   identification: string;
   scheme_name: string;
 };
+
+declare type Balances = {
+  balances: Balance[];
+};
+declare type Balance = {
+  name: string;
+  balance_amount: {
+    currency: string;
+    amount: string;
+  };
+  balance_type: string;
+  last_change_date_time: string;
+  reference_date: string;
+  last_committed_transaction: string;
+};
