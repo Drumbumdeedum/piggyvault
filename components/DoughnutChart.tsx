@@ -42,6 +42,7 @@ const DoughnutChart = ({ balances }: { balances: Balance[] }) => {
             nameKey="name"
             innerRadius={60}
             strokeWidth={5}
+            paddingAngle={3}
           />
         </PieChart>
       </ChartContainer>

@@ -13,16 +13,22 @@ export default async function Index() {
           title={`Welcome ${user.firstName} ${user.lastName}`}
           subtitle="Access and manage your account and transactions"
         />
-        <main>
-          <Card>
-            <CardHeader>
-              <CardTitle>Current balance</CardTitle>
-            </CardHeader>
+        <Card className="flex flex-col lg:flex-row gap-5 p-6 min-h-[404px]">
+          <Card className="min-w-[306px]">
             <CardContent>
               <TotalBalanceBox />
             </CardContent>
           </Card>
-        </main>
+          <Card>
+            <div className="p-6">Expenses this month</div>
+          </Card>
+          <Card>
+            <div className="p-6">Incomes this month</div>
+          </Card>
+          <Card>
+            <div className="p-6">Recent transactions</div>
+          </Card>
+        </Card>
       </main>
     </>
   );

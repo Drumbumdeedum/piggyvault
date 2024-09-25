@@ -19,6 +19,7 @@ const AccountsList = () => {
   useEffect(() => {
     const getAccounts = async () => {
       const accounts = await listAccounts();
+      console.log(accounts);
       setAccounts(accounts!);
     };
     getAccounts();
@@ -74,7 +75,7 @@ const AccountsList = () => {
         return (
           <div
             key={index}
-            className="border bg-gradient-to-br from-purple-500/80 to-pink-500/80 text-background shadow-lg rounded w-72 h-44 "
+            className="border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded w-72 h-44 "
           >
             {account.currency && account.account_id.iban ? (
               <div className="flex flex-col gap-2 h-full p-6">
@@ -83,9 +84,10 @@ const AccountsList = () => {
                 </h3>
                 <div className="flex">
                   <p className="text-sm grow">{account.currency}</p>
-                  <div className="flex items-center justify-end gap-1">
+                  <div className="flex items-center justify-end gap-1 text-green-400/90">
                     <span className="text-xs">Connected</span>
                     <svg
+                      className=""
                       stroke="currentColor"
                       fill="currentColor"
                       strokeWidth="0"

@@ -5,6 +5,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "./auth.actions";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { deepEqual, filterDuplicates } from "../utils";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
@@ -99,40 +100,14 @@ export const listAccounts = async () => {
 
   const allAccounts = await Promise.all(
     data.map(async (accountConnection) => {
-      let sessionBody;
-      if (accountConnection.sessionId) {
-        const getSessionRequest = await fetch(
-          `https://api.enablebanking.com/sessions/${accountConnection.sessionId}`,
-          {
-            method: "GET",
-            headers: baseHeaders,
-          }
-        );
-        sessionBody = await getSessionRequest.json();
-      } else {
-        const createSessionBody = {
-          code: accountConnection.authCode,
-        };
-        const createSessionResponse = await fetch(
-          `https://api.enablebanking.com/sessions`,
-          {
-            method: "POST",
-            headers: baseHeaders,
-            body: JSON.stringify(createSessionBody),
-          }
-        );
-        sessionBody = await createSessionResponse.json();
-        await supabase
-          .from("accountConnections")
-          .update({
-            sessionId: sessionBody.session_id,
-          })
-          .eq("userId", user.id)
-          .eq("authCode", accountConnection.authCode)
-          .select();
-      }
+      const session = await createOrRetrieveSession({
+        userId: user.id,
+        baseHeaders,
+        accountConnection,
+      });
+      console.log("SESSION:", session);
       const accounts = await Promise.all(
-        sessionBody.accounts.map(async (accountId: any) => {
+        session.accounts.map(async (accountId: any) => {
           const accountDetailsResponse = await fetch(
             `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/details`,
             {
@@ -150,42 +125,25 @@ export const listAccounts = async () => {
 };
 
 export const getTotalBalance = async () => {
+  const allAccounts = await listAccounts();
+  if (!allAccounts) return;
   const baseHeaders = getBaseHeaders();
-  const user: User = await getLoggedInUser();
-
-  const supabase = createClient();
-  const { data: accountConnections, error } = await supabase
-    .from("accountConnections")
-    .select("*")
-    .eq("userId", user.id);
-
-  if (error) {
-    console.log(error);
-    return;
-  }
 
   const totalBalances = await Promise.all(
-    accountConnections.map(async (accountConnection) => {
-      const session = await createOrRetrieveSession({
-        userId: user.id,
-        baseHeaders,
-        accountConnection,
-      });
-
-      const accountId = session.accounts[0];
+    allAccounts.map(async (account) => {
       const accountBalancesResponse = await fetch(
-        `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/balances`,
+        `${ENABLE_BANKING_BASE_URL}/accounts/${account.uid}/balances`,
         {
           headers: baseHeaders,
         }
       );
       const result = await accountBalancesResponse.json();
-      return result.balances;
+      const filtered = filterDuplicates(result.balances);
+      console.log("FILTERED: ", filtered);
+      console.log("ACCOUNT", account);
+      return filtered;
     })
   );
-
-  console.log(totalBalances.flat());
-
   return totalBalances.flat();
 };
 

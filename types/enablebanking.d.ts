@@ -10,6 +10,20 @@ declare type Bank = {
   logo: string;
 };
 
+declare type Balance = {
+  name: string;
+  balance_amount: BalanceAmount;
+  balance_type: string;
+  last_change_date_time: string;
+  reference_date: string;
+  last_committed_transaction: string;
+};
+
+declare type BalanceAmount = {
+  amount: string;
+  currency: string;
+};
+
 declare type Account = {
   account_id: {
     iban: string;

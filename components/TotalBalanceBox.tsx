@@ -25,25 +25,22 @@ export const TotalBalanceBox = () => {
     fetchTotalBalance();
   }, []);
   return (
-    <>
+    <div className="relative">
       {!!balances && !!totalCurrentBalance ? (
-        <section className="flex">
-          <DoughnutChart balances={balances} />
-          <div className="flex flex-col items-start justify-center gap-2">
-            <h2 className="text-xl font-bold">
-              Connected accounts: {balances?.length}
-            </h2>
-            <div className="flex flex-col">
-              <p className="italic text-sm">Total current balance:</p>
-              <div className=" flex-center gap-2 text-3xl font-bold">
-                <AnimatedCounter amount={totalCurrentBalance} />
-              </div>
+        <>
+          <div className="p-6 pb-0">
+            <p className="text-sm">Total current balance:</p>
+            <div className="text-xl font-bold">
+              <AnimatedCounter amount={totalCurrentBalance} />
             </div>
           </div>
-        </section>
+          <DoughnutChart balances={balances} />
+        </>
       ) : (
-        <div className="h-12 w-12 border-t-2 border-r-2 animate-spin border-foreground/70 rounded-full" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="h-12 w-12 border-t-2 border-r-2 animate-spin border-foreground/70 rounded-full" />
+        </div>
       )}
-    </>
+    </div>
   );
 };
