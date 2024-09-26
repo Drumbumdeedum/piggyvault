@@ -87,7 +87,7 @@ export const completeAccountConnection = async ({
     });
   }
 
-  const session = await createOrRetrieveSession({
+  const session: GetSessionResponse = await createOrRetrieveSession({
     user_id: user_id,
     auth_code,
     session_id: account_connection.session_id,
@@ -96,7 +96,7 @@ export const completeAccountConnection = async ({
   await Promise.all(
     session.accounts?.map(async (account_id) => {
       const accountDetailsPromise = await getAccountDetails(account_id);
-      const accountDetailsResult: EnablebankingAccount =
+      const accountDetailsResult: GetAccountDetailResponse =
         await accountDetailsPromise.json();
       await supabase.from("accounts").insert({
         user_id: user_id,
@@ -108,6 +108,7 @@ export const completeAccountConnection = async ({
         currency: accountDetailsResult.currency,
         iban: accountDetailsResult.account_id.iban,
         account_uid: accountDetailsResult.uid,
+        account_id: account_id,
       });
     })
   );
@@ -140,7 +141,7 @@ export const getTotalBalance = async () => {
   const totalBalances = await Promise.all(
     allAccounts.map(async (account) => {
       const accountBalancesResponse = await fetch(
-        `${ENABLE_BANKING_BASE_URL}/accounts/${account.uid}/balances`,
+        `${ENABLE_BANKING_BASE_URL}/accounts/${account.account_id}/balances`,
         {
           headers: base_headers,
         }
