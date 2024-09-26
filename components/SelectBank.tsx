@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { connectAccount, listBanks } from "@/lib/actions/enablebanking.actions";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 const SelectBank = ({ userId }: { userId: string }) => {
   const router = useRouter();
@@ -93,14 +94,14 @@ const SelectBank = ({ userId }: { userId: string }) => {
                         height={20}
                       />
                     ) : (
-                      <div className="h-12 w-12 bg-muted rounded-full" />
+                      <Skeleton className="h-12 w-12 rounded-full" />
                     )}
                     {bank.name ? (
                       <span className="text-xl flex justify-center items-center">
                         {bank.name}
                       </span>
                     ) : (
-                      <span className="bg-muted h-6 w-56 rounded-sm" />
+                      <Skeleton className=" h-6 w-56 " />
                     )}
 
                     <div

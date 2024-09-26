@@ -41,9 +41,10 @@ const AccountsList = () => {
 
   return (
     <div className="flex gap-3">
-      <div
-        className="group relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 flex flex-col items-center justify-center cursor-pointer transform will-change-transform transition-transform hover:scale-[101%] active:scale-[99%]"
+      <button
+        className="group relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 text-left flex flex-col items-center justify-normal cursor-pointer transform will-change-transform transition-transform hover:scale-[101%] active:scale-[99%] disabled:cursor-not-allowed"
         onClick={onClick}
+        disabled={loading}
       >
         {loading ? (
           <div className="flex flex-col gap-2 h-full w-full relative p-6">
@@ -79,7 +80,7 @@ const AccountsList = () => {
           height={190}
           alt="lines"
         />
-      </div>
+      </button>
       {accounts.map((account, index) => {
         const cardName = account.product
           ? account.product.toLowerCase()

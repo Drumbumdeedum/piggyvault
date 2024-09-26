@@ -41,7 +41,10 @@ export const connectAccount = async ({
   countryCode: string;
 }) => {
   const base_headers = getBaseHeaders();
-  const validUntil = new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000);
+  const validUntilDays = 10;
+  const validUntil = new Date(
+    new Date().getTime() + validUntilDays * 24 * 60 * 60 * 1000
+  );
   const startAuthorizationBody = {
     access: {
       valid_until: validUntil.toISOString(),

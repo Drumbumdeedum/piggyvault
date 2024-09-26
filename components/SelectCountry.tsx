@@ -17,8 +17,12 @@ const SelectCountry = () => {
   const [countryFilter, setCountryFilter] = useState<string | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState<boolean>(false);
+
   const selectCountry = async (country: Country) => {
+    setLoading(true);
     router.push(`/linked-accounts/country/${country.code}`);
+    setLoading(false);
   };
   return (
     <>
@@ -35,15 +39,18 @@ const SelectCountry = () => {
           onValueChange={setCountryFilter}
           className="text-2xl p-3 h-16"
           placeholder="Select country"
+          disabled={loading}
         />
         <CommandList className="w-full max-h-full">
-          <CommandEmpty>Country not found.</CommandEmpty>
+          {!loading && <CommandEmpty>Country not found.</CommandEmpty>}
+
           <CommandGroup>
             {enablebankingCountries.map((country, index) => {
               return (
                 <CommandItem
                   key={index}
                   className="cursor-pointer gap-2 p-0 border my-1 rounded-sm shadow-none pl-2"
+                  disabled={loading}
                 >
                   <div
                     className="flex gap-2 p-2 justify-left items-center w-full"
