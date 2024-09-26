@@ -5,22 +5,22 @@ import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "./auth.actions";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { deepEqual, filterDuplicates } from "../utils";
+import { filterDuplicates } from "../utils";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
 export const listBanks = async ({ countryCode }: { countryCode: string }) => {
-  const baseHeaders = getBaseHeaders();
-  const aspspsResponse = await fetch(
+  const base_headers = getBaseHeaders();
+  const aspsps_response = await fetch(
     `${ENABLE_BANKING_BASE_URL}/aspsps?country=${countryCode.toUpperCase()}`,
     {
-      headers: baseHeaders,
+      headers: base_headers,
     }
   );
-  const responseBody = await aspspsResponse.json();
+  const response_body = await aspsps_response.json();
   if (
-    responseBody.code === 422 &&
-    responseBody.error === "WRONG_REQUEST_PARAMETERS"
+    response_body.code === 422 &&
+    response_body.error === "WRONG_REQUEST_PARAMETERS"
   ) {
     return encodedRedirect(
       "error",
@@ -28,7 +28,7 @@ export const listBanks = async ({ countryCode }: { countryCode: string }) => {
       "Invalid country code."
     );
   }
-  return responseBody.aspsps;
+  return response_body.aspsps;
 };
 
 export const connectAccount = async ({
@@ -40,7 +40,7 @@ export const connectAccount = async ({
   bankName: string;
   countryCode: string;
 }) => {
-  const baseHeaders = getBaseHeaders();
+  const base_headers = getBaseHeaders();
   const validUntil = new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000);
   const startAuthorizationBody = {
     access: {
@@ -58,7 +58,7 @@ export const connectAccount = async ({
     `${ENABLE_BANKING_BASE_URL}/auth`,
     {
       method: "POST",
-      headers: baseHeaders,
+      headers: base_headers,
       body: JSON.stringify(startAuthorizationBody),
     }
   );
@@ -84,14 +84,14 @@ export const completeAccountConnection = async ({ code }: { code: string }) => {
 };
 
 export const listAccounts = async () => {
-  const baseHeaders = getBaseHeaders();
+  const base_headers = getBaseHeaders();
   const user: User = await getLoggedInUser();
 
   const supabase = createClient();
   const { data, error } = await supabase
     .from("account_connections")
     .select("*")
-    .eq("userId", user.id);
+    .eq("user_id", user.id);
 
   if (error) {
     console.log(error);
@@ -101,8 +101,8 @@ export const listAccounts = async () => {
   const allAccounts = await Promise.all(
     data.map(async (accountConnection) => {
       const session = await createOrRetrieveSession({
-        userId: user.id,
-        baseHeaders,
+        user_id: user.id,
+        base_headers,
         accountConnection,
       });
       const accounts = await Promise.all(
@@ -110,7 +110,7 @@ export const listAccounts = async () => {
           const accountDetailsResponse = await fetch(
             `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/details`,
             {
-              headers: baseHeaders,
+              headers: base_headers,
             }
           );
           return await accountDetailsResponse.json();
@@ -126,14 +126,14 @@ export const listAccounts = async () => {
 export const getTotalBalance = async () => {
   const allAccounts = await listAccounts();
   if (!allAccounts) return;
-  const baseHeaders = getBaseHeaders();
+  const base_headers = getBaseHeaders();
 
   const totalBalances = await Promise.all(
     allAccounts.map(async (account) => {
       const accountBalancesResponse = await fetch(
         `${ENABLE_BANKING_BASE_URL}/accounts/${account.uid}/balances`,
         {
-          headers: baseHeaders,
+          headers: base_headers,
         }
       );
       const result = await accountBalancesResponse.json();
@@ -162,7 +162,7 @@ const startAuthorizationResponse = await fetch(
   `${ENABLE_BANKING_BASE_URL}/auth`,
   {
     method: "POST",
-    headers: baseHeaders,
+    headers: base_headers,
     body: JSON.stringify(startAuthorizationBody),
   }
 );
@@ -173,7 +173,7 @@ const createSessionResponse = await fetch(
   `${ENABLE_BANKING_BASE_URL}/sessions/96373b22-691b-48ac-b528-8aad4639a180`,
   {
     method: "GET",
-    headers: baseHeaders,
+    headers: base_headers,
   }
 );
 const session = await createSessionResponse.json();
@@ -184,7 +184,7 @@ const accountId = session.accounts[0];
 const accountBalancesResponse = await fetch(
   `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/balances`,
   {
-    headers: baseHeaders,
+    headers: base_headers,
   }
 );
 const balances = await accountBalancesResponse.json();
@@ -193,29 +193,29 @@ console.log(balances);
 const accountTransactionsResponse = await fetch(
   `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/transactions`,
   {
-    headers: baseHeaders,
+    headers: base_headers,
   }
 );
 const transactions = await accountTransactionsResponse.json();
 console.log(transactions); */
 
 const createOrRetrieveSession = async ({
-  userId,
-  baseHeaders,
+  user_id,
+  base_headers,
   accountConnection,
 }: {
-  userId: string;
-  baseHeaders: any;
-  accountConnection: { sessionId: string; authCode: string };
+  user_id: string;
+  base_headers: any;
+  accountConnection: AccountConnection;
 }) => {
   let sessionBody;
-  //  If session has already been initialized
-  if (accountConnection.sessionId) {
+  //  If session has already been initialized retrieve it by stored session_id
+  if (accountConnection.session_id) {
     const getSessionRequest = await fetch(
-      `https://api.enablebanking.com/sessions/${accountConnection.sessionId}`,
+      `https://api.enablebanking.com/sessions/${accountConnection.session_id}`,
       {
         method: "GET",
-        headers: baseHeaders,
+        headers: base_headers,
       }
     );
     sessionBody = await getSessionRequest.json();
@@ -223,13 +223,13 @@ const createOrRetrieveSession = async ({
   }
 
   const createSessionRequestBody = {
-    code: accountConnection.authCode,
+    code: accountConnection.auth_code,
   };
   const createSessionResponse = await fetch(
     `https://api.enablebanking.com/sessions`,
     {
       method: "POST",
-      headers: baseHeaders,
+      headers: base_headers,
       body: JSON.stringify(createSessionRequestBody),
     }
   );
@@ -238,9 +238,9 @@ const createOrRetrieveSession = async ({
   await supabase
     .from("account_connections")
     .update({
-      sessionId: sessionBody.session_id,
+      session_id: sessionBody.session_id,
     })
-    .eq("userId", userId)
+    .eq("user_id", user_id)
     .select();
 
   return sessionBody;

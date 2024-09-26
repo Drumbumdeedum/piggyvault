@@ -7,7 +7,7 @@ export const getBaseHeaders = () => {
       .toString("base64")
       .replace("=", "");
   };
-  const privateKey = readFileSync(
+  const private_key = readFileSync(
     process.env.ENABLE_BANKING_CERT_FILE!,
     "utf8"
   );
@@ -25,12 +25,12 @@ export const getBaseHeaders = () => {
       kid: process.env.ENABLE_BANKING_APP_ID,
     });
     const body = jsonBase64(jwtBody);
-    const signature = jwa("RS256").sign(`${header}.${body}`, privateKey);
+    const signature = jwa("RS256").sign(`${header}.${body}`, private_key);
     return `${header}.${body}.${signature}`;
   })();
-  const baseHeaders = {
+  const base_headers = {
     Authorization: `Bearer ${jwt}`,
     "Content-type": "application/json; charset=UTF-8",
   };
-  return baseHeaders;
+  return base_headers;
 };
