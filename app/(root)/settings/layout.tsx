@@ -1,5 +1,5 @@
 import AccountSettingsSidebar from "@/components/AccountSettingsSidebar";
-import PageHeader from "@/components/PageHeader";
+
 export default function RootLayout({
   children,
 }: {

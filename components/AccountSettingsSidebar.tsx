@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
 import { CircleUser, LinkIcon } from "lucide-react";
-import PageHeader from "./PageHeader";
 
 export const sidebarLinks = [
   {

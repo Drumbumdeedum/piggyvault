@@ -12,7 +12,7 @@ const page = async () => {
   const user: User = await getLoggedInUser();
   if (!user) return;
   return (
-    <Card className="w-full min-w-[938px]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Linked accounts</CardTitle>
         <CardDescription>Manage your linked bank accounts</CardDescription>
