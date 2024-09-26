@@ -15,7 +15,7 @@ const AccountsList = () => {
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
-    router.push("/linked-accounts/country");
+    router.push("/settings/linked-accounts/country");
   };
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -40,7 +40,7 @@ const AccountsList = () => {
     }
     if (sp.has("success")) {
       const showToast = () => {
-        router.push("/linked-accounts");
+        router.push("/settings/linked-accounts");
         toast.success("Success! 🎉", {
           description: sp.get("success")!,
           action: {
@@ -51,7 +51,7 @@ const AccountsList = () => {
         });
       };
       const onCloseToastAction = () => {
-        router.replace("/linked-accounts");
+        router.replace("/settings/linked-accounts");
       };
       showToast();
     }

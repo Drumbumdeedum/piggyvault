@@ -4,42 +4,45 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
-import { KeyRound, CircleUser } from "lucide-react";
+import { CircleUser, LinkIcon } from "lucide-react";
+import PageHeader from "./PageHeader";
 
 export const sidebarLinks = [
   {
-    route: "personal-data",
-    label: "Personal",
+    route: "account-settings",
+    label: "Account settings",
     icon: <CircleUser size="18" />,
   },
   {
-    route: "login-details",
-    label: "Login details",
-    icon: <KeyRound size="18" />,
+    route: "linked-accounts",
+    label: "Linked accounts",
+    icon: <LinkIcon size="18" />,
   },
 ];
 
 const AccountSettingsSidebar = () => {
   const pathName: string = usePathname();
   return (
-    <div className="pr-5 min-w-56 flex flex-col gap-3">
-      {sidebarLinks.map((link, index) => {
-        const path: string = pathName.split("/").pop()!;
-        const isActive =
-          path === link.route ||
-          (link.route !== "/" && path.startsWith(`${link.route}`));
-        return (
-          <Link key={index} href={link.route}>
-            <Button
-              variant={isActive ? "default" : "ghost"}
-              className="w-full justify-start items-center gap-2"
-            >
-              <div>{link.icon}</div>
-              <p>{link.label}</p>
-            </Button>
-          </Link>
-        );
-      })}
+    <div className="flex flex-col">
+      <div className="pr-5 min-w-56 flex flex-col gap-3">
+        {sidebarLinks.map((link, index) => {
+          const path: string = pathName.split("/").pop()!;
+          const isActive =
+            path === link.route ||
+            (link.route !== "/" && path.startsWith(`${link.route}`));
+          return (
+            <Link key={index} href={link.route}>
+              <Button
+                variant={isActive ? "default" : "ghost"}
+                className="w-full justify-start items-center gap-2"
+              >
+                <div>{link.icon}</div>
+                <p>{link.label}</p>
+              </Button>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };

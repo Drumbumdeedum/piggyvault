@@ -21,13 +21,13 @@ const SelectCountry = () => {
 
   const selectCountry = async (country: Country) => {
     setLoading(true);
-    router.push(`/linked-accounts/country/${country.code}`);
+    router.push(`/settings/linked-accounts/country/${country.code}`);
     setLoading(false);
   };
   return (
     <>
       <Button
-        onClick={() => router.push("/linked-accounts")}
+        onClick={() => router.push("/settings/linked-accounts")}
         className="mb-6 flex gap-2"
       >
         <ChevronLeft size="20" />

@@ -53,7 +53,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
   return (
     <>
       <Button
-        onClick={() => router.push("/linked-accounts/country")}
+        onClick={() => router.push("/settings/linked-accounts/country")}
         className="mb-6 flex gap-2"
       >
         <ChevronLeft size="20" />

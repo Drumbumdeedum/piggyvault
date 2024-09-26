@@ -5,12 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
-import {
-  House,
-  ArrowRightLeft,
-  Link as LinkIcon,
-  Settings,
-} from "lucide-react";
+import { House, ArrowRightLeft, Settings } from "lucide-react";
 
 const sidebarLinks = [
   {
@@ -26,15 +21,9 @@ const sidebarLinks = [
     icon: <ArrowRightLeft size="18" />,
   },
   {
-    base: "/linked-accounts",
-    route: "/linked-accounts",
-    label: "Linked accounts",
-    icon: <LinkIcon size="18" />,
-  },
-  {
-    base: "/account",
-    route: "/account/personal-data",
-    label: "Account",
+    base: "/settings",
+    route: "/settings/account-settings",
+    label: "Settings",
     icon: <Settings size="18" />,
   },
 ];
