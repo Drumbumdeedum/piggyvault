@@ -120,13 +120,16 @@ export const completeAccountConnection = async ({
   );
 };
 
-export const listAccounts = async () => {
-  const user: User = await getLoggedInUser();
+export const fetchAllUserAccounts = async ({
+  user_id,
+}: {
+  user_id: string;
+}) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("accounts")
     .select("*")
-    .eq("user_id", user.id);
+    .eq("user_id", user_id);
   if (error) {
     console.log(error);
     return;
@@ -135,10 +138,11 @@ export const listAccounts = async () => {
 };
 
 export const getTotalBalance = async () => {
-  const allAccounts = await listAccounts();
-  if (!allAccounts) return;
+  const { id: user_id }: User = await getLoggedInUser();
+  const allAccounts = await fetchAllUserAccounts({ user_id });
+  if (!allAccounts || !user_id) return;
 
-  const totalBalances = await Promise.all(
+  const resultAccounts: Account[][] = await Promise.all(
     allAccounts.map(async (account) => {
       const accountBalancesResponse = await fetch(
         `${ENABLE_BANKING_BASE_URL}/accounts/${account.account_id}/balances`,
@@ -146,13 +150,41 @@ export const getTotalBalance = async () => {
           headers: base_headers,
         }
       );
-      const result = await accountBalancesResponse.json();
-      const filtered = filterDuplicates(result.balances);
-      return filtered;
+      const accountBalancesResponseBody: BalancesResponse =
+        await accountBalancesResponse.json();
+      const balances: BalanceResponse[] = filterDuplicates(
+        accountBalancesResponseBody.balances
+      );
+      const savedAccounts = await Promise.all(
+        balances.map(async (balance: BalanceResponse) => {
+          const supabase = createClient();
+          const { data, error } = await supabase
+            .from("accounts")
+            .update({
+              current_balance: parseFloat(balance.balance_amount.amount),
+              balance_name: balance.name,
+            })
+            .eq("user_id", user_id)
+            .eq("account_id", account.account_id)
+            .select("*");
+          if (error) {
+            console.log("Error while updating account balance.", error);
+            return;
+          }
+          if (!data) {
+            console.log("Error while updating account balance.", error);
+            return;
+          }
+          return data[0];
+        })
+      );
+      return savedAccounts;
     })
   );
-  return totalBalances.flat();
+  return resultAccounts.flat();
 };
+
+const updateAccountBalance = () => {};
 
 const createOrRetrieveSession = async ({
   user_id,

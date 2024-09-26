@@ -18,7 +18,7 @@ const page = async () => {
         <CardDescription>Manage your linked bank accounts</CardDescription>
       </CardHeader>
       <CardContent>
-        <LinkedAccountsList />
+        <LinkedAccountsList user={user} />
       </CardContent>
     </Card>
   );

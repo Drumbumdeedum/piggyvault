@@ -2,7 +2,7 @@
 
 import {
   completeAccountConnection,
-  listAccounts,
+  fetchAllUserAccounts,
 } from "@/lib/actions/enablebanking.actions";
 import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,7 +11,8 @@ import Image from "next/image";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
 
-const AccountsList = () => {
+const AccountsList = ({ user }: { user: User }) => {
+  console.log(user);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
@@ -22,7 +23,7 @@ const AccountsList = () => {
 
   useEffect(() => {
     const getAccounts = async () => {
-      const accounts = await listAccounts();
+      const accounts = await fetchAllUserAccounts({ user_id: user.id });
       setAccounts(accounts!);
       setLoading(false);
     };

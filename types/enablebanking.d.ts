@@ -20,7 +20,11 @@ declare type Bank = {
   logo: string;
 };
 
-declare type Balance = {
+declare type BalancesResponse = {
+  balances: BalanceResponse[];
+};
+
+declare type BalanceResponse = {
   name: string;
   balance_amount: BalanceAmount;
   balance_type: string;
@@ -67,21 +71,6 @@ declare type GetAccountDetailResponse = {
 declare type AccountId = {
   identification: string;
   scheme_name: string;
-};
-
-declare type Balances = {
-  balances: Balance[];
-};
-declare type Balance = {
-  name: string;
-  balance_amount: {
-    currency: string;
-    amount: string;
-  };
-  balance_type: string;
-  last_change_date_time: string;
-  reference_date: string;
-  last_committed_transaction: string;
 };
 
 declare type CreateSessionResponse = {
@@ -140,4 +129,6 @@ declare type Account = {
   currency: string;
   product_name: string;
   account_id: string;
+  current_balance: number;
+  balance_name: string;
 };

@@ -16,7 +16,7 @@ export default async function Index() {
           subtitle="Access and manage your account and transactions"
         />
         <Card className="flex flex-col lg:flex-row gap-5 p-6">
-          <TotalBalanceBox />
+          <TotalBalanceBox user={user} />
           <Card>
             <div className="p-6">Expenses this month</div>
           </Card>
