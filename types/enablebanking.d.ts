@@ -34,7 +34,7 @@ declare type BalanceAmount = {
   currency: string;
 };
 
-declare type Account = {
+declare type EnablebankingAccount = {
   account_id: {
     iban: string;
   };
@@ -82,4 +82,59 @@ declare type Balance = {
   last_change_date_time: string;
   reference_date: string;
   last_committed_transaction: string;
+};
+
+declare type CreateSessionResponse = {
+  session_id: string;
+  accounts: Account[];
+  aspsp: Aspsp;
+  psu_type: PSU_TYPE;
+  access: {
+    valid_until: string;
+  };
+};
+
+declare type GetSessionResponse = {
+  access: {
+    valid_until: string;
+  };
+  accounts: string[];
+  accounts_data: AccountsData[];
+  aspsp: Aspsp;
+  authorized: string;
+  created: string;
+  psu_type: PSU_TYPE;
+  status: string;
+};
+
+declare type AccountsData = {
+  identification_hash: "string";
+  uid: "string";
+};
+
+declare type Aspsp = {
+  name: string;
+  country: string;
+};
+
+enum PSU_TYPE {
+  business = "business",
+  personal = "personal",
+}
+
+declare type CreateOrRetrieveSessionRequest = {
+  user_id: string;
+  auth_code: string;
+  session_id?: string;
+};
+
+declare type Account = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  institution_name: string;
+  country: string;
+  product_name: string;
+  currency: string;
+  iban: string;
 };

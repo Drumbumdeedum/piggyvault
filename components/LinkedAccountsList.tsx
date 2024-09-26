@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Skeleton } from "./ui/skeleton";
+import { toast } from "sonner";
 
 const AccountsList = () => {
   const router = useRouter();
@@ -32,10 +33,27 @@ const AccountsList = () => {
     if (sp.has("code")) {
       const connectAccount = async () => {
         await completeAccountConnection({
-          code: sp.get("code")!,
+          auth_code: sp.get("code")!,
         });
       };
       connectAccount();
+    }
+    if (sp.has("success")) {
+      const showToast = () => {
+        router.push("/linked-accounts");
+        toast.success("Success! 🎉", {
+          description: sp.get("success")!,
+          action: {
+            label: "Close",
+            onClick: () => onCloseToastAction(),
+          },
+          onAutoClose: () => onCloseToastAction(),
+        });
+      };
+      const onCloseToastAction = () => {
+        router.replace("/linked-accounts");
+      };
+      showToast();
     }
   }, [sp]);
 
@@ -62,7 +80,6 @@ const AccountsList = () => {
           <>
             <div className="flex flex-col gap-2 h-full w-full p-6">
               <h3 className="font-semibold flex-1">Link a new account</h3>
-              <p className="text-sm">•••</p>
               <p className="text-sm">Access transaction and balance data</p>
             </div>
             <div className="absolute top-[38%] left-1/2 transform -translate-x-1/2 -traslate-y-1/2">
@@ -81,17 +98,22 @@ const AccountsList = () => {
           alt="lines"
         />
       </button>
-      {accounts.map((account, index) => {
-        const cardName = account.product
-          ? account.product.toLowerCase()
-          : account.name.toLowerCase();
+      {accounts?.map((account, index) => {
         return (
           <div
             key={index}
             className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
           >
             <div className="flex flex-col gap-2 h-full p-6">
-              <h3 className="font-semibold flex-1 capitalize">{cardName}</h3>
+              <div className="flex-1">
+                <h1 className="font-semibold">{account.institution_name}</h1>
+                {account.product_name && (
+                  <h2 className="font-semibold text-xs flex-1">
+                    {account.product_name}
+                  </h2>
+                )}
+              </div>
+
               <div className="flex">
                 <p className="text-sm grow">{account.currency}</p>
                 <div className="flex items-center justify-end gap-1 text-green-400/90">
@@ -99,7 +121,7 @@ const AccountsList = () => {
                   <BadgeCheck size="18" />
                 </div>
               </div>
-              <p className="text-sm">{account.account_id.iban}</p>
+              <p className="text-sm">{account.iban}</p>
             </div>
             <Image
               className="absolute top-0 left-0 opacity-50"

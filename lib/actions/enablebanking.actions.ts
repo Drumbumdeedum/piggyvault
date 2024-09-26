@@ -8,9 +8,9 @@ import { revalidatePath } from "next/cache";
 import { filterDuplicates } from "../utils";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
+const base_headers = getBaseHeaders();
 
 export const listBanks = async ({ countryCode }: { countryCode: string }) => {
-  const base_headers = getBaseHeaders();
   const aspsps_response = await fetch(
     `${ENABLE_BANKING_BASE_URL}/aspsps?country=${countryCode.toUpperCase()}`,
     {
@@ -40,7 +40,6 @@ export const connectAccount = async ({
   bankName: string;
   countryCode: string;
 }) => {
-  const base_headers = getBaseHeaders();
   const validUntilDays = 10;
   const validUntil = new Date(
     new Date().getTime() + validUntilDays * 24 * 60 * 60 * 1000
@@ -69,67 +68,74 @@ export const connectAccount = async ({
   return startAuthorizationData;
 };
 
-export const completeAccountConnection = async ({ code }: { code: string }) => {
+export const completeAccountConnection = async ({
+  auth_code,
+}: {
+  auth_code: string;
+}) => {
   const supabase = createClient();
-  const user = await getLoggedInUser();
+  const { id: user_id } = await getLoggedInUser();
 
-  const { data, error } = await supabase
-    .from("account_connections")
-    .insert({ userId: user.id, authCode: code })
-    .select();
-
-  if (error) {
-    console.log(error);
-    return;
+  let account_connection = await getAccountConnectionByUserIdAndAuthCode({
+    user_id,
+    auth_code,
+  });
+  if (!account_connection) {
+    account_connection = await createAccountConnection({
+      user_id,
+      auth_code,
+    });
   }
+
+  const session = await createOrRetrieveSession({
+    user_id: user_id,
+    auth_code,
+    session_id: account_connection.session_id,
+  });
+
+  await Promise.all(
+    session.accounts?.map(async (account_id) => {
+      const accountDetailsPromise = await getAccountDetails(account_id);
+      const accountDetailsResult: EnablebankingAccount =
+        await accountDetailsPromise.json();
+      await supabase.from("accounts").insert({
+        user_id: user_id,
+        institution_name: session.aspsp.name,
+        country: session.aspsp.country,
+        product_name: accountDetailsResult.details
+          ? accountDetailsResult.details
+          : accountDetailsResult.product,
+        currency: accountDetailsResult.currency,
+        iban: accountDetailsResult.account_id.iban,
+        account_uid: accountDetailsResult.uid,
+      });
+    })
+  );
   revalidatePath("/linked-accounts");
-  return;
+  return encodedRedirect(
+    "success",
+    "/linked-accounts",
+    "Your account is now connected."
+  );
 };
 
 export const listAccounts = async () => {
-  const base_headers = getBaseHeaders();
   const user: User = await getLoggedInUser();
-
   const supabase = createClient();
   const { data, error } = await supabase
-    .from("account_connections")
+    .from("accounts")
     .select("*")
     .eq("user_id", user.id);
-
   if (error) {
     console.log(error);
     return;
   }
-
-  const allAccounts = await Promise.all(
-    data.map(async (accountConnection) => {
-      const session = await createOrRetrieveSession({
-        user_id: user.id,
-        base_headers,
-        accountConnection,
-      });
-      const accounts = await Promise.all(
-        session.accounts.map(async (accountId: any) => {
-          const accountDetailsResponse = await fetch(
-            `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/details`,
-            {
-              headers: base_headers,
-            }
-          );
-          return await accountDetailsResponse.json();
-        })
-      );
-
-      return accounts;
-    })
-  );
-  return allAccounts.flat() as Account[];
+  return data as Account[];
 };
 
 export const getTotalBalance = async () => {
   const allAccounts = await listAccounts();
   if (!allAccounts) return;
-  const base_headers = getBaseHeaders();
 
   const totalBalances = await Promise.all(
     allAccounts.map(async (account) => {
@@ -147,104 +153,120 @@ export const getTotalBalance = async () => {
   return totalBalances.flat();
 };
 
-/* // 10 days ahead
-const validUntil = new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000);
-const startAuthorizationBody = {
-  access: {
-    valid_until: validUntil.toISOString(),
-  },
-  aspsp: {
-    name: "UniCredit Bank",
-    country: "HU",
-  },
-  state: userId,
-  redirect_url: ENABLE_BANKING_REDIRECT_URI,
-  psu_type: "personal",
-};
-const startAuthorizationResponse = await fetch(
-  `${ENABLE_BANKING_BASE_URL}/auth`,
-  {
-    method: "POST",
-    headers: base_headers,
-    body: JSON.stringify(startAuthorizationBody),
-  }
-);
-const startAuthorizationData = await startAuthorizationResponse.text();
-console.log(`Start authorization data: ${startAuthorizationData}`);
-
-const createSessionResponse = await fetch(
-  `${ENABLE_BANKING_BASE_URL}/sessions/96373b22-691b-48ac-b528-8aad4639a180`,
-  {
-    method: "GET",
-    headers: base_headers,
-  }
-);
-const session = await createSessionResponse.json();
-console.log(session);
-
-// Using the first available account for the following API calls
-const accountId = session.accounts[0];
-const accountBalancesResponse = await fetch(
-  `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/balances`,
-  {
-    headers: base_headers,
-  }
-);
-const balances = await accountBalancesResponse.json();
-console.log(balances);
-
-const accountTransactionsResponse = await fetch(
-  `${ENABLE_BANKING_BASE_URL}/accounts/${accountId}/transactions`,
-  {
-    headers: base_headers,
-  }
-);
-const transactions = await accountTransactionsResponse.json();
-console.log(transactions); */
-
 const createOrRetrieveSession = async ({
   user_id,
-  base_headers,
-  accountConnection,
+  auth_code,
+  session_id,
+}: CreateOrRetrieveSessionRequest) => {
+  let current_session_id = session_id;
+  if (!current_session_id) {
+    const postSessionPromise = await postSession(auth_code);
+    const postSessionBody: CreateSessionResponse =
+      await postSessionPromise.json();
+    current_session_id = postSessionBody.session_id;
+    await updateAccountConnectionSessionId({
+      user_id,
+      session_id: postSessionBody.session_id,
+      auth_code,
+    });
+  }
+  const getSessionPromise = await getSession(current_session_id);
+  const getSessionBody: GetSessionResponse = await getSessionPromise.json();
+  return getSessionBody;
+};
+
+const getSession = (session_id: string) => {
+  return fetch(`https://api.enablebanking.com/sessions/${session_id}`, {
+    method: "GET",
+    headers: base_headers,
+  });
+};
+
+const postSession = (auth_code: string) => {
+  const createSessionRequestBody = {
+    code: auth_code,
+  };
+  return fetch(`https://api.enablebanking.com/sessions`, {
+    method: "POST",
+    headers: base_headers,
+    body: JSON.stringify(createSessionRequestBody),
+  });
+};
+
+const updateAccountConnectionSessionId = async ({
+  user_id,
+  session_id,
+  auth_code,
 }: {
   user_id: string;
-  base_headers: any;
-  accountConnection: AccountConnection;
+  session_id: string;
+  auth_code: string;
 }) => {
-  let sessionBody;
-  //  If session has already been initialized retrieve it by stored session_id
-  if (accountConnection.session_id) {
-    const getSessionRequest = await fetch(
-      `https://api.enablebanking.com/sessions/${accountConnection.session_id}`,
-      {
-        method: "GET",
-        headers: base_headers,
-      }
-    );
-    sessionBody = await getSessionRequest.json();
-    if (sessionBody.status === "AUTHORIZED") return sessionBody;
+  if (session_id) {
+    const supabase = createClient();
+    await supabase
+      .from("account_connections")
+      .update({
+        session_id: session_id,
+      })
+      .eq("user_id", user_id)
+      .eq("auth_code", auth_code)
+      .select("*");
   }
+};
 
-  const createSessionRequestBody = {
-    code: accountConnection.auth_code,
-  };
-  const createSessionResponse = await fetch(
-    `https://api.enablebanking.com/sessions`,
-    {
-      method: "POST",
-      headers: base_headers,
-      body: JSON.stringify(createSessionRequestBody),
-    }
-  );
-  sessionBody = await createSessionResponse.json();
+const getAccountDetails = (account_id: string) => {
+  return fetch(`${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/details`, {
+    method: "GET",
+    headers: base_headers,
+  });
+};
+
+const getAccountConnectionByUserIdAndAuthCode = async ({
+  user_id,
+  auth_code,
+}: {
+  user_id: string;
+  auth_code: string;
+}) => {
   const supabase = createClient();
-  await supabase
+  const { data, error } = await supabase
     .from("account_connections")
-    .update({
-      session_id: sessionBody.session_id,
-    })
+    .select("*")
     .eq("user_id", user_id)
+    .eq("auth_code", auth_code);
+
+  if (error) {
+    console.log("Error while retrieving account_connection", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while retrieving account_connection", error);
+    return;
+  }
+  return data[0];
+};
+
+const createAccountConnection = async ({
+  user_id,
+  auth_code,
+}: {
+  user_id: string;
+  auth_code: string;
+}) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("account_connections")
+    .insert({ user_id: user_id, auth_code })
     .select();
 
-  return sessionBody;
+  if (error) {
+    console.log("Error while creating account_connection", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while creating account_connection", error);
+    return;
+  }
+  return data[0];
 };
