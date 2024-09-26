@@ -38,7 +38,14 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
-            <DoughnutChart accounts={accounts} />
+            <DoughnutChart
+              items={accounts.map((account) => {
+                return {
+                  label: account.institution_name,
+                  value: account.current_balance,
+                };
+              })}
+            />
           </div>
           {loading && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2 w-full h-full bg-muted-foreground/5 rounded-xl">

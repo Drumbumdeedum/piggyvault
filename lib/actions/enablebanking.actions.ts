@@ -137,7 +137,7 @@ export const fetchAllUserAccounts = async ({
   return data as Account[];
 };
 
-export const getTotalBalance = async () => {
+export const updateAccountTotalBalances = async () => {
   const { id: user_id }: User = await getLoggedInUser();
   const allAccounts = await fetchAllUserAccounts({ user_id });
   if (!allAccounts || !user_id) return;
@@ -183,8 +183,6 @@ export const getTotalBalance = async () => {
   );
   return resultAccounts.flat();
 };
-
-const updateAccountBalance = () => {};
 
 const createOrRetrieveSession = async ({
   user_id,

@@ -8,20 +8,24 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const DoughnutChart = ({ accounts }: { accounts: Account[] }) => {
-  const mappedChartData = accounts.map((account, index) => {
+const DoughnutChart = ({
+  items,
+}: {
+  items: { label: string; value: number }[];
+}) => {
+  const mappedChartData = items.map((item, index) => {
     return {
-      name: account.institution_name,
-      balance: account.current_balance,
+      name: item.label,
+      balance: item.value,
       fill: `var(--color-bank_${index + 1})`,
     };
   });
 
   let mappedChartConfig: ChartConfig = {};
-  accounts.forEach((account, index) => {
+  items.forEach((item, index) => {
     const key = `bank_${index + 1}` as keyof ChartConfig;
     mappedChartConfig[key] = {
-      label: account.institution_name,
+      label: item.label,
       color: `hsl(var(--chart-${index + 1}))`,
     };
   });
