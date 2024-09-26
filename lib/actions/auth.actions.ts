@@ -10,7 +10,7 @@ import { parseStringify } from "../utils";
 const formSchema = authFormSchema("sign-up");
 
 export const signUpAction = async (values: z.infer<typeof formSchema>) => {
-  const { email, password, firstName, lastName } = values;
+  const { email, password, first_name, last_name } = values;
   const supabase = createClient();
   const origin = headers().get("origin");
 
@@ -37,8 +37,8 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
 
   const { error: dbUserError } = await supabase.from("users").insert({
     email,
-    firstName,
-    lastName,
+    first_name,
+    last_name,
   });
 
   if (dbUserError) {
@@ -50,7 +50,7 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     );
   }
 
-  return encodedRedirect("success", "/", "Thanks for signing up!");
+  return encodedRedirect("success", "/", "");
 };
 
 export const signInAction = async (values: z.infer<typeof formSchema>) => {

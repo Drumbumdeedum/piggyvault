@@ -21,14 +21,14 @@ const PersonalDataForm = ({ user }: { user: User }) => {
   const firstNameForm = useForm<z.infer<typeof firstNameFormSchema>>({
     resolver: zodResolver(firstNameFormSchema),
     defaultValues: {
-      firstName: user.firstName,
+      first_name: user.first_name,
     },
   });
   const lastNameFormSchema = lastNameSchema();
   const lastNameForm = useForm<z.infer<typeof lastNameFormSchema>>({
     resolver: zodResolver(lastNameFormSchema),
     defaultValues: {
-      lastName: user.lastName,
+      last_name: user.last_name,
     },
   });
 
@@ -36,16 +36,16 @@ const PersonalDataForm = ({ user }: { user: User }) => {
     values: z.infer<typeof firstNameFormSchema>
   ) => {
     await updateFirstName({
-      userId: user.id,
-      firstName: values.firstName,
+      user_id: user.id,
+      first_name: values.first_name,
     });
   };
   const onLastNameSubmit = async (
     values: z.infer<typeof lastNameFormSchema>
   ) => {
     await updateLastName({
-      userId: user.id,
-      lastName: values.lastName,
+      user_id: user.id,
+      last_name: values.last_name,
     });
   };
   return (
@@ -57,7 +57,7 @@ const PersonalDataForm = ({ user }: { user: User }) => {
         >
           <FormField
             control={firstNameForm.control}
-            name="firstName"
+            name="first_name"
             render={({ field }) => (
               <div>
                 <FormLabel htmlFor="First name">First name</FormLabel>
@@ -91,7 +91,7 @@ const PersonalDataForm = ({ user }: { user: User }) => {
         >
           <FormField
             control={lastNameForm.control}
-            name="lastName"
+            name="last_name"
             render={({ field }) => (
               <div>
                 <FormLabel htmlFor="First name">Last name</FormLabel>

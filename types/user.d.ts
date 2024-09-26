@@ -1,9 +1,8 @@
 declare type User = {
   id: string;
-  userId: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  enablebankingSessionIds: string[];
-  enablebankingSessionCodes: string[];
+  created_at: string;
+  updated_at: string;
+  first_name: string;
+  last_name: string;
 };

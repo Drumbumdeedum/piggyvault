@@ -1,9 +1,9 @@
 declare type UpdateFirstNameRequest = {
-  userId: string;
-  firstName: string;
+  user_id: string;
+  first_name: string;
 };
 
 declare type UpdateLastNameRequest = {
-  userId: string;
-  lastName: string;
+  user_id: string;
+  last_name: string;
 };

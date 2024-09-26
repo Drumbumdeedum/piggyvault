@@ -71,7 +71,7 @@ export const completeAccountConnection = async ({ code }: { code: string }) => {
   const user = await getLoggedInUser();
 
   const { data, error } = await supabase
-    .from("accountConnections")
+    .from("account_connections")
     .insert({ userId: user.id, authCode: code })
     .select();
 
@@ -89,7 +89,7 @@ export const listAccounts = async () => {
 
   const supabase = createClient();
   const { data, error } = await supabase
-    .from("accountConnections")
+    .from("account_connections")
     .select("*")
     .eq("userId", user.id);
 
@@ -105,7 +105,6 @@ export const listAccounts = async () => {
         baseHeaders,
         accountConnection,
       });
-      console.log("SESSION:", session);
       const accounts = await Promise.all(
         session.accounts.map(async (accountId: any) => {
           const accountDetailsResponse = await fetch(
@@ -139,8 +138,6 @@ export const getTotalBalance = async () => {
       );
       const result = await accountBalancesResponse.json();
       const filtered = filterDuplicates(result.balances);
-      console.log("FILTERED: ", filtered);
-      console.log("ACCOUNT", account);
       return filtered;
     })
   );
@@ -212,6 +209,7 @@ const createOrRetrieveSession = async ({
   accountConnection: { sessionId: string; authCode: string };
 }) => {
   let sessionBody;
+  //  If session has already been initialized
   if (accountConnection.sessionId) {
     const getSessionRequest = await fetch(
       `https://api.enablebanking.com/sessions/${accountConnection.sessionId}`,
@@ -221,27 +219,29 @@ const createOrRetrieveSession = async ({
       }
     );
     sessionBody = await getSessionRequest.json();
-  } else {
-    const createSessionBody = {
-      code: accountConnection.authCode,
-    };
-    const createSessionResponse = await fetch(
-      `https://api.enablebanking.com/sessions`,
-      {
-        method: "POST",
-        headers: baseHeaders,
-        body: JSON.stringify(createSessionBody),
-      }
-    );
-    sessionBody = await createSessionResponse.json();
-    const supabase = createClient();
-    await supabase
-      .from("accountConnections")
-      .update({
-        sessionId: sessionBody.session_id,
-      })
-      .eq("userId", userId)
-      .select();
+    if (sessionBody.status === "AUTHORIZED") return sessionBody;
   }
+
+  const createSessionRequestBody = {
+    code: accountConnection.authCode,
+  };
+  const createSessionResponse = await fetch(
+    `https://api.enablebanking.com/sessions`,
+    {
+      method: "POST",
+      headers: baseHeaders,
+      body: JSON.stringify(createSessionRequestBody),
+    }
+  );
+  sessionBody = await createSessionResponse.json();
+  const supabase = createClient();
+  await supabase
+    .from("account_connections")
+    .update({
+      sessionId: sessionBody.session_id,
+    })
+    .eq("userId", userId)
+    .select();
+
   return sessionBody;
 };

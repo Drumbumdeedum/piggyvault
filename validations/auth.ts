@@ -3,13 +3,13 @@ import { z } from "zod";
 export const authFormSchema = (type: string) =>
   z.object({
     // sign up only fields
-    firstName:
+    first_name:
       type === "sign-in"
         ? z.string().optional()
         : z.string().min(3, {
             message: "Required",
           }),
-    lastName:
+    last_name:
       type === "sign-in"
         ? z.string().optional()
         : z.string().min(3, {

@@ -19,8 +19,8 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
     },
   });
 
@@ -70,14 +70,14 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
                 <AuthFormInput
                   id="form_first_name_input"
                   control={form.control}
-                  name="firstName"
+                  name="first_name"
                   label="First name"
                   placeholder="First name"
                 />
                 <AuthFormInput
                   id="form_last_name_input"
                   control={form.control}
-                  name="lastName"
+                  name="last_name"
                   label="Last name"
                   placeholder="Last name"
                 />
