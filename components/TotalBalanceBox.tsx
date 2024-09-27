@@ -16,14 +16,14 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const fetchTotalBalance = async () => {
-      const accounts = await fetchAllUserAccounts({ user_id: user.id });
-      if (accounts) {
+      const fetchedAccounts = await fetchAllUserAccounts({ user_id: user.id });
+      if (fetchedAccounts) {
         let totalBalance = 0;
-        accounts.forEach(
-          (accounts) => (totalBalance += accounts.current_balance)
+        fetchedAccounts.forEach(
+          (fetchedAccount) => (totalBalance += fetchedAccount.current_balance)
         );
         setTotalCurrentBalance(totalBalance);
-        setAccounts(accounts);
+        setAccounts(fetchedAccounts);
         setLoading(false);
       }
     };
