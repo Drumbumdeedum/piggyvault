@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import AnimatedCounter from "./AnimatedCounter";
 import DoughnutChart from "./DoughnutChart";
 
-import { fetchAllUserAccounts } from "@/lib/actions/enablebanking.actions";
 import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
+import { readAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
 
 export const TotalBalanceBox = ({ user }: { user: User }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -16,7 +16,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const fetchTotalBalance = async () => {
-      const fetchedAccounts = await fetchAllUserAccounts({ user_id: user.id });
+      const fetchedAccounts = await readAccountsByUserId({ user_id: user.id });
       if (fetchedAccounts) {
         let totalBalance = 0;
         fetchedAccounts.forEach(

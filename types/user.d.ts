@@ -6,3 +6,13 @@ declare type User = {
   first_name: string;
   last_name: string;
 };
+
+declare type UpdateFirstNameProps = {
+  user_id: string;
+  first_name: string;
+};
+
+declare type UpdateLastNameRequest = {
+  user_id: string;
+  last_name: string;
+};

@@ -13,7 +13,10 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ghostBanks } from "@/constants/placeholders";
 import { cn } from "@/lib/utils";
-import { connectAccount, listBanks } from "@/lib/actions/enablebanking.actions";
+import {
+  connectAccount,
+  getBanksByCountryCode,
+} from "@/lib/actions/enablebanking/api.actions";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
@@ -30,7 +33,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
   useEffect(() => {
     const getBanks = async () => {
       setLoading(true);
-      const banks = await listBanks({ countryCode });
+      const banks = await getBanksByCountryCode({ countryCode });
       if (banks) {
         setBanks(banks);
         setLoading(false);

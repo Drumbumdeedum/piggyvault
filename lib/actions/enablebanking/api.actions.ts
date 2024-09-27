@@ -2,34 +2,21 @@
 
 import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
-import { getLoggedInUser } from "./auth.actions";
+import { getLoggedInUser } from "../auth.actions";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { filterDuplicates } from "../utils";
+import { filterDuplicates } from "../../utils";
+import {
+  createAccount,
+  createAccountConnection,
+  readAccountConnectionByUserIdAndAuthCode,
+  readAccountsByUserId,
+  updateAccountBalanceAndBalanceName,
+  updateAccountConnectionSessionIdByUserIdAndAuthCode,
+} from "./db.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 const base_headers = getBaseHeaders();
-
-export const listBanks = async ({ countryCode }: { countryCode: string }) => {
-  const aspsps_response = await fetch(
-    `${ENABLE_BANKING_BASE_URL}/aspsps?country=${countryCode.toUpperCase()}`,
-    {
-      headers: base_headers,
-    }
-  );
-  const response_body = await aspsps_response.json();
-  if (
-    response_body.code === 422 &&
-    response_body.error === "WRONG_REQUEST_PARAMETERS"
-  ) {
-    return encodedRedirect(
-      "error",
-      "/linked-accounts/country",
-      "Invalid country code."
-    );
-  }
-  return response_body.aspsps;
-};
 
 export const connectAccount = async ({
   userId,
@@ -73,10 +60,9 @@ export const completeAccountConnection = async ({
 }: {
   auth_code: string;
 }) => {
-  const supabase = createClient();
   const { id: user_id } = await getLoggedInUser();
 
-  let account_connection = await getAccountConnectionByUserIdAndAuthCode({
+  let account_connection = await readAccountConnectionByUserIdAndAuthCode({
     user_id,
     auth_code,
   });
@@ -98,7 +84,7 @@ export const completeAccountConnection = async ({
       const accountDetailsPromise = await getAccountDetails(account_id);
       const accountDetailsResult: GetAccountDetailResponse =
         await accountDetailsPromise.json();
-      await supabase.from("accounts").insert({
+      await createAccount({
         user_id: user_id,
         institution_name: session.aspsp.name,
         country: session.aspsp.country,
@@ -110,78 +96,52 @@ export const completeAccountConnection = async ({
         account_uid: accountDetailsResult.uid,
         account_id: account_id,
       });
+
+      await updateAccountTotalBalance({ user_id, account_id });
     })
   );
   revalidatePath("/linked-accounts");
   return encodedRedirect(
     "success",
-    "/linked-accounts",
+    "/settings/linked-accounts",
     "Your account is now connected."
   );
 };
 
-export const fetchAllUserAccounts = async ({
-  user_id,
-}: {
-  user_id: string;
-}) => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("accounts")
-    .select("*")
-    .eq("user_id", user_id);
-  if (error) {
-    console.log(error);
-    return;
-  }
-  return data as Account[];
-};
-
-export const updateAccountTotalBalances = async () => {
+export const updateAllAccountsTotalBalances = async () => {
   const { id: user_id }: User = await getLoggedInUser();
-  const allAccounts = await fetchAllUserAccounts({ user_id });
+  const allAccounts = await readAccountsByUserId({ user_id });
   if (!allAccounts || !user_id) return;
-
   const resultAccounts: Account[][] = await Promise.all(
     allAccounts.map(async (account) => {
-      const accountBalancesResponse = await fetch(
-        `${ENABLE_BANKING_BASE_URL}/accounts/${account.account_id}/balances`,
-        {
-          headers: base_headers,
-        }
-      );
-      const accountBalancesResponseBody: BalancesResponse =
-        await accountBalancesResponse.json();
-      const balances: BalanceResponse[] = filterDuplicates(
-        accountBalancesResponseBody.balances
-      );
-      const savedAccounts = await Promise.all(
-        balances.map(async (balance: BalanceResponse) => {
-          const supabase = createClient();
-          const { data, error } = await supabase
-            .from("accounts")
-            .update({
-              current_balance: parseFloat(balance.balance_amount.amount),
-              balance_name: balance.name,
-            })
-            .eq("user_id", user_id)
-            .eq("account_id", account.account_id)
-            .select("*");
-          if (error) {
-            console.log("Error while updating account balance.", error);
-            return;
-          }
-          if (!data) {
-            console.log("Error while updating account balance.", error);
-            return;
-          }
-          return data[0];
-        })
-      );
-      return savedAccounts;
+      return updateAccountTotalBalance({
+        user_id,
+        account_id: account.account_id,
+      });
     })
   );
   return resultAccounts.flat();
+};
+
+const updateAccountTotalBalance = async ({
+  user_id,
+  account_id,
+}: {
+  user_id: string;
+  account_id: string;
+}) => {
+  const accountBalancesResponse: BalanceResponse[] =
+    await getAccountTotalBalances(account_id);
+  return await Promise.all(
+    accountBalancesResponse.map(async (balance: BalanceResponse) => {
+      return await updateAccountBalanceAndBalanceName({
+        user_id,
+        account_id,
+        current_balance: parseFloat(balance.balance_amount.amount),
+        balance_name: balance.name,
+      });
+    })
+  );
 };
 
 const createOrRetrieveSession = async ({
@@ -195,7 +155,7 @@ const createOrRetrieveSession = async ({
     const postSessionBody: CreateSessionResponse =
       await postSessionPromise.json();
     current_session_id = postSessionBody.session_id;
-    await updateAccountConnectionSessionId({
+    await updateAccountConnectionSessionIdByUserIdAndAuthCode({
       user_id,
       session_id: postSessionBody.session_id,
       auth_code,
@@ -204,6 +164,32 @@ const createOrRetrieveSession = async ({
   const getSessionPromise = await getSession(current_session_id);
   const getSessionBody: GetSessionResponse = await getSessionPromise.json();
   return getSessionBody;
+};
+
+export const getBanksByCountryCode = async ({
+  countryCode,
+}: {
+  countryCode: string;
+}) => {
+  const aspsps_response = await fetch(
+    `${ENABLE_BANKING_BASE_URL}/aspsps?country=${countryCode.toUpperCase()}`,
+    {
+      method: "GET",
+      headers: base_headers,
+    }
+  );
+  const response_body = await aspsps_response.json();
+  if (
+    response_body.code === 422 &&
+    response_body.error === "WRONG_REQUEST_PARAMETERS"
+  ) {
+    return encodedRedirect(
+      "error",
+      "/settings/linked-accounts/country",
+      "Invalid country code."
+    );
+  }
+  return response_body.aspsps;
 };
 
 const getSession = (session_id: string) => {
@@ -224,28 +210,6 @@ const postSession = (auth_code: string) => {
   });
 };
 
-const updateAccountConnectionSessionId = async ({
-  user_id,
-  session_id,
-  auth_code,
-}: {
-  user_id: string;
-  session_id: string;
-  auth_code: string;
-}) => {
-  if (session_id) {
-    const supabase = createClient();
-    await supabase
-      .from("account_connections")
-      .update({
-        session_id: session_id,
-      })
-      .eq("user_id", user_id)
-      .eq("auth_code", auth_code)
-      .select("*");
-  }
-};
-
 const getAccountDetails = (account_id: string) => {
   return fetch(`${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/details`, {
     method: "GET",
@@ -253,51 +217,26 @@ const getAccountDetails = (account_id: string) => {
   });
 };
 
-const getAccountConnectionByUserIdAndAuthCode = async ({
-  user_id,
-  auth_code,
-}: {
-  user_id: string;
-  auth_code: string;
-}) => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("account_connections")
-    .select("*")
-    .eq("user_id", user_id)
-    .eq("auth_code", auth_code);
-
-  if (error) {
-    console.log("Error while retrieving account_connection", error);
-    return;
+const getAccountTotalBalances = async (
+  account_id: string
+): Promise<BalanceResponse[]> => {
+  const accountBalancesResponse = await fetch(
+    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/balances`,
+    {
+      headers: base_headers,
+    }
+  );
+  if (!accountBalancesResponse.ok) {
+    console.log(
+      `Error ${accountBalancesResponse.status} while fetching account balances.`
+    );
   }
-  if (!data) {
-    console.log("Error while retrieving account_connection", error);
-    return;
-  }
-  return data[0];
-};
-
-const createAccountConnection = async ({
-  user_id,
-  auth_code,
-}: {
-  user_id: string;
-  auth_code: string;
-}) => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("account_connections")
-    .insert({ user_id: user_id, auth_code })
-    .select();
-
-  if (error) {
-    console.log("Error while creating account_connection", error);
-    return;
-  }
-  if (!data) {
-    console.log("Error while creating account_connection", error);
-    return;
-  }
-  return data[0];
+  const accountBalancesResponseBody: BalancesResponse =
+    await accountBalancesResponse.json();
+  // For some reason the enablebanking API sometimes return the exact same balance twice,
+  // due to this we have to filter out duplicates using a deepEqual function here
+  const balances: BalanceResponse[] = filterDuplicates(
+    accountBalancesResponseBody.balances
+  );
+  return balances;
 };

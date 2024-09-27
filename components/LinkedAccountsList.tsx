@@ -1,15 +1,13 @@
 "use client";
 
-import {
-  completeAccountConnection,
-  fetchAllUserAccounts,
-} from "@/lib/actions/enablebanking.actions";
 import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
+import { readNonCashAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
+import { completeAccountConnection } from "@/lib/actions/enablebanking/api.actions";
 
 const AccountsList = ({ user }: { user: User }) => {
   const router = useRouter();
@@ -22,7 +20,7 @@ const AccountsList = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const getAccounts = async () => {
-      const accounts = await fetchAllUserAccounts({ user_id: user.id });
+      const accounts = await readNonCashAccountsByUserId({ user_id: user.id });
       setAccounts(accounts!);
       setLoading(false);
     };

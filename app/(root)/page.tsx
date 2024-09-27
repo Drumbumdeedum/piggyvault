@@ -1,6 +1,6 @@
 import PageHeader from "@/components/PageHeader";
 import { TotalBalanceBox } from "@/components/TotalBalanceBox";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import WelcomeDialog from "@/components/WelcomeDialog";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
@@ -11,21 +11,16 @@ export default async function Index() {
     <>
       <main>
         <WelcomeDialog user={user} />
-        <PageHeader
-          title={`Welcome ${user.first_name} ${user.last_name}`}
-          subtitle="Access and manage your account and transactions"
-        />
-        <Card className="flex flex-col lg:flex-row gap-5 p-6">
-          <TotalBalanceBox user={user} />
-          <Card>
-            <div className="p-6">Expenses this month</div>
-          </Card>
-          <Card>
-            <div className="p-6">Incomes this month</div>
-          </Card>
-          <Card>
-            <div className="p-6">Recent transactions</div>
-          </Card>
+        <Card>
+          <CardHeader>
+            <PageHeader
+              title={`Welcome ${user.first_name} ${user.last_name}`}
+              subtitle="Access and manage your account and transactions"
+            />
+          </CardHeader>
+          <CardContent className="flex flex-col lg:flex-row gap-5 p-6 items-center justify-center">
+            <TotalBalanceBox user={user} />
+          </CardContent>
         </Card>
       </main>
     </>

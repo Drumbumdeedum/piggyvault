@@ -1,13 +1,3 @@
-declare type AccountConnection = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-  auth_code: string;
-  session_id: string;
-  valid_until: string;
-};
-
 declare type Country = {
   code: string;
   name: string;
@@ -26,14 +16,14 @@ declare type BalancesResponse = {
 
 declare type BalanceResponse = {
   name: string;
-  balance_amount: BalanceAmount;
+  balance_amount: BalanceAmountResponse;
   balance_type: string;
   last_change_date_time: string;
   reference_date: string;
   last_committed_transaction: string;
 };
 
-declare type BalanceAmount = {
+declare type BalanceAmountResponse = {
   amount: string;
   currency: string;
 };
@@ -42,7 +32,7 @@ declare type GetAccountDetailResponse = {
   account_id: {
     iban: string;
   };
-  all_account_ids: AccountId[];
+  all_account_ids: AccountIdResponse[];
   account_servicer: {
     bic_fi: string;
     clearing_system_member_id: {
@@ -68,7 +58,7 @@ declare type GetAccountDetailResponse = {
   identification_hashes: string[];
 };
 
-declare type AccountId = {
+declare type AccountIdResponse = {
   identification: string;
   scheme_name: string;
 };
@@ -88,22 +78,12 @@ declare type GetSessionResponse = {
     valid_until: string;
   };
   accounts: string[];
-  accounts_data: AccountsData[];
-  aspsp: Aspsp;
+  accounts_data: AccountsDataResponse[];
+  aspsp: AspspResponse;
   authorized: string;
   created: string;
   psu_type: PSU_TYPE;
   status: string;
-};
-
-declare type AccountsData = {
-  identification_hash: "string";
-  uid: "string";
-};
-
-declare type Aspsp = {
-  name: string;
-  country: string;
 };
 
 enum PSU_TYPE {
@@ -111,24 +91,18 @@ enum PSU_TYPE {
   personal = "personal",
 }
 
+declare type AccountsDataResponse = {
+  identification_hash: "string";
+  uid: "string";
+};
+
+declare type AspspResponse = {
+  name: string;
+  country: string;
+};
+
 declare type CreateOrRetrieveSessionRequest = {
   user_id: string;
   auth_code: string;
   session_id?: string;
-};
-
-declare type Account = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  account_uid: string;
-  user_id: string;
-  iban: string;
-  institution_name: string;
-  country: string;
-  currency: string;
-  product_name: string;
-  account_id: string;
-  current_balance: number;
-  balance_name: string;
 };
