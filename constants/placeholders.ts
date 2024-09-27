@@ -1,105 +1,10 @@
-export const ghostBanks = [
-  {
+export const ghostBanks = new Array(20).fill(0).map(() => {
+  return {
     logo: "",
     name: "",
     country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-  {
-    logo: "",
-    name: "",
-    country: "",
-  },
-];
+  };
+});
 
 export const ghostAccounts = [
   {
