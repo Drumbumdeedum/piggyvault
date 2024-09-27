@@ -7,6 +7,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { getLastCharOfNumber } from "@/lib/utils";
 
 const DoughnutChart = ({
   items,
@@ -17,16 +18,16 @@ const DoughnutChart = ({
     return {
       name: item.label,
       balance: item.value,
-      fill: `var(--color-bank_${index + 1})`,
+      fill: `var(--color-bank_${getLastCharOfNumber(index)})`,
     };
   });
 
   let mappedChartConfig: ChartConfig = {};
   items.forEach((item, index) => {
-    const key = `bank_${index + 1}` as keyof ChartConfig;
+    const key = `bank_${getLastCharOfNumber(index)}` as keyof ChartConfig;
     mappedChartConfig[key] = {
       label: item.label,
-      color: `hsl(var(--chart-${index + 1}))`,
+      color: `hsl(var(--chart-${getLastCharOfNumber(index)}))`,
     };
   });
   return (

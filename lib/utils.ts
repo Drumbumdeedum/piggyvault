@@ -31,3 +31,8 @@ export const filterDuplicates = (arr: any) => {
       index === self.findIndex((otherObj: any) => deepEqual(obj, otherObj))
   );
 };
+
+export const getLastCharOfNumber = (number: number) => {
+  const numberStr = number.toString();
+  return numberStr.charAt(numberStr.length - 1);
+};

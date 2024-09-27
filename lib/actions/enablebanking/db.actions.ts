@@ -11,7 +11,8 @@ export const readAccountsByUserId = async ({
   const { data, error } = await supabase
     .from("accounts")
     .select("*")
-    .eq("user_id", user_id);
+    .eq("user_id", user_id)
+    .order("current_balance", { ascending: false });
   if (error) {
     console.log(error);
     return;
