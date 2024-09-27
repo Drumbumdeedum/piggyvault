@@ -12,7 +12,6 @@ import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
 
 const AccountsList = ({ user }: { user: User }) => {
-  console.log(user);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
