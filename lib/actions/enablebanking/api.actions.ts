@@ -263,8 +263,13 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
 const getTransactions = async (
   account_id: string
 ): Promise<TransactionsResponse> => {
+  let searchParams = "";
+  /*  searchParams = new URLSearchParams([
+    ["date_from", "2024-09-01"],
+    ["date_to", "2024-09-30"],
+  ]).toString(); */
   const accountTransactionsResponse = await fetch(
-    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions`,
+    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions?${searchParams}`,
     {
       method: "GET",
       headers: base_headers,
