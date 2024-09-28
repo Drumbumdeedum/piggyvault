@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/chart";
 import { getLastCharOfNumber } from "@/lib/utils";
 
-const DoughnutChart = ({
+const CustomPieChart = ({
   items,
 }: {
   items: { label: string; value: number }[];
 }) => {
   const mappedChartData = items.map((item, index) => {
     return {
-      name: item.label,
-      balance: item.value,
+      label: item.label,
+      value: item.value,
       fill: `var(--color-bank_${getLastCharOfNumber(index)})`,
     };
   });
@@ -41,8 +41,8 @@ const DoughnutChart = ({
           <Tooltip separator=" - " />
           <Pie
             data={mappedChartData}
-            dataKey="balance"
-            nameKey="name"
+            dataKey="value"
+            nameKey="label"
             innerRadius={60}
             strokeWidth={3}
             paddingAngle={5}
@@ -53,4 +53,4 @@ const DoughnutChart = ({
   );
 };
 
-export default DoughnutChart;
+export default CustomPieChart;

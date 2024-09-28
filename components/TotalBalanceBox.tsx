@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import AnimatedCounter from "./AnimatedCounter";
-import DoughnutChart from "./DoughnutChart";
 
 import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
 import { readAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
+import CustomPieChart from "./CustomPieChart";
 
 export const TotalBalanceBox = ({ user }: { user: User }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -38,7 +38,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
-            <DoughnutChart
+            <CustomPieChart
               items={accounts.map((account) => {
                 return {
                   label: account.institution_name,
