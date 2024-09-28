@@ -104,7 +104,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
                         {bank.name}
                       </span>
                     ) : (
-                      <Skeleton className=" h-6 w-56 " />
+                      <Skeleton className="h-6 w-56" />
                     )}
 
                     <div

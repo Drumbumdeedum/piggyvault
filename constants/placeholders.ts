@@ -6,6 +6,10 @@ export const ghostBanks = new Array(20).fill(0).map(() => {
   };
 });
 
+export const ghostRows = new Array(30).fill(0).map(() => {
+  return {};
+});
+
 export const ghostAccounts = [
   {
     account_id: {
