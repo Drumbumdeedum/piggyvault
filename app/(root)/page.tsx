@@ -14,7 +14,7 @@ export default async function Index() {
         <Card>
           <CardHeader>
             <PageHeader
-              title={`Welcome ${user.first_name} ${user.last_name}`}
+              title={`Welcome ${user.first_name}`}
               subtitle="Access and manage your account and transactions"
             />
           </CardHeader>

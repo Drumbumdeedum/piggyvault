@@ -1,6 +1,6 @@
 "use client";
 
-import { Pie, PieChart } from "recharts";
+import { Pie, PieChart, Tooltip } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -37,17 +37,15 @@ const DoughnutChart = ({
         className="mx-auto aspect-square max-h-[250px]"
       >
         <PieChart>
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent hideLabel />}
-          />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Tooltip separator=" - " />
           <Pie
             data={mappedChartData}
             dataKey="balance"
             nameKey="name"
             innerRadius={60}
-            strokeWidth={5}
-            paddingAngle={3}
+            strokeWidth={3}
+            paddingAngle={5}
           />
         </PieChart>
       </ChartContainer>

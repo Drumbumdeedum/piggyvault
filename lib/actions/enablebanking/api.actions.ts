@@ -11,6 +11,7 @@ import {
   createAccountConnection,
   readAccountConnectionByUserIdAndAuthCode,
   readAccountsByUserId,
+  readNonCashAccountsByUserId,
   updateAccountBalanceAndBalanceName,
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
 } from "./db.actions";
@@ -110,7 +111,7 @@ export const completeAccountConnection = async ({
 
 export const updateAllAccountsTotalBalances = async () => {
   const { id: user_id }: User = await getLoggedInUser();
-  const allAccounts = await readAccountsByUserId({ user_id });
+  const allAccounts = await readAccountsByUserId(user_id);
   if (!allAccounts || !user_id) return;
   const resultAccounts: Account[][] = await Promise.all(
     allAccounts.map(async (account) => {
@@ -223,6 +224,7 @@ const getAccountTotalBalances = async (
   const accountBalancesResponse = await fetch(
     `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/balances`,
     {
+      method: "GET",
       headers: base_headers,
     }
   );
@@ -239,4 +241,61 @@ const getAccountTotalBalances = async (
     accountBalancesResponseBody.balances
   );
   return balances;
+};
+
+export const fetchTransactionsByUserId = async (user_id: string) => {
+  const accounts = await readNonCashAccountsByUserId(user_id);
+  if (!accounts) {
+    return;
+  }
+  const transactions = await Promise.all(
+    accounts?.map(async (account) => {
+      const accountTransactions = await getTransactions(account.account_id);
+      return accountTransactions.transactions;
+    })
+  );
+
+  //const transaction = await getTransactionDetails();
+
+  return transactions.flat();
+};
+
+const getTransactions = async (
+  account_id: string
+): Promise<TransactionsResponse> => {
+  const accountTransactionsResponse = await fetch(
+    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions`,
+    {
+      method: "GET",
+      headers: base_headers,
+    }
+  );
+  if (!accountTransactionsResponse.ok) {
+    console.log(
+      `Error ${accountTransactionsResponse.status} while fetching account transactions.`
+    );
+  }
+  return await accountTransactionsResponse.json();
+};
+
+const getTransactionDetails = async ({
+  account_id,
+  transaction_id,
+}: {
+  account_id: string;
+  transaction_id: string;
+}): Promise<TransactionResponse> => {
+  const transactionDetailsResponse = await fetch(
+    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions/${transaction_id}`,
+    {
+      method: "GET",
+      headers: base_headers,
+    }
+  );
+  if (!transactionDetailsResponse.ok) {
+    console.log(
+      `Error ${transactionDetailsResponse.status} while fetching transaction details.`
+    );
+  }
+  return await transactionDetailsResponse.json();
 };

@@ -16,7 +16,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const fetchTotalBalance = async () => {
-      const fetchedAccounts = await readAccountsByUserId({ user_id: user.id });
+      const fetchedAccounts = await readAccountsByUserId(user.id);
       if (fetchedAccounts) {
         let totalBalance = 0;
         fetchedAccounts.forEach(
@@ -34,7 +34,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
       <CardContent className="p-0">
         <div className="p-6 pb-0 relative">
           <div className={cn(loading && "text-foreground/10")}>
-            <p className="text-sm">Total current balance:</p>
+            <p className="text-sm font-mono">Total current balance:</p>
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>

@@ -2,11 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 
-export const readAccountsByUserId = async ({
-  user_id,
-}: {
-  user_id: string;
-}) => {
+export const readAccountsByUserId = async (user_id: string) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("accounts")
@@ -20,11 +16,7 @@ export const readAccountsByUserId = async ({
   return data as Account[];
 };
 
-export const readNonCashAccountsByUserId = async ({
-  user_id,
-}: {
-  user_id: string;
-}) => {
+export const readNonCashAccountsByUserId = async (user_id: string) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("accounts")

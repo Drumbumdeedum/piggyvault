@@ -20,7 +20,7 @@ const AccountsList = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const getAccounts = async () => {
-      const accounts = await readNonCashAccountsByUserId({ user_id: user.id });
+      const accounts = await readNonCashAccountsByUserId(user.id);
       setAccounts(accounts!);
       setLoading(false);
     };
@@ -56,7 +56,7 @@ const AccountsList = ({ user }: { user: User }) => {
   }, [sp]);
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col gap-3">
       <button
         className="group relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 text-left flex flex-col items-center justify-normal cursor-pointer transform will-change-transform transition-transform hover:scale-[101%] active:scale-[99%] disabled:cursor-not-allowed"
         onClick={onClick}
@@ -89,8 +89,8 @@ const AccountsList = ({ user }: { user: User }) => {
           </>
         )}
         <Image
-          className="absolute top-0 left-0 opacity-50"
-          src="/images/lines.png"
+          className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
+          src="/images/wavy_lines.webp"
           width={316}
           height={190}
           alt="lines"
@@ -122,8 +122,8 @@ const AccountsList = ({ user }: { user: User }) => {
               <p className="text-sm">{account.iban}</p>
             </div>
             <Image
-              className="absolute top-0 left-0 opacity-50"
-              src="/images/lines.png"
+              className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
+              src="/images/wavy_lines.webp"
               width={316}
               height={190}
               alt="lines"

@@ -36,3 +36,18 @@ export const getLastCharOfNumber = (number: number) => {
   const numberStr = number.toString();
   return numberStr.charAt(numberStr.length - 1);
 };
+
+export const formatAmount = (value: number) => {
+  let [integerPart, decimalPart] = value.toString().split(".");
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  if (decimalPart) {
+    decimalPart = decimalPart.slice(0, 2);
+  } else {
+    decimalPart = "00";
+  }
+  return `${integerPart},${decimalPart}`;
+};
+
+export const shortenString = (value: string) => {
+  return `${value.substring(0, 19)}${value.length > 19 ? "..." : ""}`;
+};
