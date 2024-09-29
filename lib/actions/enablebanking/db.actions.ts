@@ -1,6 +1,6 @@
 "use server";
 
-import { parseStringify } from "@/lib/utils";
+import { getCompositeId } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
 
 export const readAccountsByUserId = async (user_id: string) => {
@@ -182,16 +182,25 @@ export const updateAccountSyncedAt = async (id: string) => {
   return data[0];
 };
 
-export const createTransaction = async (transaction: TransactionResponse) => {
+export const createTransaction = async ({
+  transaction,
+  user_id,
+  account_id,
+}: {
+  transaction: TransactionResponse;
+  user_id: string;
+  account_id: string;
+}) => {
   const supabase = createClient();
-
-  const composite_id = `${transaction.transaction_amount.amount}-${transaction.transaction_amount.currency}-${transaction.booking_date}-${transaction.value_date}-${transaction.credit_debit_indicator}-${parseStringify(transaction.remittance_information)}`;
-
   const { data, error } = await supabase
     .from("transactions")
-    .insert({ ...transaction, composite_id: composite_id })
+    .insert({
+      ...transaction,
+      composite_id: getCompositeId(transaction),
+      user_id,
+      account_id,
+    })
     .select("*");
-
   if (error) {
     console.log("Error while creating transaction.", error);
     return;
@@ -201,4 +210,22 @@ export const createTransaction = async (transaction: TransactionResponse) => {
     return;
   }
   return data[0];
+};
+
+export const readTransactionsByUserId = async (user_id: string) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", user_id)
+    .order("booking_date", { ascending: false });
+  if (error) {
+    console.log("Error while reading transactions.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while reading transactions.", error);
+    return;
+  }
+  return data;
 };

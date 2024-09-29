@@ -46,3 +46,12 @@ export const formatAmount = (value: number) => {
 export const shortenString = (value: string) => {
   return `${value.substring(0, 19)}${value.length > 19 ? "..." : ""}`;
 };
+
+export const trimWhiteSpace = (input: string) => {
+  console.log(input);
+  return input ? input.replace(/\s/g, "") : "";
+};
+
+export const getCompositeId = (transaction: TransactionResponse) => {
+  return `${transaction.transaction_amount.amount}-${transaction.transaction_amount.currency}-${transaction.booking_date}-${transaction.value_date}-${transaction.credit_debit_indicator}-${trimWhiteSpace(parseStringify(transaction.remittance_information.join()))}`;
+};

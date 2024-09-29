@@ -15,6 +15,7 @@ import {
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
   updateAccountSyncedAt,
   createTransaction,
+  readTransactionsByUserId,
 } from "./db.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
@@ -245,22 +246,15 @@ const getAccountTotalBalances = async (
 };
 
 export const fetchTransactionsByUserId = async (user_id: string) => {
-  const accounts = await readNonCashAccountsByUserId(user_id);
-  if (!accounts) {
-    return;
+  let transactions;
+  const updateRequired = false;
+  if (updateRequired) {
+    const result = await fetchAndUpdateTransactions(user_id);
+    transactions = result ? result.flat() : [];
+  } else {
+    transactions = await readTransactionsByUserId(user_id);
   }
-  const transactions = await Promise.all(
-    accounts?.map(async (account) => {
-      let accountTransactions = await getTransactions({
-        account_id: account.account_id,
-      });
-      await updateAccountSyncedAt(account.id);
-      return accountTransactions.transactions;
-    })
-  );
-
-  return transactions.flat();
-  /* return fetchAndUpdateTransactions(user_id); */
+  return transactions;
 };
 
 export const fetchAndUpdateTransactions = async (user_id: string) => {
@@ -276,7 +270,11 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
       Promise.all(
         accountTransactions.transactions.map(
           async (transaction: TransactionResponse) => {
-            await createTransaction(transaction);
+            await createTransaction({
+              transaction,
+              user_id,
+              account_id: account.account_id,
+            });
           }
         )
       );
