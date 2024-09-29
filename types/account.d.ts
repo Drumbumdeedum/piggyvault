@@ -2,6 +2,7 @@ declare type Account = {
   id: string;
   created_at: string;
   updated_at: string;
+  synced_at: string;
   account_uid: string;
   user_id: string;
   iban: string;

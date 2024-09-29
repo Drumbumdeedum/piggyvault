@@ -15,7 +15,7 @@ import { formatAmount, shortenString } from "@/lib/utils";
 import { cn } from "@/utils/cn";
 import { useEffect, useState } from "react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
-import { ghostRows } from "@/constants/placeholders";
+import { skeletonItems } from "@/constants/placeholders";
 import { Skeleton } from "./ui/skeleton";
 
 const TransactionsTable = ({ user }: { user: User }) => {
@@ -108,7 +108,7 @@ const TransactionsTable = ({ user }: { user: User }) => {
                 </TableRow>
               );
             })
-          : ghostRows.map((_item, index) => {
+          : skeletonItems(30).map((_item, index) => {
               return (
                 <TableRow key={index}>
                   <TableCell>

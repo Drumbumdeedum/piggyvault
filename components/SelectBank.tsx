@@ -11,7 +11,7 @@ import {
 } from "./ui/command";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { ghostBanks } from "@/constants/placeholders";
+import { skeletonItems } from "@/constants/placeholders";
 import { cn } from "@/lib/utils";
 import {
   connectAccount,
@@ -26,7 +26,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
   const pathName = usePathname();
   const countryCode = pathName.split("/").pop();
   if (!countryCode) return;
-  const [banks, setBanks] = useState<Bank[]>(ghostBanks);
+  const [banks, setBanks] = useState<Bank[]>(skeletonItems(20) as Bank[]);
   const [loading, setLoading] = useState<boolean>(true);
   const [bankFilter, setBankFilter] = useState<string | undefined>(undefined);
 

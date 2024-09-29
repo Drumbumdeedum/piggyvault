@@ -3,7 +3,6 @@
 import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "../auth.actions";
-import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { filterDuplicates } from "../../utils";
 import {
@@ -14,6 +13,8 @@ import {
   readNonCashAccountsByUserId,
   updateAccountBalanceAndBalanceName,
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
+  updateAccountSyncedAt,
+  createTransaction,
 } from "./db.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
@@ -250,26 +251,52 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
   }
   const transactions = await Promise.all(
     accounts?.map(async (account) => {
-      const accountTransactions = await getTransactions(account.account_id);
+      let accountTransactions = await getTransactions({
+        account_id: account.account_id,
+      });
+      await updateAccountSyncedAt(account.id);
       return accountTransactions.transactions;
     })
   );
 
-  //const transaction = await getTransactionDetails();
+  return transactions.flat();
+  /* return fetchAndUpdateTransactions(user_id); */
+};
+
+export const fetchAndUpdateTransactions = async (user_id: string) => {
+  const accounts = await readNonCashAccountsByUserId(user_id);
+  if (!accounts) {
+    return;
+  }
+  const transactions = await Promise.all(
+    accounts?.map(async (account) => {
+      let accountTransactions = await getTransactions({
+        account_id: account.account_id,
+      });
+      Promise.all(
+        accountTransactions.transactions.map(
+          async (transaction: TransactionResponse) => {
+            await createTransaction(transaction);
+          }
+        )
+      );
+      await updateAccountSyncedAt(account.id);
+      return accountTransactions.transactions;
+    })
+  );
 
   return transactions.flat();
 };
 
-const getTransactions = async (
-  account_id: string
-): Promise<TransactionsResponse> => {
-  let searchParams = "";
-  /*  searchParams = new URLSearchParams([
-    ["date_from", "2024-09-01"],
-    ["date_to", "2024-09-30"],
-  ]).toString(); */
+const getTransactions = async ({
+  account_id,
+  search_params,
+}: {
+  account_id: string;
+  search_params?: string;
+}): Promise<TransactionsResponse> => {
   const accountTransactionsResponse = await fetch(
-    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions?${searchParams}`,
+    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions?${search_params}`,
     {
       method: "GET",
       headers: base_headers,
@@ -280,27 +307,6 @@ const getTransactions = async (
       `Error ${accountTransactionsResponse.status} while fetching account transactions.`
     );
   }
-  return await accountTransactionsResponse.json();
-};
-
-const getTransactionDetails = async ({
-  account_id,
-  transaction_id,
-}: {
-  account_id: string;
-  transaction_id: string;
-}): Promise<TransactionResponse> => {
-  const transactionDetailsResponse = await fetch(
-    `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions/${transaction_id}`,
-    {
-      method: "GET",
-      headers: base_headers,
-    }
-  );
-  if (!transactionDetailsResponse.ok) {
-    console.log(
-      `Error ${transactionDetailsResponse.status} while fetching transaction details.`
-    );
-  }
-  return await transactionDetailsResponse.json();
+  const result = await accountTransactionsResponse.json();
+  return result;
 };
