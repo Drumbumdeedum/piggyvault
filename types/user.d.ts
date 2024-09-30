@@ -3,6 +3,7 @@ declare type User = {
   email: string;
   created_at: string;
   updated_at: string;
+  synced_at: string;
   first_name: string;
   last_name: string;
 };
@@ -12,7 +13,7 @@ declare type UpdateFirstNameProps = {
   first_name: string;
 };
 
-declare type UpdateLastNameRequest = {
+declare type UpdateLastNameProps = {
   user_id: string;
   last_name: string;
 };

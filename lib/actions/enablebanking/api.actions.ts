@@ -4,7 +4,7 @@ import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "../auth.actions";
 import { revalidatePath } from "next/cache";
-import { filterDuplicates } from "../../utils";
+import { filterDuplicates, haveMinutesPassedSinceDate } from "../../utils";
 import {
   createAccount,
   createAccountConnection,
@@ -17,6 +17,7 @@ import {
   createTransaction,
   readTransactionsByUserId,
 } from "./db.actions";
+import { getUserById, updateUserSyncedAt } from "../user.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 const base_headers = getBaseHeaders();
@@ -246,12 +247,20 @@ const getAccountTotalBalances = async (
 };
 
 export const fetchTransactionsByUserId = async (user_id: string) => {
+  const user = await getUserById(user_id);
+  if (!user) return;
   let transactions;
-  const updateRequired = false;
+  const updateRequired = haveMinutesPassedSinceDate({
+    date: user.synced_at,
+    minutesPassed: 10,
+  });
+  console.log("UPDATE REQUIRED:", updateRequired);
   if (updateRequired) {
+    console.log("UPDATING");
     const result = await fetchAndUpdateTransactions(user_id);
     transactions = result ? result.flat() : [];
   } else {
+    console.log("FETCHING");
     transactions = await readTransactionsByUserId(user_id);
   }
   return transactions;
@@ -282,7 +291,7 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
       return accountTransactions.transactions;
     })
   );
-
+  await updateUserSyncedAt(user_id);
   return transactions.flat();
 };
 

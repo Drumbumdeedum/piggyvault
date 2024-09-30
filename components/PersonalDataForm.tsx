@@ -13,8 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
-import { updateFirstName, updateLastName } from "@/lib/actions/account.actions";
-import { revalidatePath } from "next/cache";
+import { updateFirstName, updateLastName } from "@/lib/actions/user.actions";
 
 const PersonalDataForm = ({ user }: { user: User }) => {
   const firstNameFormSchema = firstNameSchema();

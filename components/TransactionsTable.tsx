@@ -37,7 +37,6 @@ const TransactionsTable = ({ user }: { user: User }) => {
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">Date</TableHead>
-          <TableHead>Status</TableHead>
           <TableHead>Creditor</TableHead>
           <TableHead>Debtor</TableHead>
           <TableHead>Details</TableHead>
@@ -52,9 +51,6 @@ const TransactionsTable = ({ user }: { user: User }) => {
                 <TableRow key={index}>
                   <TableCell className="font-medium cursor-pointer">
                     {transaction.booking_date}
-                  </TableCell>
-                  <TableCell className="cursor-pointer">
-                    {transaction.status}
                   </TableCell>
                   <TableCell className="cursor-pointer">
                     <HoverCard>
@@ -113,9 +109,6 @@ const TransactionsTable = ({ user }: { user: User }) => {
                 <TableRow key={index}>
                   <TableCell>
                     <Skeleton className="h-[21px] w-[84px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-[21px] w-[43px]" />
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-[21px] w-[189px]" />

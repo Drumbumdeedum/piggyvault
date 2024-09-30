@@ -55,3 +55,17 @@ export const trimWhiteSpace = (input: string) => {
 export const getCompositeId = (transaction: TransactionResponse) => {
   return `${transaction.transaction_amount.amount}-${transaction.transaction_amount.currency}-${transaction.booking_date}-${transaction.value_date}-${transaction.credit_debit_indicator}-${trimWhiteSpace(parseStringify(transaction.remittance_information.join()))}`;
 };
+
+export const haveMinutesPassedSinceDate = ({
+  date,
+  minutesPassed,
+}: {
+  date: string;
+  minutesPassed: number;
+}) => {
+  const d1 = new Date(date);
+  const d2 = Date.now();
+  const differenceInMilliseconds = Math.abs(d1.getTime() - d2);
+  const inputMinutesInMilliseconds = minutesPassed * 60 * 1000;
+  return differenceInMilliseconds >= inputMinutesInMilliseconds;
+};
