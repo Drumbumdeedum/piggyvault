@@ -4,7 +4,11 @@ import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "../auth.actions";
 import { revalidatePath } from "next/cache";
-import { filterDuplicates, haveMinutesPassedSinceDate } from "../../utils";
+import {
+  filterDuplicates,
+  getMonthRange,
+  haveMinutesPassedSinceDate,
+} from "../../utils";
 import {
   createAccount,
   createAccountConnection,
@@ -20,7 +24,6 @@ import {
 import { getUserById, updateUserSyncedAt } from "../user.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
-const base_headers = getBaseHeaders();
 
 export const connectAccount = async ({
   userId,
@@ -31,6 +34,7 @@ export const connectAccount = async ({
   bankName: string;
   countryCode: string;
 }) => {
+  const base_headers = getBaseHeaders();
   const validUntilDays = 10;
   const validUntil = new Date(
     new Date().getTime() + validUntilDays * 24 * 60 * 60 * 1000
@@ -101,9 +105,11 @@ export const completeAccountConnection = async ({
         account_id: account_id,
       });
 
+      await getTransactionsOfPastMonths({ user_id, account_id, nrOfMonths: 3 });
       await updateAccountTotalBalance({ user_id, account_id });
     })
   );
+  await updateUserSyncedAt(user_id);
   revalidatePath("/linked-accounts");
   return encodedRedirect(
     "success",
@@ -175,6 +181,7 @@ export const getBanksByCountryCode = async ({
 }: {
   countryCode: string;
 }) => {
+  const base_headers = getBaseHeaders();
   const aspsps_response = await fetch(
     `${ENABLE_BANKING_BASE_URL}/aspsps?country=${countryCode.toUpperCase()}`,
     {
@@ -197,6 +204,7 @@ export const getBanksByCountryCode = async ({
 };
 
 const getSession = (session_id: string) => {
+  const base_headers = getBaseHeaders();
   return fetch(`https://api.enablebanking.com/sessions/${session_id}`, {
     method: "GET",
     headers: base_headers,
@@ -204,6 +212,7 @@ const getSession = (session_id: string) => {
 };
 
 const postSession = (auth_code: string) => {
+  const base_headers = getBaseHeaders();
   const createSessionRequestBody = {
     code: auth_code,
   };
@@ -215,6 +224,7 @@ const postSession = (auth_code: string) => {
 };
 
 const getAccountDetails = (account_id: string) => {
+  const base_headers = getBaseHeaders();
   return fetch(`${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/details`, {
     method: "GET",
     headers: base_headers,
@@ -224,6 +234,7 @@ const getAccountDetails = (account_id: string) => {
 const getAccountTotalBalances = async (
   account_id: string
 ): Promise<BalanceResponse[]> => {
+  const base_headers = getBaseHeaders();
   const accountBalancesResponse = await fetch(
     `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/balances`,
     {
@@ -250,17 +261,14 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
   let transactions;
-  const updateRequired = haveMinutesPassedSinceDate({
+  let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
   });
-  console.log("UPDATE REQUIRED:", updateRequired);
   if (updateRequired) {
-    console.log("UPDATING");
     const result = await fetchAndUpdateTransactions(user_id);
     transactions = result ? result.flat() : [];
   } else {
-    console.log("FETCHING");
     transactions = await readTransactionsByUserId(user_id);
   }
   return transactions;
@@ -273,9 +281,11 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
   }
   const transactions = await Promise.all(
     accounts?.map(async (account) => {
-      let accountTransactions = await getTransactions({
+      let accountTransactions = await getAndSyncTransactions({
         account_id: account.account_id,
+        synced_at: account.synced_at,
       });
+
       Promise.all(
         accountTransactions.transactions.map(
           async (transaction: TransactionResponse) => {
@@ -295,6 +305,75 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
   return transactions.flat();
 };
 
+const getTransactionsOfPastMonths = async ({
+  user_id,
+  account_id,
+  nrOfMonths = 1,
+}: {
+  user_id: string;
+  account_id: string;
+  nrOfMonths: number;
+}) => {
+  Promise.all(
+    Array(nrOfMonths)
+      .fill(0)
+      .map(async (_, i) => {
+        const { startDate, endDate } = getMonthRange(i);
+        let search_params = new URLSearchParams([
+          ["date_from", startDate],
+          ["date_to", endDate],
+        ]).toString();
+
+        const result = await getAndSyncTransactions({
+          account_id,
+          search_params,
+        });
+        Promise.all(
+          result.transactions.map(async (transaction: TransactionResponse) => {
+            await createTransaction({
+              transaction,
+              user_id,
+              account_id: account_id,
+            });
+          })
+        );
+        await updateAccountSyncedAt(account_id);
+      })
+  );
+};
+
+const getAndSyncTransactions = async ({
+  account_id,
+  synced_at,
+  search_params,
+}: {
+  account_id: string;
+  synced_at?: string;
+  search_params?: string;
+}): Promise<TransactionsResponse> => {
+  let params = search_params;
+  if (!search_params) {
+    let now = new Date();
+    if (synced_at) {
+      now = new Date(synced_at);
+    }
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const day = "01";
+    const startDate = `${year}-${month}-${day}`;
+    const end = new Date();
+    const endDate = end.toISOString().split("T")[0];
+    params = new URLSearchParams([
+      ["date_from", startDate],
+      ["date_to", endDate],
+    ]).toString();
+  }
+  return await getTransactions({
+    account_id,
+    search_params: params,
+  });
+};
+
 const getTransactions = async ({
   account_id,
   search_params,
@@ -302,6 +381,7 @@ const getTransactions = async ({
   account_id: string;
   search_params?: string;
 }): Promise<TransactionsResponse> => {
+  const base_headers = getBaseHeaders();
   const accountTransactionsResponse = await fetch(
     `${ENABLE_BANKING_BASE_URL}/accounts/${account_id}/transactions?${search_params}`,
     {
@@ -309,11 +389,12 @@ const getTransactions = async ({
       headers: base_headers,
     }
   );
+  const result = await accountTransactionsResponse.json();
   if (!accountTransactionsResponse.ok) {
     console.log(
-      `Error ${accountTransactionsResponse.status} while fetching account transactions.`
+      `Error ${accountTransactionsResponse.status} while fetching account transactions.`,
+      result
     );
   }
-  const result = await accountTransactionsResponse.json();
   return result;
 };

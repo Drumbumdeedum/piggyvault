@@ -50,7 +50,7 @@ const TransactionsTable = ({ user }: { user: User }) => {
               return (
                 <TableRow key={index}>
                   <TableCell className="font-medium cursor-pointer">
-                    {transaction.booking_date}
+                    {transaction.value_date}
                   </TableCell>
                   <TableCell className="cursor-pointer">
                     <HoverCard>

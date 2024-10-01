@@ -11,7 +11,11 @@ export const readAccountsByUserId = async (user_id: string) => {
     .eq("user_id", user_id)
     .order("current_balance", { ascending: false });
   if (error) {
-    console.log(error);
+    console.log("Error while retrieving accounts.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while retrieving accounts.");
     return;
   }
   return data as Account[];
@@ -25,7 +29,11 @@ export const readNonCashAccountsByUserId = async (user_id: string) => {
     .eq("user_id", user_id)
     .eq("cash_account", false);
   if (error) {
-    console.log(error);
+    console.log("Error while retrieving non cash accounts.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while retrieving non cash accounts.");
     return;
   }
   return data as Account[];
@@ -70,7 +78,7 @@ export const readAccountConnectionByUserIdAndAuthCode = async ({
     return;
   }
   if (!data) {
-    console.log("Error while retrieving account_connection", error);
+    console.log("Error while retrieving account_connection");
     return;
   }
   return data[0];
@@ -94,7 +102,7 @@ export const createAccountConnection = async ({
     return;
   }
   if (!data) {
-    console.log("Error while creating account connection:", error);
+    console.log("Error while creating account connection:");
     return;
   }
   return data[0];
@@ -151,7 +159,7 @@ export const updateAccountBalanceAndBalanceName = async ({
     return;
   }
   if (!data) {
-    console.log("Error while updating account balance.", error);
+    console.log("Error while updating account balance.");
     return;
   }
   return data[0];
@@ -160,7 +168,6 @@ export const updateAccountBalanceAndBalanceName = async ({
 export const updateAccountSyncedAt = async (id: string) => {
   const date = new Date();
   const dateString = date.toISOString();
-
   const supabase = createClient();
   const { data, error } = await supabase
     .from("accounts")
@@ -176,7 +183,7 @@ export const updateAccountSyncedAt = async (id: string) => {
     return;
   }
   if (!data) {
-    console.log("Error while updating account sync date.", error);
+    console.log("Error while updating account sync date.");
     return;
   }
   return data[0];
@@ -206,7 +213,7 @@ export const createTransaction = async ({
     return;
   }
   if (!data) {
-    console.log("Error while creating transaction.", error);
+    console.log("Error while creating transaction.");
     return;
   }
   return data[0];
@@ -218,13 +225,13 @@ export const readTransactionsByUserId = async (user_id: string) => {
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
-    .order("booking_date", { ascending: false });
+    .order("value_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
     return;
   }
   if (!data) {
-    console.log("Error while reading transactions.", error);
+    console.log("Error while reading transactions.");
     return;
   }
   return data;

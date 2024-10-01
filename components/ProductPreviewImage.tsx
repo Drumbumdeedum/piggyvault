@@ -12,9 +12,11 @@ const ProductPreviewImage = () => {
     >
       <Image
         src="/images/placeholders/product_placeholder.svg"
+        className="w-[600px] h-[600px]"
         width={600}
         height={600}
         alt="Product preview"
+        priority
       />
     </motion.div>
   );
