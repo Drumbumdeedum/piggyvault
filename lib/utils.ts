@@ -48,7 +48,6 @@ export const shortenString = (value: string) => {
 };
 
 export const trimWhiteSpace = (input: string) => {
-  console.log(input);
   return input ? input.replace(/\s/g, "") : "";
 };
 
@@ -68,4 +67,28 @@ export const haveMinutesPassedSinceDate = ({
   const differenceInMilliseconds = Math.abs(d1.getTime() - d2);
   const inputMinutesInMilliseconds = minutesPassed * 60 * 1000;
   return differenceInMilliseconds >= inputMinutesInMilliseconds;
+};
+
+export const getMonthRange = (monthsBefore: number) => {
+  const currentDate = new Date();
+  const targetMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1 - monthsBefore,
+    currentDate.getDate()
+  );
+  const startDate = new Date(
+    targetMonth.getFullYear(),
+    targetMonth.getMonth() - 1,
+    2
+  );
+  const endDate = new Date(
+    targetMonth.getFullYear(),
+    targetMonth.getMonth(),
+    1
+  );
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+  return {
+    startDate: formatDate(startDate),
+    endDate: formatDate(endDate),
+  };
 };
