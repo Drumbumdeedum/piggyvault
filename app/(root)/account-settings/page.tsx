@@ -13,11 +13,11 @@ const page = async () => {
   if (!user) return;
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">Personal data</CardTitle>
-        <CardDescription>Update personal data</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-row py-5">
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold">Personal data</h1>
+          <p>Update personal data</p>
+        </div>
         <PersonalDataForm user={user} />
       </CardContent>
     </Card>

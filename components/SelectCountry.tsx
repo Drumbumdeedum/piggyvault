@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Command,
   CommandEmpty,
@@ -21,19 +23,16 @@ const SelectCountry = () => {
 
   const selectCountry = async (country: Country) => {
     setLoading(true);
-    router.push(`/settings/linked-accounts/country/${country.code}`);
+    router.push(`/link-account/country/${country.code}`);
     setLoading(false);
   };
   return (
     <>
-      <Button
-        onClick={() => router.push("/settings/linked-accounts")}
-        className="mb-6 flex gap-2"
-      >
+      <Button onClick={() => router.push("/")} className="mb-6 flex gap-2">
         <ChevronLeft size="20" />
         Back
       </Button>
-      <Command className="rounded-lg border shadow-md h-[70vh] w-[40vw]">
+      <Command className="rounded-lg border shadow-md h-[80vh] lg:w-[46rem]">
         <CommandInput
           value={countryFilter}
           onValueChange={setCountryFilter}

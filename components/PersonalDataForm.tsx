@@ -48,7 +48,7 @@ const PersonalDataForm = ({ user }: { user: User }) => {
     });
   };
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:min-w-[50rem]">
       <Form {...firstNameForm}>
         <form
           onSubmit={firstNameForm.handleSubmit(onFirstNameSubmit)}
@@ -64,7 +64,7 @@ const PersonalDataForm = ({ user }: { user: User }) => {
                   <div className="flex flex-1 flex-col gap-1">
                     <FormControl>
                       <Input
-                        className="w-96"
+                        className="min-w-96"
                         id="first_name_form_input"
                         type="text"
                         placeholder="First name"
@@ -98,7 +98,7 @@ const PersonalDataForm = ({ user }: { user: User }) => {
                   <div className="flex flex-1 flex-col gap-1">
                     <FormControl>
                       <Input
-                        className="w-96"
+                        className="min-w-96"
                         id="last_name_form_input"
                         type="text"
                         placeholder="Last name"

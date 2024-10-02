@@ -1,6 +1,11 @@
 "use client";
 
-import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
+import {
+  BadgeCheck,
+  CircleAlert,
+  CirclePlus,
+  LoaderPinwheel,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -8,12 +13,13 @@ import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
 import { readNonCashAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
 import { completeAccountConnection } from "@/lib/actions/enablebanking/api.actions";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
 const AccountsList = ({ user }: { user: User }) => {
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
-    router.push("/settings/linked-accounts/country");
+    router.push("/link-account");
   };
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,7 +44,7 @@ const AccountsList = ({ user }: { user: User }) => {
     }
     if (sp.has("success")) {
       const showToast = () => {
-        router.push("/settings/linked-accounts");
+        router.push("/");
         toast.success("Success! 🎉", {
           description: sp.get("success")!,
           action: {
@@ -49,7 +55,7 @@ const AccountsList = ({ user }: { user: User }) => {
         });
       };
       const onCloseToastAction = () => {
-        router.replace("/settings/linked-accounts");
+        router.replace("/");
       };
       showToast();
     }
@@ -57,6 +63,61 @@ const AccountsList = ({ user }: { user: User }) => {
 
   return (
     <div className="flex flex-col gap-3">
+      <div>
+        {accounts.length ? (
+          <h1 className="font-bold text-xl">Your linked accounts:</h1>
+        ) : (
+          <>
+            {!loading && (
+              <Alert>
+                <CircleAlert className="h-4 w-4" />
+                <AlertTitle className="font-bold">
+                  Connect an account
+                </AlertTitle>
+                <AlertDescription className="text-xs">
+                  Looks like you haven't connected a bank account yet. Click the
+                  card below to get started!
+                </AlertDescription>
+              </Alert>
+            )}
+          </>
+        )}
+      </div>
+      {accounts?.map((account, index) => {
+        return (
+          <div
+            key={index}
+            className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
+          >
+            <div className="flex flex-col gap-2 h-full p-6">
+              <div className="flex-1">
+                <h1 className="font-semibold">{account.institution_name}</h1>
+                {account.product_name && (
+                  <h2 className="font-semibold text-xs flex-1">
+                    {account.product_name}
+                  </h2>
+                )}
+              </div>
+
+              <div className="flex">
+                <p className="text-sm grow">{account.currency}</p>
+                <div className="flex items-center justify-end gap-1 text-green-400/90">
+                  <span className="text-xs">Connected</span>
+                  <BadgeCheck size="18" />
+                </div>
+              </div>
+              <p className="text-sm">{account.iban}</p>
+            </div>
+            <Image
+              className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
+              src="/images/wavy_lines.webp"
+              width={316}
+              height={190}
+              alt="lines"
+            />
+          </div>
+        );
+      })}
       <button
         className="group relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 text-left flex flex-col items-center justify-normal cursor-pointer transform will-change-transform transition-transform hover:scale-[101%] active:scale-[99%] disabled:cursor-not-allowed"
         onClick={onClick}
@@ -96,41 +157,6 @@ const AccountsList = ({ user }: { user: User }) => {
           alt="lines"
         />
       </button>
-      {accounts?.map((account, index) => {
-        return (
-          <div
-            key={index}
-            className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
-          >
-            <div className="flex flex-col gap-2 h-full p-6">
-              <div className="flex-1">
-                <h1 className="font-semibold">{account.institution_name}</h1>
-                {account.product_name && (
-                  <h2 className="font-semibold text-xs flex-1">
-                    {account.product_name}
-                  </h2>
-                )}
-              </div>
-
-              <div className="flex">
-                <p className="text-sm grow">{account.currency}</p>
-                <div className="flex items-center justify-end gap-1 text-green-400/90">
-                  <span className="text-xs">Connected</span>
-                  <BadgeCheck size="18" />
-                </div>
-              </div>
-              <p className="text-sm">{account.iban}</p>
-            </div>
-            <Image
-              className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
-              src="/images/wavy_lines.webp"
-              width={316}
-              height={190}
-              alt="lines"
-            />
-          </div>
-        );
-      })}
     </div>
   );
 };

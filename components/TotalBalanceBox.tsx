@@ -30,12 +30,12 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
     fetchTotalBalance();
   }, []);
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="p-6 pb-0 relative">
+    <Card className="w-80">
+      <CardContent className="p-0 w-full">
+        <div className="relative flex justify-center items-center p-5">
           <div className={cn(loading && "text-foreground/10")}>
-            <p className="text-sm font-mono">Total current balance:</p>
-            <div className="text-xl font-bold">
+            <p>Total current balance:</p>
+            <div className="text-xl font-mono font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
             <CustomPieChart

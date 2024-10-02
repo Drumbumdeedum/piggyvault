@@ -48,6 +48,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
       bankName: bank.name,
       countryCode: countryCode,
     });
+    console.log(result);
     if (result) {
       window.open(result.url, "_self");
     }
@@ -56,13 +57,13 @@ const SelectBank = ({ userId }: { userId: string }) => {
   return (
     <>
       <Button
-        onClick={() => router.push("/settings/linked-accounts/country")}
+        onClick={() => router.push("/link-account")}
         className="mb-6 flex gap-2"
       >
         <ChevronLeft size="20" />
         Back
       </Button>
-      <Command className="rounded-lg border shadow-md h-[70vh] w-[40vw]">
+      <Command className="rounded-lg border shadow-md h-[80vh] lg:w-[46rem]">
         <CommandInput
           value={bankFilter}
           onValueChange={setBankFilter}

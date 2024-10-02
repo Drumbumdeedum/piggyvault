@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { signOutAction } from "@/lib/actions/auth.actions";
 import { LogOut } from "lucide-react";
 
@@ -17,7 +16,6 @@ const SidebarFooter = () => {
           Sign out
         </Button>
       </div>
-      <ThemeSwitcher />
     </footer>
   );
 };

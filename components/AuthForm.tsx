@@ -100,7 +100,7 @@ const AuthForm = ({ type, searchParams }: AuthFormParams) => {
             : "Already have an account?"}
         </p>
         <Link
-          className="form-link"
+          className="form-link font-bold"
           href={type === "sign-in" ? "/sign-up" : "/sign-in"}
         >
           {type === "sign-in" ? "Sign up" : "Sign in"}

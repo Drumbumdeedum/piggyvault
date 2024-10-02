@@ -31,7 +31,7 @@ const CustomPieChart = ({
     };
   });
   return (
-    <div className="w-64 h-64">
+    <div className="w-64 h-64 my-auto">
       <ChartContainer
         config={mappedChartConfig}
         className="mx-auto aspect-square max-h-[250px]"

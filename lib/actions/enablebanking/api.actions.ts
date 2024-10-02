@@ -110,12 +110,8 @@ export const completeAccountConnection = async ({
     })
   );
   await updateUserSyncedAt(user_id);
-  revalidatePath("/linked-accounts");
-  return encodedRedirect(
-    "success",
-    "/settings/linked-accounts",
-    "Your account is now connected."
-  );
+  revalidatePath("/");
+  return encodedRedirect("success", "/", "Your account is now connected.");
 };
 
 export const updateAllAccountsTotalBalances = async () => {
@@ -196,7 +192,7 @@ export const getBanksByCountryCode = async ({
   ) {
     return encodedRedirect(
       "error",
-      "/settings/linked-accounts/country",
+      "/link-account/country",
       "Invalid country code."
     );
   }

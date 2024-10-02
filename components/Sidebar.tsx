@@ -21,8 +21,8 @@ const sidebarLinks = [
     icon: <ArrowRightLeft size="18" />,
   },
   {
-    base: "/settings",
-    route: "/settings/account-settings",
+    base: "/account-settings",
+    route: "/account-settings",
     label: "Settings",
     icon: <Settings size="18" />,
   },
@@ -32,7 +32,7 @@ const Sidebar = () => {
   const pathName = usePathname();
 
   return (
-    <section className="sticky left-0 top-0 flex h-screen w-fit flex-col justify-between border-r pt-8 max-md:hidden sm:p-4 xl:p-6 xl:w-[355px]">
+    <section className="sticky left-0 top-0 flex h-screen w-fit flex-col justify-between border-r pt-8 max-md:hidden sm:p-4 xl:p-6 xl:w-[18rem]">
       <nav className="flex flex-col gap-3">
         {sidebarLinks.map((sidebarLink) => {
           const isActive =
