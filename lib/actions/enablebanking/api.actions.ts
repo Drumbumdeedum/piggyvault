@@ -274,6 +274,30 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
   return transactions;
 };
 
+export const fetchAccountsByUserId = async (user_id: string) => {
+  const user = await getUserById(user_id);
+  if (!user) return;
+  let accounts = await readAccountsByUserId(user_id);
+  let updateRequired = haveMinutesPassedSinceDate({
+    date: user.synced_at,
+    minutesPassed: 10,
+  });
+  if (accounts && updateRequired) {
+    const updatedAccounts = await Promise.all(
+      accounts.map(async (account) => {
+        await updateAccountSyncedAt(account.account_id);
+        return await updateAccountTotalBalance({
+          user_id,
+          account_id: account.account_id,
+        });
+      })
+    );
+    accounts = updatedAccounts.flat();
+  }
+  await updateUserSyncedAt(user_id);
+  return accounts;
+};
+
 export const fetchAndUpdateTransactions = async (user_id: string) => {
   const accounts = await readNonCashAccountsByUserId(user_id);
   if (!accounts) {

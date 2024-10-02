@@ -6,8 +6,8 @@ import AnimatedCounter from "./AnimatedCounter";
 import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
-import { readAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
 import CustomPieChart from "./CustomPieChart";
+import { fetchAccountsByUserId } from "@/lib/actions/enablebanking/api.actions";
 
 export const TotalBalanceBox = ({ user }: { user: User }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -16,7 +16,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
 
   useEffect(() => {
     const fetchTotalBalance = async () => {
-      const fetchedAccounts = await readAccountsByUserId(user.id);
+      const fetchedAccounts = await fetchAccountsByUserId(user.id);
       if (fetchedAccounts) {
         let totalBalance = 0;
         fetchedAccounts.forEach(
