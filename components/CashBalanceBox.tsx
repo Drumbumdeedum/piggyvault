@@ -15,8 +15,6 @@ const CashBalanceBox = () => {
   const [showCreateCashTransactionDialog, setShowCreateCashTransactionDialog] =
     useState<boolean>(false);
 
-  const open = async () => {};
-
   return (
     <>
       <AddCashBalanceDialog

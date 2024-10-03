@@ -22,7 +22,6 @@ const CreateCashTransactionDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New cash transaction</DialogTitle>
-          <DialogDescription>Form goes here</DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
