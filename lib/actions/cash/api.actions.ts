@@ -1,14 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getLoggedInUser } from "../auth.actions";
 import {
   createCashAccount,
+  createCashTransaction,
   readCashAccountsByUserId,
   readCashAccountsByUserIdAndCurrency,
   updateCashAccountCurrentBalance,
 } from "./db.actions";
 
-export const addCashBalance = async ({
+export const updateCashBalance = async ({
   amount,
   currency,
 }: {
@@ -48,4 +50,36 @@ export const fetchCurrentCashBalance = async () => {
   console.log(result);
 
   return result;
+};
+
+export const createCashTransactionAndUpdateCashBalance = async ({
+  amount,
+  currency,
+  note = "",
+}: {
+  amount: number;
+  currency: string;
+  note?: string;
+}) => {
+  const user = await getLoggedInUser();
+  if (!user) return;
+
+  const cashTransaction = await createCashTransaction({
+    user_id: user.id,
+    amount,
+    currency,
+    note,
+  });
+
+  if (cashTransaction) {
+    console.log(cashTransaction);
+    const updatedBalance = await updateCashBalance({
+      amount: -amount,
+      currency: currency,
+    });
+    console.log(updatedBalance);
+    revalidatePath("/");
+    return updatedBalance;
+  }
+  return null;
 };

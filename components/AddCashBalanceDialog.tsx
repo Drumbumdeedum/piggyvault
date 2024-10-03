@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import FormSubmitButton from "./core/FormSubmitButton";
-import { addCashBalanceSchema } from "@/validations/cash-balance";
+import { updateCashBalanceSchema } from "@/validations/cash-balance";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,18 +28,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { addCashBalance } from "@/lib/actions/cash/api.actions";
+import { updateCashBalance } from "@/lib/actions/cash/api.actions";
 
 const AddCashBalanceDialog = ({
   open,
   setOpen,
   setBalance,
+  setStartAmount,
+  currentBalance,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setBalance: Dispatch<SetStateAction<number>>;
+  setStartAmount: Dispatch<SetStateAction<number>>;
+  currentBalance: number;
 }) => {
-  const formSchema = addCashBalanceSchema();
+  const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +54,9 @@ const AddCashBalanceDialog = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { amount, currency } = values;
-    const result = await addCashBalance({ amount, currency });
+    const result = await updateCashBalance({ amount, currency });
     if (result && result.current_balance) {
+      setStartAmount(currentBalance);
       setBalance(result.current_balance);
       form.reset();
       setOpen(false);
@@ -73,7 +78,6 @@ const AddCashBalanceDialog = ({
             Add a cash balance amount to your selected currency
           </DialogDescription>
         </DialogHeader>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
@@ -110,8 +114,7 @@ const AddCashBalanceDialog = ({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="HUF">HUF</SelectItem>
-                          {/*                           <SelectItem value="EUR">EUR</SelectItem>
-                           */}
+                          {/* <SelectItem value="EUR">EUR</SelectItem> */}
                         </SelectContent>
                       </Select>
                       <FormMessage />

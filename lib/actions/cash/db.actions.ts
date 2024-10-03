@@ -103,3 +103,40 @@ export const updateCashAccountCurrentBalance = async ({
   }
   return data[0] as Account;
 };
+
+export const createCashTransaction = async ({
+  user_id,
+  amount,
+  currency,
+  note,
+}: {
+  user_id: string;
+  amount: number;
+  currency: string;
+  note: string;
+}) => {
+  const supabase = createClient();
+  const date = new Date();
+  const bookingDate = date.toISOString().split("T")[0];
+  const { data, error } = await supabase
+    .from("transactions")
+    .insert({
+      user_id,
+      transaction_amount: { amount, currency },
+      credit_debit_indicator: "DBIT",
+      booking_date: bookingDate,
+      value_date: bookingDate,
+      remittance_information: [note],
+      account_id: `cash_account_${user_id}`,
+    })
+    .select("*");
+  if (error) {
+    console.log("Error while creating cash transaction.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while creating cash transaction.");
+    return;
+  }
+  return data[0];
+};

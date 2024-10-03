@@ -1,7 +1,13 @@
 import { formatAmount } from "@/lib/utils";
-import { CountUp, useCountUp } from "use-count-up";
+import { CountUp } from "use-count-up";
 
-const AnimatedCounter = ({ amount }: { amount: number }) => {
+const AnimatedCounter = ({
+  amount,
+  startAmount = 0,
+}: {
+  amount: number;
+  startAmount?: number;
+}) => {
   return (
     <div className="w-full">
       HUF{" "}
@@ -9,6 +15,7 @@ const AnimatedCounter = ({ amount }: { amount: number }) => {
         isCounting
         key={amount}
         end={amount}
+        start={startAmount}
         duration={1}
         decimalPlaces={2}
         decimalSeparator=","

@@ -5,9 +5,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Control, FieldPath } from "react-hook-form";
-import { Input } from "./ui/input";
 import { z } from "zod";
 import { authFormSchema } from "@/validations/auth";
+import { Input } from "../ui/input";
 
 const formSchema = authFormSchema("sign-up");
 type FormInputProps = {
