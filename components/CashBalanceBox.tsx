@@ -52,7 +52,7 @@ const CashBalanceBox = ({ user }: { user: User }) => {
         <CardContent className="p-0 w-full h-full">
           <div className="relative flex flex-col h-full gap-6 p-5">
             <div className="flex-1">
-              <p className="font-bold">Total cash balance:</p>
+              <p className="font-semibold">Total cash balance:</p>
               <ScrollArea className="h-[180px]">
                 <div className="flex flex-col gap-2">
                   {accounts.map((account, index) => {

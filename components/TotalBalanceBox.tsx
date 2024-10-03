@@ -34,7 +34,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
       <CardContent className="p-0 w-full">
         <div className="relative flex p-5 w-full">
           <div className={cn(loading && "text-foreground/10", "w-full")}>
-            <p className="font-bold">Total current balance:</p>
+            <p className="font-semibold">Total current balance:</p>
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
