@@ -67,7 +67,7 @@ const CashBalanceBox = ({ user }: { user: User }) => {
                         <div className="text-lg font-bold">
                           <AnimatedCounter
                             amount={account.current_balance}
-                            startAmount={account.current_balance}
+                            startAmount={0}
                           />
                         </div>
                       </div>

@@ -35,7 +35,7 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
         <div className="relative flex p-5 w-full">
           <div className={cn(loading && "text-foreground/10", "w-full")}>
             <p className="font-bold">Total current balance:</p>
-            <div className="text-xl text-green-600 font-mono font-bold">
+            <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
             <div className="flex justify-center items-center w-full">
