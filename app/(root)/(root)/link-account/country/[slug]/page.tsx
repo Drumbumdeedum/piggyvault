@@ -1,6 +1,6 @@
-import PageHeader from "@/components/PageHeader";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 import SelectBank from "@/components/SelectBank";
+import PageHeader from "@/components/layout/PageHeader";
 
 const page = async () => {
   const user = await getLoggedInUser();

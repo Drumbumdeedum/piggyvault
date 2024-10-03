@@ -1,4 +1,4 @@
-import SidebarRight from "@/components/SidebarRight";
+import SidebarRight from "@/components/layout/SidebarRight";
 
 export default function RootLayout({
   children,

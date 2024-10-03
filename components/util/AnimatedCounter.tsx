@@ -1,5 +1,4 @@
 import { formatAmount } from "@/lib/utils";
-import React from "react";
 import { CountUp } from "use-count-up";
 
 const AnimatedCounter = ({ amount }: { amount: number }) => {

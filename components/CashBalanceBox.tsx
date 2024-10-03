@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "./ui/card";
-import AnimatedCounter from "./AnimatedCounter";
+import AnimatedCounter from "./util/AnimatedCounter";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { CirclePlus, CreditCard } from "lucide-react";

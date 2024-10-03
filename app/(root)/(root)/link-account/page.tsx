@@ -1,4 +1,4 @@
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/components/layout/PageHeader";
 import SelectCountry from "@/components/SelectCountry";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 

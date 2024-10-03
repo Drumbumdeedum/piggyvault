@@ -1,5 +1,5 @@
 import CashBalanceBox from "@/components/CashBalanceBox";
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/components/layout/PageHeader";
 import { TotalBalanceBox } from "@/components/TotalBalanceBox";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 

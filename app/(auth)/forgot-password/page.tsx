@@ -1,6 +1,6 @@
 "use client";
 
-import FormSubmitButton from "@/components/FormSubmitButton";
+import FormSubmitButton from "@/components/core/FormSubmitButton";
 import {
   Form,
   FormControl,

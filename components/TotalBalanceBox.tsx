@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AnimatedCounter from "./AnimatedCounter";
+import AnimatedCounter from "./util/AnimatedCounter";
 
 import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";

@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import FormSubmitButton from "./FormSubmitButton";
 import { authFormSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { Form } from "./ui/form";
-import FormError from "./FormError";
 import AuthFormInput from "./AuthFormInput";
 import { motion } from "framer-motion";
 import { signInAction, signUpAction } from "@/lib/actions/auth.actions";
+import { Form } from "../ui/form";
+import FormError from "../core/FormError";
+import FormSubmitButton from "../core/FormSubmitButton";
 
 const AuthForm = ({ type, searchParams }: AuthFormParams) => {
   const formSchema = authFormSchema(type);

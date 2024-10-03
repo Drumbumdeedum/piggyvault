@@ -1,6 +1,6 @@
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
-import LinkedAccountsList from "./LinkedAccountsList";
-import { ThemeSwitcher } from "./ThemeSwitcher";
+import LinkedAccountsList from "../LinkedAccountsList";
+import { ThemeSwitcher } from "../core/ThemeSwitcher";
 
 const SidebarRight = async () => {
   const user = await getLoggedInUser();

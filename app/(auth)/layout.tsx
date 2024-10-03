@@ -1,4 +1,4 @@
-import ProductPreviewImage from "@/components/ProductPreviewImage";
+import ProductPreviewImage from "@/components/auth/ProductPreviewImage";
 
 export default async function Layout({
   children,
