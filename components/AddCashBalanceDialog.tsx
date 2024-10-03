@@ -59,7 +59,13 @@ const AddCashBalanceDialog = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        form.reset();
+        setOpen(!open);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add cash balance</DialogTitle>
