@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { type } from "os";
 import FormSubmitButton from "./core/FormSubmitButton";
 import { addCashBalanceSchema } from "@/validations/cash-balance";
 import { useForm } from "react-hook-form";
@@ -29,13 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { addCashBalance } from "@/lib/actions/cash/api.actions";
 
 const AddCashBalanceDialog = ({
   open,
   setOpen,
+  setBalance,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  setBalance: Dispatch<SetStateAction<number>>;
 }) => {
   const formSchema = addCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,7 +49,13 @@ const AddCashBalanceDialog = ({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const { amount, currency } = values;
+    const result = await addCashBalance({ amount, currency });
+    if (result && result.current_balance) {
+      setBalance(result.current_balance);
+      form.reset();
+      setOpen(false);
+    }
   }
 
   return (
@@ -85,7 +93,6 @@ const AddCashBalanceDialog = ({
                   <div>
                     <FormLabel htmlFor="Balance">Currency</FormLabel>
                     <div className="flex w-full flex-col">
-                      {/* <Input id="currency_input" type="string" {...field} /> */}
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -97,7 +104,8 @@ const AddCashBalanceDialog = ({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="HUF">HUF</SelectItem>
-                          <SelectItem value="EUR">EUR</SelectItem>
+                          {/*                           <SelectItem value="EUR">EUR</SelectItem>
+                           */}
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -2,24 +2,36 @@
 
 import { Card, CardContent } from "./ui/card";
 import AnimatedCounter from "./util/AnimatedCounter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { CirclePlus, CreditCard } from "lucide-react";
 import AddCashBalanceDialog from "./AddCashBalanceDialog";
 import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
+import { readCashAccountsByUserId } from "@/lib/actions/cash/db.actions";
 
-const CashBalanceBox = () => {
-  const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(43500);
+const CashBalanceBox = ({ user }: { user: User }) => {
+  const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
   const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
     useState<boolean>(false);
   const [showCreateCashTransactionDialog, setShowCreateCashTransactionDialog] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    const getCashBalances = async () => {
+      const accounts = await readCashAccountsByUserId(user.id);
+      if (accounts) {
+        setTotalCurrentBalance(accounts[0].current_balance);
+      }
+    };
+    getCashBalances();
+  }, []);
 
   return (
     <>
       <AddCashBalanceDialog
         open={showAddCashBalanceDialog}
         setOpen={setShowAddCashBalanceDialog}
+        setBalance={setTotalCurrentBalance}
       />
       <CreateCashTransactionDialog
         open={showCreateCashTransactionDialog}

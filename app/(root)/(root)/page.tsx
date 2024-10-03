@@ -15,7 +15,7 @@ export default async function Index() {
         />
         <div className="flex gap-5">
           <TotalBalanceBox user={user} />
-          <CashBalanceBox />
+          <CashBalanceBox user={user} />
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ declare type Account = {
   account_id: string;
   current_balance: number;
   balance_name: string;
+  cash_account: boolean;
 };
 
 declare type CreateAccountProps = {

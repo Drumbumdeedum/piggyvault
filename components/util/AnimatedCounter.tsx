@@ -1,5 +1,5 @@
 import { formatAmount } from "@/lib/utils";
-import { CountUp } from "use-count-up";
+import { CountUp, useCountUp } from "use-count-up";
 
 const AnimatedCounter = ({ amount }: { amount: number }) => {
   return (
@@ -7,6 +7,7 @@ const AnimatedCounter = ({ amount }: { amount: number }) => {
       HUF{" "}
       <CountUp
         isCounting
+        key={amount}
         end={amount}
         duration={1}
         decimalPlaces={2}

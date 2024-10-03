@@ -280,13 +280,15 @@ export const fetchAccountsByUserId = async (user_id: string) => {
   });
   if (accounts && updateRequired) {
     const updatedAccounts = await Promise.all(
-      accounts.map(async (account) => {
-        await updateAccountSyncedAt(account.account_id);
-        return await updateAccountTotalBalance({
-          user_id,
-          account_id: account.account_id,
-        });
-      })
+      accounts
+        .filter((account) => !account.cash_account)
+        .map(async (account) => {
+          await updateAccountSyncedAt(account.account_id);
+          return await updateAccountTotalBalance({
+            user_id,
+            account_id: account.account_id,
+          });
+        })
     );
     accounts = updatedAccounts.flat();
   }
