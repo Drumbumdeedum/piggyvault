@@ -61,8 +61,7 @@ export const createCashAccount = async ({
       user_id,
       cash_account: true,
       current_balance: amount,
-      institution_name: "Cash balance",
-      country: "HUF",
+      institution_name: `${currency} cash balance`,
       currency,
     })
     .select("*");

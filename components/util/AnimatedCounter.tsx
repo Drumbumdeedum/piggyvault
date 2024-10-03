@@ -10,7 +10,6 @@ const AnimatedCounter = ({
 }) => {
   return (
     <div className="w-full">
-      HUF{" "}
       <CountUp
         isCounting
         key={amount}

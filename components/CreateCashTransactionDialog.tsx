@@ -28,19 +28,16 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 
 const CreateCashTransactionDialog = ({
   open,
   setOpen,
   setBalance,
-  setStartAmount,
-  currentBalance,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setBalance: Dispatch<SetStateAction<number>>;
-  setStartAmount: Dispatch<SetStateAction<number>>;
-  currentBalance: number;
 }) => {
   const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,7 +57,6 @@ const CreateCashTransactionDialog = ({
       note,
     });
     if (result && result.current_balance) {
-      setStartAmount(currentBalance);
       setBalance(result.current_balance);
       form.reset();
       setOpen(false);
@@ -110,8 +106,13 @@ const CreateCashTransactionDialog = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="HUF">HUF</SelectItem>
-                          {/* <SelectItem value="EUR">EUR</SelectItem> */}
+                          {enableBankingCurrencies.map((currency, index) => {
+                            return (
+                              <SelectItem key={index} value={currency}>
+                                {currency}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <FormMessage />
