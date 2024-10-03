@@ -197,6 +197,7 @@ const AccountsList = ({ user }: { user: User }) => {
             width={316}
             height={190}
             alt="lines"
+            priority
           />
         </button>
       </div>

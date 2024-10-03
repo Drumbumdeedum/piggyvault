@@ -1,3 +1,4 @@
+import CashBalanceBox from "@/components/CashBalanceBox";
 import PageHeader from "@/components/PageHeader";
 import { TotalBalanceBox } from "@/components/TotalBalanceBox";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
@@ -12,7 +13,10 @@ export default async function Index() {
           title={`Welcome ${user.first_name}`}
           subtitle="Access and manage your account and transactions"
         />
-        <TotalBalanceBox user={user} />
+        <div className="flex gap-5">
+          <TotalBalanceBox user={user} />
+          <CashBalanceBox />
+        </div>
       </div>
     </div>
   );

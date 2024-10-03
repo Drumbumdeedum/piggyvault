@@ -30,22 +30,24 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
     fetchTotalBalance();
   }, []);
   return (
-    <Card className="w-80">
+    <Card className="w-72">
       <CardContent className="p-0 w-full">
-        <div className="relative flex justify-center items-center p-5">
-          <div className={cn(loading && "text-foreground/10")}>
-            <p>Total current balance:</p>
-            <div className="text-xl font-mono font-bold">
+        <div className="relative flex p-5 w-full">
+          <div className={cn(loading && "text-foreground/10", "w-full")}>
+            <p className="font-bold">Total current balance:</p>
+            <div className="text-xl text-green-600 font-mono font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>
-            <CustomPieChart
-              items={accounts.map((account) => {
-                return {
-                  label: account.institution_name,
-                  value: account.current_balance,
-                };
-              })}
-            />
+            <div className="flex justify-center items-center w-full">
+              <CustomPieChart
+                items={accounts.map((account) => {
+                  return {
+                    label: account.institution_name,
+                    value: account.current_balance,
+                  };
+                })}
+              />
+            </div>
           </div>
           {loading && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2 w-full h-full bg-muted-foreground/5 rounded-xl">
