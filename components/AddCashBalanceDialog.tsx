@@ -1,7 +1,13 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 import {
   Form,
   FormControl,
@@ -36,7 +42,7 @@ const AddCashBalanceDialog = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
-      currency: "",
+      currency: "HUF",
     },
   });
 
@@ -49,6 +55,9 @@ const AddCashBalanceDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add cash balance</DialogTitle>
+          <DialogDescription>
+            Add a cash balance amount to your selected currency
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -83,7 +92,7 @@ const AddCashBalanceDialog = ({
                       >
                         <FormControl>
                           <SelectTrigger className="h-10">
-                            <SelectValue placeholder="Theme" />
+                            <SelectValue placeholder="HUF" defaultValue="HUF" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
