@@ -11,7 +11,7 @@ export default async function Index() {
       <div className="p-5">
         <PageHeader
           title={`Welcome ${user.first_name}`}
-          subtitle="Access and manage your account and transactions"
+          subtitle="Access and manage your accounts and transactions"
         />
         <div className="flex gap-5">
           <TotalBalanceBox user={user} />

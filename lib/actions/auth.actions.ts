@@ -18,7 +18,7 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     return { error: "Email and password are required." };
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -35,7 +35,12 @@ export const signUpAction = async (values: z.infer<typeof formSchema>) => {
     return encodedRedirect("error", "/sign-up", errorMessage);
   }
 
+  if (!data || !data.user) {
+    return encodedRedirect("error", "/sign-up", "Authentication error.");
+  }
+
   const { error: dbUserError } = await supabase.from("users").insert({
+    id: data.user.id,
     email,
     first_name,
     last_name,

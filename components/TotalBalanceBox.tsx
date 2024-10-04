@@ -8,11 +8,44 @@ import { Card, CardContent } from "./ui/card";
 import { cn } from "@/lib/utils";
 import CustomPieChart from "./CustomPieChart";
 import { fetchAccountsByUserId } from "@/lib/actions/enablebanking/api.actions";
+import { createBrowserClient } from "@supabase/ssr";
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export const TotalBalanceBox = ({ user }: { user: User }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("update_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "accounts" },
+        (payload) => {
+          if (payload && payload.new) {
+            setAccounts((prevAccounts) =>
+              prevAccounts.map((account) => {
+                return account.id === payload.new.id
+                  ? {
+                      ...account,
+                      current_balance: payload.new.current_balance,
+                    }
+                  : account;
+              })
+            );
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const fetchTotalBalance = async () => {

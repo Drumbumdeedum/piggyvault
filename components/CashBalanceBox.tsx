@@ -9,6 +9,12 @@ import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
 import { readCashAccountsByUserId } from "@/lib/actions/cash/db.actions";
 import { ScrollArea } from "./ui/scroll-area";
 import CashBalanceItem from "./CashBalanceItem";
+import { createBrowserClient } from "@supabase/ssr";
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const CashBalanceBox = ({ user }: { user: User }) => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -25,6 +31,32 @@ const CashBalanceBox = ({ user }: { user: User }) => {
       }
     };
     getCashBalances();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("update_balance_channel")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "accounts" },
+        (payload) => {
+          if (
+            payload &&
+            payload.new &&
+            payload.new.current_balance &&
+            payload.new.currency
+          ) {
+          }
+          updateAccountBalance({
+            amount: payload.new.current_balance,
+            currency: payload.new.currency,
+          });
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const updateAccountBalance = ({
@@ -50,12 +82,10 @@ const CashBalanceBox = ({ user }: { user: User }) => {
       <AddCashBalanceDialog
         open={showAddCashBalanceDialog}
         setOpen={setShowAddCashBalanceDialog}
-        updateBalance={updateAccountBalance}
       />
       <CreateCashTransactionDialog
         open={showCreateCashTransactionDialog}
         setOpen={setShowCreateCashTransactionDialog}
-        updateBalance={updateAccountBalance}
       />
       <Card className="w-72">
         <CardContent className="p-0 w-full h-full">

@@ -1,16 +1,11 @@
 import PersonalDataForm from "@/components/PersonalDataForm";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
 const page = async () => {
   const user = await getLoggedInUser();
   if (!user) return;
+
   return (
     <Card className="w-full">
       <CardContent className="flex flex-row py-5">

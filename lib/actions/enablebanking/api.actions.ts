@@ -110,7 +110,6 @@ export const completeAccountConnection = async ({
     })
   );
   await updateUserSyncedAt(user_id);
-  revalidatePath("/");
   return encodedRedirect("success", "/", "Your account is now connected.");
 };
 

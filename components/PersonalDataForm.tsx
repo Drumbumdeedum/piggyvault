@@ -14,6 +14,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { updateFirstName, updateLastName } from "@/lib/actions/user.actions";
+import { useEffect } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const PersonalDataForm = ({ user }: { user: User }) => {
   const firstNameFormSchema = firstNameSchema();
@@ -30,6 +37,27 @@ const PersonalDataForm = ({ user }: { user: User }) => {
       last_name: user.last_name,
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("update_user_channel")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "users" },
+        (payload) => {
+          if (payload && payload.new && payload.new.first_name) {
+            firstNameForm.setValue("first_name", payload.new.first_name);
+          }
+          if (payload && payload.new && payload.new.last_name) {
+            lastNameForm.setValue("last_name", payload.new.last_name);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [firstNameForm, lastNameForm]);
 
   const onFirstNameSubmit = async (
     values: z.infer<typeof firstNameFormSchema>

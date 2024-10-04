@@ -21,6 +21,12 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { Progress } from "./ui/progress";
+import { createBrowserClient } from "@supabase/ssr";
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const AccountsList = ({ user }: { user: User }) => {
   const router = useRouter();
@@ -44,11 +50,11 @@ const AccountsList = ({ user }: { user: User }) => {
             setProgress(60);
             setTimeout(() => {
               setProgress(90);
-            }, 800);
-          }, 800);
-        }, 800);
-      }, 800);
-    }, 800);
+            }, 200);
+          }, 200);
+        }, 200);
+      }, 200);
+    }, 200);
   }, []);
 
   useEffect(() => {
@@ -58,6 +64,27 @@ const AccountsList = ({ user }: { user: User }) => {
       setLoading(false);
     };
     getAccounts();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "accounts" },
+        (payload) => {
+          if (payload && payload.new) {
+            setAccounts((prevAccounts) => [
+              ...prevAccounts,
+              payload.new as Account,
+            ]);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -106,12 +133,11 @@ const AccountsList = ({ user }: { user: User }) => {
       </AlertDialog>
       <div className="flex flex-col gap-3">
         <div>
-          {accounts.length ? (
-            <h1 className="font-bold text-xl">Your linked accounts:</h1>
-          ) : (
+          <h1 className="font-bold text-xl">Your connected accounts:</h1>
+          {!accounts.length && (
             <>
               {!loading && (
-                <Alert>
+                <Alert className="mt-2">
                   <CircleAlert className="h-4 w-4" />
                   <AlertTitle className="font-bold">
                     Connect an account
@@ -179,8 +205,8 @@ const AccountsList = ({ user }: { user: User }) => {
             </div>
           ) : (
             <>
-              <div className="flex flex-col gap-2 h-full w-full p-6">
-                <h3 className="font-semibold flex-1">Link a new account</h3>
+              <div className="flex flex-col gap-2 h-full items-center w-full p-6">
+                <h3 className="font-semibold flex-1">Connect a new account</h3>
                 <p className="text-sm">Access transaction and balance data</p>
               </div>
               <div className="absolute top-[38%] left-1/2 transform -translate-x-1/2 -traslate-y-1/2">

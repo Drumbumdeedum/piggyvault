@@ -33,17 +33,9 @@ import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 const CreateCashTransactionDialog = ({
   open,
   setOpen,
-  updateBalance,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  updateBalance: ({
-    amount,
-    currency,
-  }: {
-    amount: number;
-    currency: string;
-  }) => void;
 }) => {
   const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,19 +49,13 @@ const CreateCashTransactionDialog = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { amount, currency, note } = values;
-    const result = await createCashTransactionAndUpdateCashBalance({
+    await createCashTransactionAndUpdateCashBalance({
       amount: amount,
       currency,
       note,
     });
-    if (result && result.current_balance) {
-      updateBalance({
-        amount: result.current_balance,
-        currency: result.currency,
-      });
-      form.reset();
-      setOpen(false);
-    }
+    form.reset();
+    setOpen(false);
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
