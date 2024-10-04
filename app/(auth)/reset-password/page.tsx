@@ -1,4 +1,4 @@
-import FormError from "@/components/FormError";
+import FormError from "@/components/core/FormError";
 import FormSubmitButton from "@/components/core/FormSubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
