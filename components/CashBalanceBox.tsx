@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "./ui/card";
-import AnimatedCounter from "./util/AnimatedCounter";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { CirclePlus, CreditCard } from "lucide-react";
@@ -9,10 +8,9 @@ import AddCashBalanceDialog from "./AddCashBalanceDialog";
 import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
 import { readCashAccountsByUserId } from "@/lib/actions/cash/db.actions";
 import { ScrollArea } from "./ui/scroll-area";
+import CashBalanceItem from "./CashBalanceItem";
 
 const CashBalanceBox = ({ user }: { user: User }) => {
-  const [startAmount, setStartAmount] = useState<number>(0);
-  const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
     useState<boolean>(false);
@@ -20,33 +18,44 @@ const CashBalanceBox = ({ user }: { user: User }) => {
     useState<boolean>(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setStartAmount(totalCurrentBalance);
-    }, 1000);
-  }, [totalCurrentBalance]);
-
-  useEffect(() => {
     const getCashBalances = async () => {
       const accounts = await readCashAccountsByUserId(user.id);
       if (accounts) {
-        setTotalCurrentBalance(accounts[0].current_balance);
         setAccounts(accounts);
       }
     };
     getCashBalances();
   }, []);
 
+  const updateAccountBalance = ({
+    amount,
+    currency,
+  }: {
+    amount: number;
+    currency: string;
+  }) => {
+    setAccounts((prevAccounts) =>
+      prevAccounts.map((account) => {
+        let resultAccount = account;
+        if (account.currency === currency) {
+          resultAccount = { ...account, current_balance: amount };
+        }
+        return resultAccount;
+      })
+    );
+  };
+
   return (
     <>
       <AddCashBalanceDialog
         open={showAddCashBalanceDialog}
         setOpen={setShowAddCashBalanceDialog}
-        setBalance={setTotalCurrentBalance}
+        updateBalance={updateAccountBalance}
       />
       <CreateCashTransactionDialog
         open={showCreateCashTransactionDialog}
         setOpen={setShowCreateCashTransactionDialog}
-        setBalance={setTotalCurrentBalance}
+        updateBalance={updateAccountBalance}
       />
       <Card className="w-72">
         <CardContent className="p-0 w-full h-full">
@@ -57,20 +66,11 @@ const CashBalanceBox = ({ user }: { user: User }) => {
                 <div className="flex flex-col gap-2">
                   {accounts.map((account, index) => {
                     return (
-                      <div
+                      <CashBalanceItem
                         key={index}
-                        className="flex items-center justify-between p-3 rounded-lg bg-card text-card-foreground shadow"
-                      >
-                        <p className="font-medium text-muted-foreground">
-                          {account.currency}
-                        </p>
-                        <div className="text-lg font-bold">
-                          <AnimatedCounter
-                            amount={account.current_balance}
-                            startAmount={0}
-                          />
-                        </div>
-                      </div>
+                        current_balance={account.current_balance}
+                        currency={account.currency}
+                      />
                     );
                   })}
                 </div>

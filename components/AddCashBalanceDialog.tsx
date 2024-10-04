@@ -34,11 +34,17 @@ import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 const AddCashBalanceDialog = ({
   open,
   setOpen,
-  setBalance,
+  updateBalance,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setBalance: Dispatch<SetStateAction<number>>;
+  updateBalance: ({
+    amount,
+    currency,
+  }: {
+    amount: number;
+    currency: string;
+  }) => void;
 }) => {
   const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,7 +59,10 @@ const AddCashBalanceDialog = ({
     const { amount, currency } = values;
     const result = await updateCashBalance({ amount, currency });
     if (result && result.current_balance) {
-      setBalance(result.current_balance);
+      updateBalance({
+        amount: result.current_balance,
+        currency: result.currency,
+      });
       form.reset();
       setOpen(false);
     }

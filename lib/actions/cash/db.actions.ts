@@ -8,7 +8,8 @@ export const readCashAccountsByUserId = async (user_id: string) => {
     .from("accounts")
     .select("*")
     .eq("user_id", user_id)
-    .eq("cash_account", true);
+    .eq("cash_account", true)
+    .order("current_balance", { ascending: false });
   if (error) {
     console.log("Error while retrieving cash accounts.", error);
     return;
