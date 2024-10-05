@@ -13,7 +13,7 @@ const page = async () => {
           <h1 className="text-2xl font-bold">Personal data</h1>
           <p>Update personal data</p>
         </div>
-        <PersonalDataForm user={user} />
+        <PersonalDataForm />
       </CardContent>
     </Card>
   );

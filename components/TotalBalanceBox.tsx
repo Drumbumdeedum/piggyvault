@@ -9,13 +9,15 @@ import { cn } from "@/lib/utils";
 import CustomPieChart from "./CustomPieChart";
 import { fetchAccountsByUserId } from "@/lib/actions/enablebanking/api.actions";
 import { createBrowserClient } from "@supabase/ssr";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export const TotalBalanceBox = ({ user }: { user: User }) => {
+export const TotalBalanceBox = () => {
+  const user = useUser((state: any) => state.user);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,8 +62,11 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
         setLoading(false);
       }
     };
-    fetchTotalBalance();
-  }, []);
+    if (user) {
+      fetchTotalBalance();
+    }
+  }, [user]);
+
   return (
     <Card className="w-72">
       <CardContent className="p-0 w-full">

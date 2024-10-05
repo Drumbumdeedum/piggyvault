@@ -10,7 +10,7 @@ export default async function RootLayout({
   return (
     <div className="no-scrollbar flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll">
       {children}
-      <SidebarRight user={user} />
+      <SidebarRight />
     </div>
   );
 }

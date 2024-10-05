@@ -16,13 +16,15 @@ import { Button } from "./ui/button";
 import { updateFirstName, updateLastName } from "@/lib/actions/user.actions";
 import { useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const PersonalDataForm = ({ user }: { user: User }) => {
+const PersonalDataForm = () => {
+  const user = useUser((state: any) => state.user);
   const firstNameFormSchema = firstNameSchema();
   const firstNameForm = useForm<z.infer<typeof firstNameFormSchema>>({
     resolver: zodResolver(firstNameFormSchema),

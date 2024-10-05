@@ -10,13 +10,15 @@ import { readCashAccountsByUserId } from "@/lib/actions/cash/db.actions";
 import { ScrollArea } from "./ui/scroll-area";
 import CashBalanceItem from "./CashBalanceItem";
 import { createBrowserClient } from "@supabase/ssr";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const CashBalanceBox = ({ user }: { user: User }) => {
+const CashBalanceBox = () => {
+  const user = useUser((state: any) => state.user);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
     useState<boolean>(false);
@@ -30,8 +32,10 @@ const CashBalanceBox = ({ user }: { user: User }) => {
         setAccounts(accounts);
       }
     };
-    getCashBalances();
-  }, []);
+    if (user) {
+      getCashBalances();
+    }
+  }, [user]);
 
   useEffect(() => {
     const channel = supabase

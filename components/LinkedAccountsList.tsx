@@ -23,13 +23,16 @@ import {
 import { Progress } from "./ui/progress";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const AccountsList = ({ user }: { user: User }) => {
+const AccountsList = () => {
+  const user = useUser((state: any) => state.user);
+  console.log(user);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
@@ -61,8 +64,10 @@ const AccountsList = ({ user }: { user: User }) => {
       setAccounts(accounts!);
       setLoading(false);
     };
-    getAccounts();
-  }, []);
+    if (user) {
+      getAccounts();
+    }
+  }, [user]);
 
   useEffect(() => {
     const channel = supabase

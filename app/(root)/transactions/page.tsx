@@ -8,7 +8,7 @@ const page = async () => {
   return (
     <div className="p-5">
       <PageHeader title="Transactions" />
-      <TransactionsTable user={user} />
+      <TransactionsTable />
     </div>
   );
 };
