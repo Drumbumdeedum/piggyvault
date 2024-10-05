@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "./ui/button";
 import { signOutAction } from "@/lib/actions/auth.actions";
 import { LogOut } from "lucide-react";
+import { Button } from "../ui/button";
 
 const SidebarFooter = () => {
   const signout = async () => {

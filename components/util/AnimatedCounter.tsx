@@ -1,14 +1,20 @@
 import { formatAmount } from "@/lib/utils";
-import React from "react";
 import { CountUp } from "use-count-up";
 
-const AnimatedCounter = ({ amount }: { amount: number }) => {
+const AnimatedCounter = ({
+  amount,
+  startAmount = 0,
+}: {
+  amount: number;
+  startAmount?: number;
+}) => {
   return (
     <div className="w-full">
-      HUF{" "}
       <CountUp
         isCounting
+        key={amount}
         end={amount}
+        start={startAmount}
         duration={1}
         decimalPlaces={2}
         decimalSeparator=","

@@ -1,4 +1,5 @@
-import PageHeader from "@/components/PageHeader";
+import CashBalanceBox from "@/components/CashBalanceBox";
+import PageHeader from "@/components/layout/PageHeader";
 import { TotalBalanceBox } from "@/components/TotalBalanceBox";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 
@@ -10,9 +11,12 @@ export default async function Index() {
       <div className="p-5">
         <PageHeader
           title={`Welcome ${user.first_name}`}
-          subtitle="Access and manage your account and transactions"
+          subtitle="Access and manage your accounts and transactions"
         />
-        <TotalBalanceBox user={user} />
+        <div className="flex gap-5">
+          <TotalBalanceBox user={user} />
+          <CashBalanceBox user={user} />
+        </div>
       </div>
     </div>
   );

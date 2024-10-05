@@ -3,9 +3,9 @@
 import SidebarFooter from "./SidebarFooter";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
 
 import { House, ArrowRightLeft, Settings } from "lucide-react";
+import { Button } from "../ui/button";
 
 const sidebarLinks = [
   {
