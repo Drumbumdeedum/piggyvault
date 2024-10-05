@@ -27,7 +27,8 @@ export const readNonCashAccountsByUserId = async (user_id: string) => {
     .from("accounts")
     .select("*")
     .eq("user_id", user_id)
-    .eq("cash_account", false);
+    .eq("cash_account", false)
+    .order("created_at", { ascending: true });
   if (error) {
     console.log("Error while retrieving non cash accounts.", error);
     return;

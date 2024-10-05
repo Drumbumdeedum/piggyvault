@@ -22,6 +22,7 @@ import {
 } from "./ui/alert-dialog";
 import { Progress } from "./ui/progress";
 import { createBrowserClient } from "@supabase/ssr";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,23 +39,20 @@ const AccountsList = ({ user }: { user: User }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [connectingAccount, setConnectingAccount] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
+  const [parent] = useAutoAnimate();
 
   useEffect(() => {
-    setTimeout(() => {
-      setProgress(15);
-      setTimeout(() => {
-        setProgress(20);
-        setTimeout(() => {
-          setProgress(35);
-          setTimeout(() => {
-            setProgress(60);
-            setTimeout(() => {
-              setProgress(90);
-            }, 200);
-          }, 200);
-        }, 200);
-      }, 200);
-    }, 200);
+    const incrementProgress = () => {
+      let start = 0;
+      const interval = setInterval(() => {
+        start += 0.5;
+        setProgress(start);
+        if (start >= 100) {
+          clearInterval(interval);
+        }
+      }, 5);
+    };
+    incrementProgress();
   }, []);
 
   useEffect(() => {
@@ -133,7 +131,7 @@ const AccountsList = ({ user }: { user: User }) => {
       </AlertDialog>
       <div className="flex flex-col gap-3">
         <div>
-          <h1 className="font-bold text-xl">Your connected accounts:</h1>
+          <h1 className="font-semibold text-xl">Your connected accounts:</h1>
           {!accounts.length && (
             <>
               {!loading && (
@@ -151,41 +149,45 @@ const AccountsList = ({ user }: { user: User }) => {
             </>
           )}
         </div>
-        {accounts?.map((account, index) => {
-          return (
-            <div
-              key={index}
-              className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 "
-            >
-              <div className="flex flex-col gap-2 h-full p-6">
-                <div className="flex-1">
-                  <h1 className="font-semibold">{account.institution_name}</h1>
-                  {account.product_name && (
-                    <h2 className="font-semibold text-xs flex-1">
-                      {account.product_name}
-                    </h2>
-                  )}
-                </div>
-
-                <div className="flex">
-                  <p className="text-sm grow">{account.currency}</p>
-                  <div className="flex items-center justify-end gap-1 text-green-400/90">
-                    <span className="text-xs">Connected</span>
-                    <BadgeCheck size="18" />
+        <div className="space-y-3" ref={parent}>
+          {accounts?.map((account, index) => {
+            return (
+              <div
+                key={index}
+                className="relative border bg-gradient-to-br from-purple-500/70 to-pink-500 text-background shadow-lg rounded-xl w-72 h-44 transition animate-in"
+              >
+                <div className="flex flex-col gap-2 h-full p-6">
+                  <div className="flex-1">
+                    <h1 className="font-semibold">
+                      {account.institution_name}
+                    </h1>
+                    {account.product_name && (
+                      <h2 className="font-semibold text-xs flex-1">
+                        {account.product_name}
+                      </h2>
+                    )}
                   </div>
+
+                  <div className="flex">
+                    <p className="text-sm grow">{account.currency}</p>
+                    <div className="flex items-center justify-end gap-1 text-green-400/90">
+                      <span className="text-xs">Connected</span>
+                      <BadgeCheck size="18" />
+                    </div>
+                  </div>
+                  <p className="text-sm">{account.iban}</p>
                 </div>
-                <p className="text-sm">{account.iban}</p>
+                <Image
+                  className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
+                  src="/images/wavy_lines.webp"
+                  width={316}
+                  height={190}
+                  alt="lines"
+                />
               </div>
-              <Image
-                className="absolute top-0 left-0 opacity-10 object-cover h-full rounded-lg"
-                src="/images/wavy_lines.webp"
-                width={316}
-                height={190}
-                alt="lines"
-              />
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
         <button
           className="group relative border bg-gradient-to-br from-blue-500 to-green-500 text-background shadow-lg rounded-xl w-72 h-44 text-left flex flex-col items-center justify-normal cursor-pointer transform will-change-transform transition-transform hover:scale-[101%] active:scale-[99%] disabled:cursor-not-allowed"
           onClick={onClick}
