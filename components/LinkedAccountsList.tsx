@@ -32,7 +32,6 @@ const supabase = createBrowserClient(
 
 const AccountsList = () => {
   const user = useUser((state: any) => state.user);
-  console.log(user);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {

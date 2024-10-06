@@ -31,7 +31,9 @@ const TransactionsTable = () => {
         setTransactions(fetchedTransactions);
       }
     };
-    fetchTransactions();
+    if (user) {
+      fetchTransactions();
+    }
   }, [user]);
 
   return (
