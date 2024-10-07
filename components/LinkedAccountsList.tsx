@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  BadgeCheck,
-  CircleAlert,
-  CirclePlus,
-  LoaderPinwheel,
-} from "lucide-react";
+import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";

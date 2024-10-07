@@ -62,7 +62,7 @@ const SelectBank = ({ userId }: { userId: string }) => {
         <ChevronLeft size="20" />
         Back
       </Button>
-      <Command className="rounded-lg border shadow-md h-[80vh] lg:w-[46rem]">
+      <Command className="rounded-lg border shadow-md h-[70vh] lg:w-[46rem]">
         <CommandInput
           value={bankFilter}
           onValueChange={setBankFilter}
