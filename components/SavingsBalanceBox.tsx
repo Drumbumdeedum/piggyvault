@@ -108,7 +108,7 @@ const SavingsBalanceBox = () => {
                         key={index}
                         current_balance={account.current_balance}
                         currency={account.currency}
-                        balance_name={account.balance_name}
+                        balance_name={account.institution_name}
                       />
                     );
                   })}

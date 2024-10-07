@@ -33,6 +33,7 @@ export const getLastCharOfNumber = (number: number) => {
 };
 
 export const formatAmount = (value: number) => {
+  if (!value) return "0.00";
   let [integerPart, decimalPart] = value.toString().split(".");
   integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   if (decimalPart) {

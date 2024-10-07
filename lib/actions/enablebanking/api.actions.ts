@@ -111,7 +111,11 @@ export const completeAccountConnection = async ({
     })
   );
   await updateUserSyncedAt(user_id);
-  return encodedRedirect("success", "/", "Your account is now connected.");
+  return encodedRedirect(
+    "success",
+    "/accounts",
+    "Your account is now connected."
+  );
 };
 
 export const updateAllAccountsTotalBalances = async () => {

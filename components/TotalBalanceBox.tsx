@@ -21,9 +21,12 @@ export const TotalBalanceBox = () => {
   const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
 
   useEffect(() => {
-    setAccounts(allAccounts);
+    const mainCurrencyAccounts = allAccounts.filter(
+      (account) => account.currency === "HUF"
+    );
+    setAccounts(mainCurrencyAccounts);
     setTotalCurrentBalance(
-      allAccounts.reduce(
+      mainCurrencyAccounts.reduce(
         (current, account) => current + account.current_balance,
         0
       )
@@ -88,7 +91,7 @@ export const TotalBalanceBox = () => {
       <CardContent className="p-0 w-full">
         <div className="flex p-5 w-full">
           <div className="w-full">
-            <p className="font-semibold">Total current balance:</p>
+            <p className="font-semibold">HUF balance summary:</p>
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>

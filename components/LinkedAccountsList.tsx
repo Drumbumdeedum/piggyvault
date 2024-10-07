@@ -99,7 +99,7 @@ const AccountsList = () => {
     }
     if (sp.has("success")) {
       const showToast = () => {
-        router.push("/");
+        router.push("/accounts");
         setConnectingAccount(false);
         toast.success("Success! 🎉", {
           description: sp.get("success")!,
@@ -111,7 +111,7 @@ const AccountsList = () => {
         });
       };
       const onCloseToastAction = () => {
-        router.replace("/");
+        router.replace("/accounts");
       };
       showToast();
     }
