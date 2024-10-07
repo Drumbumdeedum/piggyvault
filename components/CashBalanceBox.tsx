@@ -93,12 +93,12 @@ const CashBalanceBox = () => {
         open={showCreateCashTransactionDialog}
         setOpen={setShowCreateCashTransactionDialog}
       />
-      <Card className="w-72">
+      <Card className="w-[16rem] h-[20rem]">
         <CardContent className="p-0 w-full h-full">
           <div className="relative flex flex-col h-full gap-6 p-5">
             <div className="flex-1">
               <p className="font-semibold">Cash balance:</p>
-              <ScrollArea className="h-[180px]">
+              <ScrollArea className="h-[10rem]">
                 <div className="flex flex-col gap-2">
                   {accounts.map((account, index) => {
                     return (

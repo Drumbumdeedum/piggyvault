@@ -18,7 +18,9 @@ const BalanceItem = ({
   }, [current_balance]);
   return (
     <div className="p-3 rounded-lg bg-card text-card-foreground shadow">
-      {balance_name && <p className="text-sm font-semibold">{balance_name}</p>}
+      {balance_name && (
+        <p className="text-xs font-semibold mb-2">{balance_name}</p>
+      )}
       <div className="flex items-center justify-between">
         <p className="font-medium text-muted-foreground">{currency}</p>
         <div className="text-lg font-bold">

@@ -43,7 +43,7 @@ const CustomPieChart = ({
             data={mappedChartData}
             dataKey="value"
             nameKey="label"
-            innerRadius={60}
+            innerRadius={50}
             strokeWidth={3}
             paddingAngle={5}
           />
