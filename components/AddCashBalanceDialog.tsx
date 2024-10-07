@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from "./ui/form";
 import FormSubmitButton from "./core/FormSubmitButton";
-import { updateCashBalanceSchema } from "@/validations/cash-balance";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,6 +29,7 @@ import {
 } from "./ui/select";
 import { updateCashBalance } from "@/lib/actions/cash/api.actions";
 import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
+import { updateCashBalanceSchema } from "@/validations/balance";
 
 const AddCashBalanceDialog = ({
   open,
@@ -92,7 +92,7 @@ const AddCashBalanceDialog = ({
                 name="currency"
                 render={({ field }) => (
                   <div>
-                    <FormLabel htmlFor="Balance">Currency</FormLabel>
+                    <FormLabel htmlFor="Currency">Currency</FormLabel>
                     <div className="flex w-full flex-col">
                       <Select
                         onValueChange={field.onChange}

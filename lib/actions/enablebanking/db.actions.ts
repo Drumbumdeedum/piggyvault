@@ -11,30 +11,30 @@ export const readAccountsByUserId = async (user_id: string) => {
     .eq("user_id", user_id)
     .order("current_balance", { ascending: false });
   if (error) {
-    console.log("Error while retrieving accounts.", error);
+    console.log("Error while retrieving accounts by user_id.", error);
     return;
   }
   if (!data) {
-    console.log("Error while retrieving accounts.");
+    console.log("Error while retrieving accounts by user_id.");
     return;
   }
   return data as Account[];
 };
 
-export const readNonCashAccountsByUserId = async (user_id: string) => {
+export const readBankAccountsByUserId = async (user_id: string) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("accounts")
     .select("*")
     .eq("user_id", user_id)
-    .neq("account_type", "cash_account")
+    .eq("account_type", "bank_account")
     .order("created_at", { ascending: true });
   if (error) {
-    console.log("Error while retrieving non cash accounts.", error);
+    console.log("Error while retrieving bank accounts by user_id.", error);
     return;
   }
   if (!data) {
-    console.log("Error while retrieving non cash accounts.");
+    console.log("Error while retrieving bank accounts by user_id.");
     return;
   }
   return data as Account[];

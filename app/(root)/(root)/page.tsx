@@ -1,5 +1,6 @@
 import CashBalanceBox from "@/components/CashBalanceBox";
 import PageHeader from "@/components/layout/PageHeader";
+import SavingsBalanceBox from "@/components/SavingsBalanceBox";
 import { TotalBalanceBox } from "@/components/TotalBalanceBox";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
 import InitUser from "@/lib/stores/InitUser";
@@ -17,9 +18,10 @@ export default async function Index() {
             title={`Welcome ${user.first_name}`}
             subtitle="Access and manage your accounts and transactions"
           />
-          <div className="flex gap-5">
+          <div className="flex flex-col md:flex-row gap-5">
             <TotalBalanceBox />
             <CashBalanceBox />
+            <SavingsBalanceBox />
           </div>
         </div>
       </div>

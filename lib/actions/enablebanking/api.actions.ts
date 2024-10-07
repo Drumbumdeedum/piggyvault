@@ -14,7 +14,7 @@ import {
   createAccountConnection,
   readAccountConnectionByUserIdAndAuthCode,
   readAccountsByUserId,
-  readNonCashAccountsByUserId,
+  readBankAccountsByUserId,
   updateAccountBalanceAndBalanceName,
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
   updateAccountSyncedAt,
@@ -273,7 +273,7 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
 export const fetchAccountsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
-  let accounts = await readNonCashAccountsByUserId(user_id);
+  let accounts = await readBankAccountsByUserId(user_id);
   let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
@@ -295,7 +295,7 @@ export const fetchAccountsByUserId = async (user_id: string) => {
 };
 
 export const fetchAndUpdateTransactions = async (user_id: string) => {
-  const accounts = await readNonCashAccountsByUserId(user_id);
+  const accounts = await readBankAccountsByUserId(user_id);
   if (!accounts) {
     return;
   }

@@ -44,12 +44,7 @@ export const updateCashBalance = async ({
 export const fetchCurrentCashBalance = async () => {
   const user = await getLoggedInUser();
   if (!user) return;
-
-  const result = await readCashAccountsByUserId(user.id);
-
-  console.log(result);
-
-  return result;
+  return await readCashAccountsByUserId(user.id);
 };
 
 export const createCashTransactionAndUpdateCashBalance = async ({
@@ -72,14 +67,9 @@ export const createCashTransactionAndUpdateCashBalance = async ({
   });
 
   if (cashTransaction) {
-    console.log(cashTransaction);
-    const updatedBalance = await updateCashBalance({
+    await updateCashBalance({
       amount: -amount,
       currency: currency,
     });
-    console.log(updatedBalance);
-    revalidatePath("/");
-    return updatedBalance;
   }
-  return null;
 };

@@ -37,7 +37,6 @@ export const TotalBalanceBox = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "accounts" },
         (payload) => {
-          console.log(payload);
           if (
             payload &&
             payload.new &&
@@ -85,7 +84,7 @@ export const TotalBalanceBox = () => {
   }, []);
 
   return (
-    <Card className="w-72">
+    <Card className="w-[16rem] h-[20rem]">
       <CardContent className="p-0 w-full">
         <div className="flex p-5 w-full">
           <div className="w-full">
