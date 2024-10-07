@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  BadgeCheck,
-  CircleAlert,
-  CirclePlus,
-  LoaderPinwheel,
-} from "lucide-react";
+import { BadgeCheck, CirclePlus, LoaderPinwheel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -104,7 +99,7 @@ const AccountsList = () => {
     }
     if (sp.has("success")) {
       const showToast = () => {
-        router.push("/");
+        router.push("/accounts");
         setConnectingAccount(false);
         toast.success("Success! 🎉", {
           description: sp.get("success")!,
@@ -116,7 +111,7 @@ const AccountsList = () => {
         });
       };
       const onCloseToastAction = () => {
-        router.replace("/");
+        router.replace("/accounts");
       };
       showToast();
     }

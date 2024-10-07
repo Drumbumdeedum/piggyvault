@@ -4,7 +4,7 @@ import SidebarFooter from "./SidebarFooter";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { House, ArrowRightLeft, Settings } from "lucide-react";
+import { House, ArrowRightLeft, Settings, Wallet } from "lucide-react";
 import { Button } from "../ui/button";
 
 const sidebarLinks = [
@@ -19,6 +19,12 @@ const sidebarLinks = [
     route: "/transactions",
     label: "Transactions",
     icon: <ArrowRightLeft size="18" />,
+  },
+  {
+    base: "/accounts",
+    route: "/accounts",
+    label: "Accounts",
+    icon: <Wallet size="18" />,
   },
   {
     base: "/account-settings",

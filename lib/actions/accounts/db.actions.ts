@@ -64,3 +64,32 @@ export const updateAccountCurrentBalanceById = async ({
   }
   return data as Account;
 };
+
+export const createNewAccount = async ({
+  user_id,
+  name,
+  type,
+  current_balance,
+  currency,
+}: {
+  user_id: string;
+  name: string;
+  type: string;
+  current_balance: number;
+  currency: string;
+}) => {
+  const supabase = createClient();
+  const { error } = await supabase.from("accounts").insert({
+    user_id,
+    institution_name: name,
+    balance_name: name,
+    current_balance,
+    currency,
+    account_type: type,
+  });
+
+  if (error) {
+    console.log("Error while creating account:", error);
+    return;
+  }
+};

@@ -111,7 +111,11 @@ export const completeAccountConnection = async ({
     })
   );
   await updateUserSyncedAt(user_id);
-  return encodedRedirect("success", "/", "Your account is now connected.");
+  return encodedRedirect(
+    "success",
+    "/accounts",
+    "Your account is now connected."
+  );
 };
 
 export const updateAllAccountsTotalBalances = async () => {
@@ -257,10 +261,11 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
   let transactions;
-  let updateRequired = haveMinutesPassedSinceDate({
+  /* let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
-  });
+  }); */
+  let updateRequired = false;
   if (updateRequired) {
     const result = await fetchAndUpdateTransactions(user_id);
     transactions = result ? result.flat() : [];
@@ -274,10 +279,11 @@ export const fetchAccountsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
   let accounts = await readBankAccountsByUserId(user_id);
-  let updateRequired = haveMinutesPassedSinceDate({
+  /* let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
-  });
+  }); */
+  let updateRequired = false;
   if (accounts && updateRequired) {
     const updatedAccounts = await Promise.all(
       accounts.map(async (account) => {
