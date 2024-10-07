@@ -48,7 +48,6 @@ const SelectBank = ({ userId }: { userId: string }) => {
       bankName: bank.name,
       countryCode: countryCode,
     });
-    console.log(result);
     if (result) {
       window.open(result.url, "_self");
     }

@@ -27,7 +27,6 @@ const TransactionsTable = () => {
     const fetchTransactions = async () => {
       const fetchedTransactions = await fetchTransactionsByUserId(user.id);
       if (fetchedTransactions) {
-        console.log(fetchedTransactions);
         setTransactions(fetchedTransactions);
       }
     };

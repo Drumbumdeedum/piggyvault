@@ -37,7 +37,6 @@ export const TotalBalanceBox = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "accounts" },
         (payload) => {
-          console.log(payload);
           if (
             payload &&
             payload.new &&

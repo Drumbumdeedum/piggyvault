@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
-import { readNonCashAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
 import { completeAccountConnection } from "@/lib/actions/enablebanking/api.actions";
 import {
   AlertDialog,
@@ -23,6 +22,7 @@ import { Progress } from "./ui/progress";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useUser } from "@/lib/stores/user";
+import { useAccounts } from "@/lib/stores/accounts";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +30,7 @@ const supabase = createBrowserClient(
 );
 
 const AccountsList = () => {
-  const user = useUser((state: any) => state.user);
+  const storedAccounts = useAccounts((s) => s.accounts);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
@@ -57,15 +57,15 @@ const AccountsList = () => {
   }, []);
 
   useEffect(() => {
-    const getAccounts = async () => {
-      const accounts = await readNonCashAccountsByUserId(user.id);
-      setAccounts(accounts!);
+    if (storedAccounts) {
+      setAccounts(
+        storedAccounts.filter(
+          (account) => account.account_type === "bank_account"
+        )
+      );
       setLoading(false);
-    };
-    if (user) {
-      getAccounts();
     }
-  }, [user]);
+  }, [storedAccounts]);
 
   useEffect(() => {
     const channel = supabase
