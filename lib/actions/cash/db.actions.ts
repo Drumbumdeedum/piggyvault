@@ -8,7 +8,7 @@ export const readCashAccountsByUserId = async (user_id: string) => {
     .from("accounts")
     .select("*")
     .eq("user_id", user_id)
-    .eq("cash_account", true)
+    .eq("account_type", "cash_account")
     .order("current_balance", { ascending: false });
   if (error) {
     console.log("Error while retrieving cash accounts.", error);
@@ -34,7 +34,7 @@ export const readCashAccountsByUserIdAndCurrency = async ({
     .select("*")
     .eq("user_id", user_id)
     .eq("currency", currency)
-    .eq("cash_account", true);
+    .eq("account_type", "cash_account");
   if (error) {
     console.log("Error while retrieving cash accounts.", error);
     return;
@@ -60,7 +60,7 @@ export const createCashAccount = async ({
     .from("accounts")
     .insert({
       user_id,
-      cash_account: true,
+      account_type: "cash_account",
       current_balance: amount,
       institution_name: `${currency} cash balance`,
       currency,

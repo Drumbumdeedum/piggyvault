@@ -13,8 +13,14 @@ declare type Account = {
   account_id: string;
   current_balance: number;
   balance_name: string;
-  cash_account: boolean;
+  account_type: ACCOUNT_TYPE;
 };
+
+enum ACCOUNT_TYPE {
+  bank_account = "bank_account",
+  cash_account = "cash_account",
+  savings_account = "savings_account",
+}
 
 declare type CreateAccountProps = {
   user_id: string;
@@ -25,7 +31,7 @@ declare type CreateAccountProps = {
   iban: string;
   account_uid: string;
   account_id: string;
-  cash_account?: boolean;
+  account_type: string;
 };
 
 declare type UpdateAccountBalanceProps = {

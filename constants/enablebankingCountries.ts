@@ -201,4 +201,5 @@ export const enableBankingCurrencies = [
   "PLN",
   "RON",
   "SEK",
+  "USD",
 ];

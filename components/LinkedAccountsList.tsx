@@ -13,7 +13,6 @@ import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
 import { readNonCashAccountsByUserId } from "@/lib/actions/enablebanking/db.actions";
 import { completeAccountConnection } from "@/lib/actions/enablebanking/api.actions";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,13 +22,15 @@ import {
 import { Progress } from "./ui/progress";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const AccountsList = ({ user }: { user: User }) => {
+const AccountsList = () => {
+  const user = useUser((state: any) => state.user);
   const router = useRouter();
   const sp = useSearchParams();
   const onClick = () => {
@@ -61,17 +62,23 @@ const AccountsList = ({ user }: { user: User }) => {
       setAccounts(accounts!);
       setLoading(false);
     };
-    getAccounts();
-  }, []);
+    if (user) {
+      getAccounts();
+    }
+  }, [user]);
 
   useEffect(() => {
     const channel = supabase
-      .channel("insert_account_channel")
+      .channel("insert_bank_account_channel")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "accounts" },
         (payload) => {
-          if (payload && payload.new) {
+          if (
+            payload &&
+            payload.new &&
+            payload.new.account_type === "bank_account"
+          ) {
             setAccounts((prevAccounts) => [
               ...prevAccounts,
               payload.new as Account,
@@ -132,7 +139,7 @@ const AccountsList = ({ user }: { user: User }) => {
       <div className="flex flex-col gap-3">
         <div>
           <h1 className="font-semibold text-xl">Your connected accounts:</h1>
-          {!accounts.length && (
+          {/* {!accounts.length && (
             <>
               {!loading && (
                 <Alert className="mt-2">
@@ -147,7 +154,7 @@ const AccountsList = ({ user }: { user: User }) => {
                 </Alert>
               )}
             </>
-          )}
+          )} */}
         </div>
         <div className="space-y-3" ref={parent}>
           {accounts?.map((account, index) => {

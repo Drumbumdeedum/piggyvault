@@ -3,22 +3,59 @@
 import { useEffect, useState } from "react";
 import AnimatedCounter from "./util/AnimatedCounter";
 
-import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
-import { cn } from "@/lib/utils";
 import CustomPieChart from "./CustomPieChart";
-import { fetchAccountsByUserId } from "@/lib/actions/enablebanking/api.actions";
 import { createBrowserClient } from "@supabase/ssr";
+import { useAccounts } from "@/lib/stores/accounts";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export const TotalBalanceBox = ({ user }: { user: User }) => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+export const TotalBalanceBox = () => {
+  const allAccounts: Account[] = useAccounts((state: any) => state.accounts);
+  const pushAccount = useAccounts((s) => s.pushAccount);
+
+  const [accounts, setAccounts] = useState<Account[]>(allAccounts);
   const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setAccounts(allAccounts);
+    setTotalCurrentBalance(
+      allAccounts.reduce(
+        (current, account) => current + account.current_balance,
+        0
+      )
+    );
+  }, [allAccounts]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "accounts" },
+        (payload) => {
+          console.log(payload);
+          if (
+            payload &&
+            payload.new &&
+            payload.new.account_type !== "cash_account"
+          ) {
+            setAccounts((prevAccounts) => [
+              ...prevAccounts,
+              payload.new as Account,
+            ]);
+            pushAccount(payload.new as Account);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const channel = supabase
@@ -47,26 +84,11 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchTotalBalance = async () => {
-      const fetchedAccounts = await fetchAccountsByUserId(user.id);
-      if (fetchedAccounts) {
-        let totalBalance = 0;
-        fetchedAccounts.forEach(
-          (fetchedAccount) => (totalBalance += fetchedAccount.current_balance)
-        );
-        setTotalCurrentBalance(totalBalance);
-        setAccounts(fetchedAccounts);
-        setLoading(false);
-      }
-    };
-    fetchTotalBalance();
-  }, []);
   return (
     <Card className="w-72">
       <CardContent className="p-0 w-full">
-        <div className="relative flex p-5 w-full">
-          <div className={cn(loading && "text-foreground/10", "w-full")}>
+        <div className="flex p-5 w-full">
+          <div className="w-full">
             <p className="font-semibold">Total current balance:</p>
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
@@ -82,14 +104,6 @@ export const TotalBalanceBox = ({ user }: { user: User }) => {
               />
             </div>
           </div>
-          {loading && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2 w-full h-full bg-muted-foreground/5 rounded-xl">
-              <p>Loading data</p>
-              <p>
-                <LoaderPinwheel size="24" className="animate-spin" />
-              </p>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

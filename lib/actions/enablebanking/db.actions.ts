@@ -27,7 +27,7 @@ export const readNonCashAccountsByUserId = async (user_id: string) => {
     .from("accounts")
     .select("*")
     .eq("user_id", user_id)
-    .eq("cash_account", false)
+    .neq("account_type", "cash_account")
     .order("created_at", { ascending: true });
   if (error) {
     console.log("Error while retrieving non cash accounts.", error);
@@ -118,7 +118,7 @@ export const createAccount = async ({
   iban,
   account_uid,
   account_id,
-  cash_account = false,
+  account_type = "bank_account",
 }: CreateAccountProps) => {
   const supabase = createClient();
   const { error } = await supabase.from("accounts").insert({
@@ -130,7 +130,7 @@ export const createAccount = async ({
     iban,
     account_uid,
     account_id,
-    cash_account,
+    account_type,
   });
 
   if (error) {

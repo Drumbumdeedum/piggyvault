@@ -6,17 +6,19 @@ import { Button } from "./ui/button";
 import { CirclePlus, CreditCard } from "lucide-react";
 import AddCashBalanceDialog from "./AddCashBalanceDialog";
 import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
-import { readCashAccountsByUserId } from "@/lib/actions/cash/db.actions";
 import { ScrollArea } from "./ui/scroll-area";
 import CashBalanceItem from "./CashBalanceItem";
 import { createBrowserClient } from "@supabase/ssr";
+import { useAccounts } from "@/lib/stores/accounts";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const CashBalanceBox = ({ user }: { user: User }) => {
+const CashBalanceBox = () => {
+  const cashAccounts = useAccounts((s) => s.accounts);
+  const updateAccountBalance = useAccounts((s) => s.updateAccountBalance);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
     useState<boolean>(false);
@@ -24,14 +26,14 @@ const CashBalanceBox = ({ user }: { user: User }) => {
     useState<boolean>(false);
 
   useEffect(() => {
-    const getCashBalances = async () => {
-      const accounts = await readCashAccountsByUserId(user.id);
-      if (accounts) {
-        setAccounts(accounts);
-      }
-    };
-    getCashBalances();
-  }, []);
+    if (cashAccounts) {
+      setAccounts(
+        cashAccounts.filter(
+          (account) => account.account_type === "cash_account"
+        )
+      );
+    }
+  }, [cashAccounts]);
 
   useEffect(() => {
     const channel = supabase
@@ -46,11 +48,8 @@ const CashBalanceBox = ({ user }: { user: User }) => {
             payload.new.current_balance &&
             payload.new.currency
           ) {
+            updateAccountBalance(payload.new.id, payload.new.current_balance);
           }
-          updateAccountBalance({
-            amount: payload.new.current_balance,
-            currency: payload.new.currency,
-          });
         }
       )
       .subscribe();
@@ -59,23 +58,30 @@ const CashBalanceBox = ({ user }: { user: User }) => {
     };
   }, []);
 
-  const updateAccountBalance = ({
-    amount,
-    currency,
-  }: {
-    amount: number;
-    currency: string;
-  }) => {
-    setAccounts((prevAccounts) =>
-      prevAccounts.map((account) => {
-        let resultAccount = account;
-        if (account.currency === currency) {
-          resultAccount = { ...account, current_balance: amount };
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_cash_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "accounts" },
+        (payload) => {
+          if (
+            payload &&
+            payload.new &&
+            payload.new.account_type === "cash_account"
+          ) {
+            setAccounts((prevAccounts) => [
+              ...prevAccounts,
+              payload.new as Account,
+            ]);
+          }
         }
-        return resultAccount;
-      })
-    );
-  };
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   return (
     <>

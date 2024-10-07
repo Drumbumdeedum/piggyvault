@@ -17,8 +17,10 @@ import { useEffect, useState } from "react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { skeletonItems } from "@/constants/placeholders";
 import { Skeleton } from "./ui/skeleton";
+import { useUser } from "@/lib/stores/user";
 
-const TransactionsTable = ({ user }: { user: User }) => {
+const TransactionsTable = () => {
+  const user = useUser((state: any) => state.user);
   const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
 
   useEffect(() => {
@@ -29,7 +31,9 @@ const TransactionsTable = ({ user }: { user: User }) => {
         setTransactions(fetchedTransactions);
       }
     };
-    fetchTransactions();
+    if (user) {
+      fetchTransactions();
+    }
   }, [user]);
 
   return (

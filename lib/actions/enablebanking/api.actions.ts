@@ -103,6 +103,7 @@ export const completeAccountConnection = async ({
         iban: accountDetailsResult.account_id.iban,
         account_uid: accountDetailsResult.uid,
         account_id: account_id,
+        account_type: "bank_account",
       });
 
       await getTransactionsOfPastMonths({ user_id, account_id, nrOfMonths: 3 });
@@ -272,22 +273,20 @@ export const fetchTransactionsByUserId = async (user_id: string) => {
 export const fetchAccountsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
-  let accounts = await readAccountsByUserId(user_id);
+  let accounts = await readNonCashAccountsByUserId(user_id);
   let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
   });
   if (accounts && updateRequired) {
     const updatedAccounts = await Promise.all(
-      accounts
-        .filter((account) => !account.cash_account)
-        .map(async (account) => {
-          await updateAccountSyncedAt(account.account_id);
-          return await updateAccountTotalBalance({
-            user_id,
-            account_id: account.account_id,
-          });
-        })
+      accounts.map(async (account) => {
+        await updateAccountSyncedAt(account.account_id);
+        return await updateAccountTotalBalance({
+          user_id,
+          account_id: account.account_id,
+        });
+      })
     );
     accounts = updatedAccounts.flat();
   }
