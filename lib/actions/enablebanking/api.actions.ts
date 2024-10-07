@@ -103,6 +103,7 @@ export const completeAccountConnection = async ({
         iban: accountDetailsResult.account_id.iban,
         account_uid: accountDetailsResult.uid,
         account_id: account_id,
+        account_type: "bank_account",
       });
 
       await getTransactionsOfPastMonths({ user_id, account_id, nrOfMonths: 3 });

@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import AnimatedCounter from "./util/AnimatedCounter";
 
-import { LoaderPinwheel } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
-import { cn } from "@/lib/utils";
 import CustomPieChart from "./CustomPieChart";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
@@ -17,6 +15,8 @@ const supabase = createBrowserClient(
 
 export const TotalBalanceBox = () => {
   const allAccounts: Account[] = useAccounts((state: any) => state.accounts);
+  const pushAccount = useAccounts((s) => s.pushAccount);
+
   const [accounts, setAccounts] = useState<Account[]>(allAccounts);
   const [totalCurrentBalance, setTotalCurrentBalance] = useState<number>(0);
 
@@ -29,6 +29,33 @@ export const TotalBalanceBox = () => {
       )
     );
   }, [allAccounts]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "accounts" },
+        (payload) => {
+          console.log(payload);
+          if (
+            payload &&
+            payload.new &&
+            payload.new.account_type !== "cash_account"
+          ) {
+            setAccounts((prevAccounts) => [
+              ...prevAccounts,
+              payload.new as Account,
+            ]);
+            pushAccount(payload.new as Account);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const channel = supabase

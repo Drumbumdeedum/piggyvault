@@ -58,6 +58,31 @@ const CashBalanceBox = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_cash_account_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "accounts" },
+        (payload) => {
+          if (
+            payload &&
+            payload.new &&
+            payload.new.account_type === "cash_account"
+          ) {
+            setAccounts((prevAccounts) => [
+              ...prevAccounts,
+              payload.new as Account,
+            ]);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
+
   return (
     <>
       <AddCashBalanceDialog
