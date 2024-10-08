@@ -13,13 +13,10 @@ export const updateSavingsBalance = async ({
   amount: number;
 }) => {
   const dbAccount = await readAccountBalanceById(account_id);
-  console.log(dbAccount);
   if (dbAccount) {
     const updatedAccount = await updateAccountCurrentBalanceById({
       id: account_id,
       current_balance: dbAccount.current_balance + amount,
     });
-
-    console.log(updatedAccount);
   }
 };

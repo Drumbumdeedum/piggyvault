@@ -1,44 +1,27 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getLoggedInUser } from "../auth.actions";
+import { createCashTransaction, readCashAccountsByUserId } from "./db.actions";
 import {
-  createCashAccount,
-  createCashTransaction,
-  readCashAccountsByUserId,
-  readCashAccountsByUserIdAndCurrency,
-  updateCashAccountCurrentBalance,
-} from "./db.actions";
+  readAccountBalanceById,
+  readAccountById,
+  updateAccountCurrentBalanceById,
+} from "../accounts/db.actions";
 
 export const updateCashBalance = async ({
+  account_id,
   amount,
-  currency,
 }: {
+  account_id: string;
   amount: number;
-  currency: string;
 }) => {
-  const user = await getLoggedInUser();
-  if (!user) return;
-
-  let cashAccount = await readCashAccountsByUserIdAndCurrency({
-    user_id: user.id,
-    currency,
-  });
-
-  if (!cashAccount) {
-    cashAccount = await createCashAccount({
-      user_id: user.id,
-      currency,
-      amount,
-    });
-  } else {
-    cashAccount = await updateCashAccountCurrentBalance({
-      id: cashAccount.id,
-      current_balance: (cashAccount.current_balance += amount),
+  const dbAccount = await readAccountBalanceById(account_id);
+  if (dbAccount) {
+    await updateAccountCurrentBalanceById({
+      id: account_id,
+      current_balance: dbAccount.current_balance + amount,
     });
   }
-
-  return { current_balance: cashAccount?.current_balance, currency: currency };
 };
 
 export const fetchCurrentCashBalance = async () => {
@@ -48,28 +31,33 @@ export const fetchCurrentCashBalance = async () => {
 };
 
 export const createCashTransactionAndUpdateCashBalance = async ({
+  account_id,
   amount,
-  currency,
   note = "",
 }: {
+  account_id: string;
   amount: number;
-  currency: string;
   note?: string;
 }) => {
   const user = await getLoggedInUser();
   if (!user) return;
+  const dbAccount = await readAccountById(account_id);
+  console.log(account_id);
+  console.log(dbAccount);
+  if (!dbAccount) return;
 
   const cashTransaction = await createCashTransaction({
     user_id: user.id,
     amount,
-    currency,
+    currency: dbAccount.currency,
     note,
   });
+  console.log(cashTransaction);
 
   if (cashTransaction) {
     await updateCashBalance({
+      account_id,
       amount: -amount,
-      currency: currency,
     });
   }
 };

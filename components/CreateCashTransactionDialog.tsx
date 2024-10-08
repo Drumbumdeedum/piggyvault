@@ -26,32 +26,33 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 import { updateCashBalanceSchema } from "@/validations/balance";
 import { createCashTransactionAndUpdateCashBalance } from "@/lib/actions/cash/api.actions";
 
 const CreateCashTransactionDialog = ({
   open,
   setOpen,
+  cashAccounts,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  cashAccounts: Account[];
 }) => {
   const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: 0,
-      currency: "HUF",
-      note: "",
+      amount: undefined,
+      account_id: undefined,
+      note: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { amount, currency, note } = values;
+    const { account_id, amount, note } = values;
     await createCashTransactionAndUpdateCashBalance({
-      amount: amount,
-      currency,
+      account_id,
+      amount,
       note,
     });
     form.reset();
@@ -86,10 +87,10 @@ const CreateCashTransactionDialog = ({
               />
               <FormField
                 control={form.control}
-                name="currency"
+                name="account_id"
                 render={({ field }) => (
                   <div>
-                    <FormLabel htmlFor="Balance">Currency</FormLabel>
+                    <FormLabel htmlFor="Account">Account</FormLabel>
                     <div className="flex w-full flex-col">
                       <Select
                         onValueChange={field.onChange}
@@ -97,14 +98,14 @@ const CreateCashTransactionDialog = ({
                       >
                         <FormControl>
                           <SelectTrigger className="h-10">
-                            <SelectValue placeholder="HUF" defaultValue="HUF" />
+                            <SelectValue placeholder="Select an account" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {enableBankingCurrencies.map((currency, index) => {
+                          {cashAccounts.map((account, index) => {
                             return (
-                              <SelectItem key={index} value={currency}>
-                                {currency}
+                              <SelectItem key={index} value={account.id}>
+                                {account.balance_name}
                               </SelectItem>
                             );
                           })}
