@@ -20,20 +20,20 @@ import { Skeleton } from "./ui/skeleton";
 import { useUser } from "@/lib/stores/user";
 
 const TransactionsTable = () => {
-  const user = useUser((state: any) => state.user);
+  const user_id = useUser((state: any) => state.id);
   const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const fetchedTransactions = await fetchTransactionsByUserId(user.id);
+      const fetchedTransactions = await fetchTransactionsByUserId(user_id);
       if (fetchedTransactions) {
         setTransactions(fetchedTransactions);
       }
     };
-    if (user) {
+    if (user_id) {
       fetchTransactions();
     }
-  }, [user]);
+  }, [user_id]);
 
   return (
     <Table>

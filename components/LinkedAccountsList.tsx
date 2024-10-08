@@ -16,7 +16,6 @@ import {
 import { Progress } from "./ui/progress";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useUser } from "@/lib/stores/user";
 import { useAccounts } from "@/lib/stores/accounts";
 
 const supabase = createBrowserClient(

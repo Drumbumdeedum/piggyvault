@@ -6,6 +6,7 @@ declare type User = {
   synced_at: string;
   first_name: string;
   last_name: string;
+  default_currency?: string;
 };
 
 declare type UpdateFirstNameProps = {
@@ -16,4 +17,9 @@ declare type UpdateFirstNameProps = {
 declare type UpdateLastNameProps = {
   user_id: string;
   last_name: string;
+};
+
+declare type UpdateDefaultCurrencyProps = {
+  user_id: string;
+  default_currency: string;
 };

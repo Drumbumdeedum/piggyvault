@@ -10,7 +10,13 @@ export default function InitUser({ user }: { user: User }) {
 
   useEffect(() => {
     const initUser = async () => {
-      useUser.setState({ user });
+      useUser.setState({
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        default_currency: user.default_currency,
+      });
       const accounts = await readAccountsByUserId(user.id);
       if (accounts) {
         useAccounts.setState({ accounts });

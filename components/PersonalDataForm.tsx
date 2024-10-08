@@ -13,43 +13,64 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "./ui/button";
-import { updateFirstName, updateLastName } from "@/lib/actions/user.actions";
+import {
+  updateFirstNameByUserId,
+  updateLastNameByUserId,
+} from "@/lib/actions/user.actions";
 import { useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const PersonalDataForm = ({ user }: { user: User }) => {
+const PersonalDataForm = () => {
+  const user_id = useUser((state) => state.id);
+  const first_name = useUser((state) => state.first_name);
+  const updateFirstName = useUser((state) => state.updateFirstName);
+  const last_name = useUser((state) => state.last_name);
+  const updateLastName = useUser((state) => state.updateLastName);
+
   const firstNameFormSchema = firstNameSchema();
   const firstNameForm = useForm<z.infer<typeof firstNameFormSchema>>({
     resolver: zodResolver(firstNameFormSchema),
     defaultValues: {
-      first_name: user.first_name,
+      first_name: "",
     },
   });
   const lastNameFormSchema = lastNameSchema();
   const lastNameForm = useForm<z.infer<typeof lastNameFormSchema>>({
     resolver: zodResolver(lastNameFormSchema),
     defaultValues: {
-      last_name: user.last_name,
+      last_name: "",
     },
   });
 
   useEffect(() => {
+    if (first_name) {
+      firstNameForm.setValue("first_name", first_name);
+    }
+  }, [first_name]);
+  useEffect(() => {
+    if (last_name) {
+      lastNameForm.setValue("last_name", last_name);
+    }
+  }, [last_name]);
+
+  useEffect(() => {
     const channel = supabase
-      .channel("update_user_channel")
+      .channel("update_user_name_channel")
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "users" },
         (payload) => {
           if (payload && payload.new && payload.new.first_name) {
-            firstNameForm.setValue("first_name", payload.new.first_name);
+            updateFirstName(payload.new.first_name);
           }
           if (payload && payload.new && payload.new.last_name) {
-            lastNameForm.setValue("last_name", payload.new.last_name);
+            updateLastName(payload.new.last_name);
           }
         }
       )
@@ -62,16 +83,16 @@ const PersonalDataForm = ({ user }: { user: User }) => {
   const onFirstNameSubmit = async (
     values: z.infer<typeof firstNameFormSchema>
   ) => {
-    await updateFirstName({
-      user_id: user.id,
+    await updateFirstNameByUserId({
+      user_id: user_id!,
       first_name: values.first_name,
     });
   };
   const onLastNameSubmit = async (
     values: z.infer<typeof lastNameFormSchema>
   ) => {
-    await updateLastName({
-      user_id: user.id,
+    await updateLastNameByUserId({
+      user_id: user_id!,
       last_name: values.last_name,
     });
   };

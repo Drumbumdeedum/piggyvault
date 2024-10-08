@@ -3,14 +3,14 @@ import { z } from "zod";
 export const firstNameSchema = () =>
   z.object({
     first_name: z.string().min(3, {
-      message: "Required",
+      message: "Minimum 3 characters required",
     }),
   });
 
 export const lastNameSchema = () =>
   z.object({
     last_name: z.string().min(3, {
-      message: "Required",
+      message: "Minimum 3 characters required",
     }),
   });
 
