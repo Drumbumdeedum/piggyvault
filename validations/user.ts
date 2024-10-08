@@ -13,3 +13,10 @@ export const lastNameSchema = () =>
       message: "Required",
     }),
   });
+
+export const preferredCurrencySchema = () =>
+  z.object({
+    currency: z.string().min(1, {
+      message: "Please select a currency",
+    }),
+  });
