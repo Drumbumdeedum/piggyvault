@@ -7,6 +7,7 @@ import { Card, CardContent } from "./ui/card";
 import CustomPieChart from "./CustomPieChart";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
+import { useUser } from "@/lib/stores/user";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,6 +16,7 @@ const supabase = createBrowserClient(
 
 export const TotalBalanceBox = () => {
   const allAccounts: Account[] = useAccounts((state: any) => state.accounts);
+  const default_currency = useUser((state) => state.default_currency);
   const pushAccount = useAccounts((s) => s.pushAccount);
 
   const [accounts, setAccounts] = useState<Account[]>(allAccounts);
@@ -22,7 +24,7 @@ export const TotalBalanceBox = () => {
 
   useEffect(() => {
     const mainCurrencyAccounts = allAccounts.filter(
-      (account) => account.currency === "HUF"
+      (account) => account.currency === default_currency
     );
     setAccounts(mainCurrencyAccounts);
     setTotalCurrentBalance(
@@ -31,7 +33,7 @@ export const TotalBalanceBox = () => {
         0
       )
     );
-  }, [allAccounts]);
+  }, [allAccounts, default_currency]);
 
   useEffect(() => {
     const channel = supabase
@@ -91,7 +93,7 @@ export const TotalBalanceBox = () => {
       <CardContent className="p-0 w-full">
         <div className="flex p-5 w-full">
           <div className="w-full">
-            <p className="font-semibold">HUF balance summary:</p>
+            <p className="font-semibold">{default_currency} balance summary:</p>
             <div className="text-xl font-bold">
               <AnimatedCounter amount={totalCurrentBalance} />
             </div>

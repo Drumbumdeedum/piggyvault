@@ -21,7 +21,7 @@ export async function getUserById(user_id: string) {
   return data[0];
 }
 
-export const updateFirstName = async ({
+export const updateFirstNameByUserId = async ({
   user_id,
   first_name,
 }: UpdateFirstNameProps) => {
@@ -35,11 +35,10 @@ export const updateFirstName = async ({
     console.log("Error updating first name.", error);
     return;
   }
-  revalidatePath("/account/personal-data");
   return parseStringify(data[0].first_name);
 };
 
-export const updateLastName = async ({
+export const updateLastNameByUserId = async ({
   user_id,
   last_name,
 }: UpdateLastNameProps) => {
@@ -53,7 +52,6 @@ export const updateLastName = async ({
     console.log("Error updating last name.", error);
     return;
   }
-  revalidatePath("/account/personal-data");
   return parseStringify(data[0].last_name);
 };
 
@@ -75,4 +73,21 @@ export const updateUserSyncedAt = async (user_id: string) => {
     return;
   }
   return parseStringify(data[0]);
+};
+
+export const updateDefaultCurrencyByUserId = async ({
+  user_id,
+  default_currency,
+}: UpdateDefaultCurrencyProps) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("users")
+    .update({ default_currency })
+    .eq("id", user_id)
+    .select("default_currency");
+  if (error) {
+    console.log("Error updating default currency.", error);
+    return;
+  }
+  return parseStringify(data[0].default_currency);
 };
