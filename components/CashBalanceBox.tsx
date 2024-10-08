@@ -88,10 +88,12 @@ const CashBalanceBox = () => {
       <AddCashBalanceDialog
         open={showAddCashBalanceDialog}
         setOpen={setShowAddCashBalanceDialog}
+        cashAccounts={cashAccounts}
       />
       <CreateCashTransactionDialog
         open={showCreateCashTransactionDialog}
         setOpen={setShowCreateCashTransactionDialog}
+        cashAccounts={cashAccounts}
       />
       <Card className="w-[16rem] h-[20rem]">
         <CardContent className="p-0 w-full h-full">

@@ -17,7 +17,7 @@ export const readAccountById = async (id: string) => {
     console.log("Error while retrieving account by id.");
     return;
   }
-  return data as Account[];
+  return data as Account;
 };
 
 export const readAccountBalanceById = async (id: string) => {

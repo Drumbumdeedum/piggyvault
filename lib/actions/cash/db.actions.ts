@@ -129,7 +129,9 @@ export const createCashTransaction = async ({
       remittance_information: [note],
       account_id: `cash_account_${user_id}`,
     })
-    .select("*");
+    .select("*")
+    .single();
+  console.log(data);
   if (error) {
     console.log("Error while creating cash transaction.", error);
     return;
@@ -138,5 +140,5 @@ export const createCashTransaction = async ({
     console.log("Error while creating cash transaction.");
     return;
   }
-  return data[0];
+  return data;
 };

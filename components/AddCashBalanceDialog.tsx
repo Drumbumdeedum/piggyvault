@@ -34,22 +34,24 @@ import { updateCashBalanceSchema } from "@/validations/balance";
 const AddCashBalanceDialog = ({
   open,
   setOpen,
+  cashAccounts,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  cashAccounts: Account[];
 }) => {
   const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: 0,
-      currency: "HUF",
+      amount: undefined,
+      account_id: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { amount, currency } = values;
-    await updateCashBalance({ amount, currency });
+    const { account_id, amount } = values;
+    await updateCashBalance({ account_id, amount });
     form.reset();
     setOpen(false);
   }
@@ -89,10 +91,10 @@ const AddCashBalanceDialog = ({
               />
               <FormField
                 control={form.control}
-                name="currency"
+                name="account_id"
                 render={({ field }) => (
                   <div>
-                    <FormLabel htmlFor="Currency">Currency</FormLabel>
+                    <FormLabel htmlFor="Account">Account</FormLabel>
                     <div className="flex w-full flex-col">
                       <Select
                         onValueChange={field.onChange}
@@ -100,14 +102,14 @@ const AddCashBalanceDialog = ({
                       >
                         <FormControl>
                           <SelectTrigger className="h-10">
-                            <SelectValue placeholder="HUF" defaultValue="HUF" />
+                            <SelectValue placeholder="Select an account" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {enableBankingCurrencies.map((currency, index) => {
+                          {cashAccounts.map((account, index) => {
                             return (
-                              <SelectItem key={index} value={currency}>
-                                {currency}
+                              <SelectItem key={index} value={account.id}>
+                                {account.balance_name}
                               </SelectItem>
                             );
                           })}
