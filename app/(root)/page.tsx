@@ -12,16 +12,22 @@ export default async function Index() {
   return (
     <>
       <InitUser user={user} />
-      <div className="no-scrollbar flex flex-1 flex-row max-xl:max-h-screen max-xl:overflow-y-scroll">
-        <div className="p-5">
+      <div className="no-scrollbar flex flex-1 flex-row w-full">
+        <div className="p-5 w-full">
           <PageHeader
             title={`Welcome ${user.first_name}`}
             subtitle="Access and manage your accounts and transactions"
           />
-          <div className="flex flex-col md:flex-row gap-5">
-            <TotalBalanceBox />
-            <CashBalanceBox />
-            <SavingsBalanceBox />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:grid-cols-4 w-full max-w-7xl">
+            <div className="flex justify-center">
+              <TotalBalanceBox />
+            </div>
+            <div className="flex justify-center">
+              <CashBalanceBox />
+            </div>
+            <div className="flex justify-center">
+              <SavingsBalanceBox />
+            </div>
           </div>
         </div>
       </div>
