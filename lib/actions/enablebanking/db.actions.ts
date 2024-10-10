@@ -237,3 +237,21 @@ export const readTransactionsByUserId = async (user_id: string) => {
   }
   return data;
 };
+
+export const readLastTransactionsByAccountId = async (account_id: string) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("account_id", account_id)
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.log("Error while reading most recent transactions.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while reading most recent transactions.");
+    return;
+  }
+  return data[0];
+};
