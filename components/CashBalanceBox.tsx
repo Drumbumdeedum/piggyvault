@@ -3,13 +3,20 @@
 import { Card, CardContent } from "./ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { CirclePlus, CreditCard } from "lucide-react";
+import { CirclePlus, Coins, CreditCard } from "lucide-react";
 import AddCashBalanceDialog from "./AddCashBalanceDialog";
 import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
 import { ScrollArea } from "./ui/scroll-area";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
 import BalanceItem from "./BalanceItem";
+import { Separator } from "./ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -98,10 +105,46 @@ const CashBalanceBox = () => {
       <Card className="w-[16rem] h-[20rem]">
         <CardContent className="p-0 w-full h-full">
           <div className="relative flex flex-col h-full gap-6 p-5">
-            <div className="flex-1">
-              <p className="font-semibold">Cash balance:</p>
-              <ScrollArea className="h-[10rem]">
-                <div className="flex flex-col gap-2">
+            <div className="flex-1 flex flex-col gap-2">
+              <p className="font-semibold flex items-center gap-2">
+                <Coins size="22" />
+                <p className="flex-1">Cash</p>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        className="justify-start p-1 h-auto w-auto"
+                        onClick={() => setShowAddCashBalanceDialog(true)}
+                      >
+                        <CirclePlus size="18" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add cash balance</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        variant="secondary"
+                        className="justify-start p-1 h-auto w-auto"
+                        onClick={() => setShowCreateCashTransactionDialog(true)}
+                      >
+                        <CreditCard size="18" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Create cash transaction</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </p>
+              <Separator />
+              <ScrollArea className="h-[14rem]">
+                <div className="flex flex-col">
                   {accounts.map((account, index) => {
                     return (
                       <BalanceItem
@@ -113,23 +156,6 @@ const CashBalanceBox = () => {
                   })}
                 </div>
               </ScrollArea>
-            </div>
-            <div className="flex flex-col justify-center gap-2">
-              <Button
-                className="justify-start"
-                onClick={() => setShowAddCashBalanceDialog(true)}
-              >
-                <CirclePlus className="mr-1" />
-                Add funds
-              </Button>
-              <Button
-                variant="secondary"
-                className="justify-start"
-                onClick={() => setShowCreateCashTransactionDialog(true)}
-              >
-                <CreditCard className="mr-1" />
-                Cash transaction
-              </Button>
             </div>
           </div>
         </CardContent>
