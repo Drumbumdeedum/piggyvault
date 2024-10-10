@@ -20,6 +20,7 @@ import {
   updateAccountSyncedAt,
   createTransaction,
   readTransactionsByUserId,
+  readLastTransactionsByAccountId,
 } from "./db.actions";
 import { getUserById, updateUserSyncedAt } from "../user.actions";
 
@@ -257,21 +258,16 @@ const getAccountTotalBalances = async (
   return balances;
 };
 
+// TODO: remove this function after refactoring updateRequired
 export const fetchTransactionsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
-  let transactions;
+  const transactions = await readTransactionsByUserId(user_id);
   /* let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 10,
   }); */
-  let updateRequired = false;
-  if (updateRequired) {
-    const result = await fetchAndUpdateTransactions(user_id);
-    transactions = result ? result.flat() : [];
-  } else {
-    transactions = await readTransactionsByUserId(user_id);
-  }
+  /* if (updateRequired)  */
   return transactions;
 };
 
@@ -298,6 +294,41 @@ export const fetchAccountsByUserId = async (user_id: string) => {
   }
   await updateUserSyncedAt(user_id);
   return accounts;
+};
+
+export const fetchTransactionsSinceLastTransaction = async () => {
+  const user = await getLoggedInUser();
+  if (!user) return;
+
+  const accounts = await readBankAccountsByUserId(user.id);
+  if (!accounts) {
+    return;
+  }
+  let updateRequired = haveMinutesPassedSinceDate({
+    date: user.synced_at,
+    minutesPassed: 60,
+  });
+  if (updateRequired) {
+    accounts.forEach(async (account) => {
+      const lastTransaction = await readLastTransactionsByAccountId(
+        account.account_id
+      );
+      if (lastTransaction) {
+        const newTransactions = await getTransactionsAfterDate({
+          account_id: account.account_id,
+          date_from: lastTransaction.created_at,
+        });
+        newTransactions.transactions.forEach(async (transaction) => {
+          await createTransaction({
+            transaction,
+            user_id: user.id,
+            account_id: account.account_id,
+          });
+        });
+      }
+    });
+    await updateUserSyncedAt(user.id);
+  }
 };
 
 export const fetchAndUpdateTransactions = async (user_id: string) => {
@@ -398,6 +429,27 @@ const getAndSyncTransactions = async ({
     account_id,
     search_params: params,
   });
+};
+
+const getTransactionsAfterDate = async ({
+  account_id,
+  date_from,
+}: {
+  account_id: string;
+  date_from: string;
+}) => {
+  const fromDate = new Date(date_from);
+  const year = fromDate.getFullYear();
+  const month = (fromDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = "01";
+  const startDate = `${year}-${month}-${day}`;
+  const end = new Date();
+  const endDate = end.toISOString().split("T")[0];
+  const search_params = new URLSearchParams([
+    ["date_from", startDate],
+    ["date_to", endDate],
+  ]).toString();
+  return await getTransactions({ account_id, search_params });
 };
 
 const getTransactions = async ({
