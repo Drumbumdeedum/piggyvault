@@ -87,9 +87,10 @@ export const getMonthRange = (monthsBefore: number) => {
     targetMonth.getMonth(),
     1
   );
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
   return {
     startDate: formatDate(startDate),
     endDate: formatDate(endDate),
   };
 };
+
+export const formatDate = (date: Date) => date.toISOString().split("T")[0];
