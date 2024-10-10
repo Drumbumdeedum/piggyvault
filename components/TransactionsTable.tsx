@@ -3,14 +3,13 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
-import { fetchTransactionsByUserId } from "@/lib/actions/enablebanking/api.actions";
+import { fetchTransactionsSinceLastTransaction } from "@/lib/actions/enablebanking/api.actions";
 import { formatAmount, shortenString } from "@/lib/utils";
 import { cn } from "@/utils/cn";
 import { useEffect, useState } from "react";
@@ -18,6 +17,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { skeletonItems } from "@/constants/placeholders";
 import { Skeleton } from "./ui/skeleton";
 import { useUser } from "@/lib/stores/user";
+import { createBrowserClient } from "@supabase/ssr";
+import { readTransactionsByUserId } from "@/lib/actions/enablebanking/db.actions";
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const TransactionsTable = () => {
   const user_id = useUser((state: any) => state.id);
@@ -25,15 +31,37 @@ const TransactionsTable = () => {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const fetchedTransactions = await fetchTransactionsByUserId(user_id);
+      const fetchedTransactions = await readTransactionsByUserId(user_id);
       if (fetchedTransactions) {
         setTransactions(fetchedTransactions);
       }
     };
     if (user_id) {
       fetchTransactions();
+      fetchTransactionsSinceLastTransaction();
     }
   }, [user_id]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("insert_new_transaction_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "transactions" },
+        (payload) => {
+          if (payload && payload.new) {
+            setTransactions((current) => [
+              payload.new as TransactionResponse,
+              ...current,
+            ]);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   return (
     <Table>
