@@ -142,7 +142,7 @@ const SavingsBalanceBox = () => {
                 </TooltipProvider>
               </div>
               <Separator />
-              <ScrollArea className="h-[14rem]">
+              <ScrollArea className="h-[14rem] shadow-inner rounded-xl">
                 <div className="flex flex-col">
                   {accounts.map((account, index) => {
                     return (
