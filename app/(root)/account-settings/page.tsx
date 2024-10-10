@@ -1,4 +1,5 @@
 import PersonalDataForm from "@/components/PersonalDataForm";
+import PreferencesData from "@/components/PreferencesData";
 import PreferencesDataForm from "@/components/PreferencesDataForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -27,7 +28,7 @@ const page = async () => {
             <h1 className="text-2xl font-bold">Preferences</h1>
             <p>Manage your app preferences</p>
           </div>
-          <PreferencesDataForm />
+          <PreferencesData />
         </CardContent>
       </Card>
     </>
