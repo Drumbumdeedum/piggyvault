@@ -3,7 +3,7 @@
 import { Card, CardContent } from "./ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { CirclePlus, Coins, CreditCard } from "lucide-react";
+import { CircleMinus, CirclePlus, Coins } from "lucide-react";
 import AddCashBalanceDialog from "./AddCashBalanceDialog";
 import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
 import { ScrollArea } from "./ui/scroll-area";
@@ -132,7 +132,7 @@ const CashBalanceBox = () => {
                         className="justify-start p-1 h-auto w-auto"
                         onClick={() => setShowCreateCashTransactionDialog(true)}
                       >
-                        <CreditCard size="18" />
+                        <CircleMinus size="18" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "./ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { CirclePlus, CreditCard, PiggyBank } from "lucide-react";
+import { CircleMinus, CirclePlus, PiggyBank } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
@@ -132,7 +132,7 @@ const SavingsBalanceBox = () => {
                         className="justify-start p-1 h-auto w-auto"
                         onClick={() => setShowSavingsWithdrawalDialog(true)}
                       >
-                        <CreditCard size="18" />
+                        <CircleMinus size="18" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
