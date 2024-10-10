@@ -1,6 +1,7 @@
 import jwa from "jwa";
 import { readFileSync } from "fs";
 import path from "path";
+import fs from "fs";
 
 export const getBaseHeaders = () => {
   const jsonBase64 = (data: any) => {
@@ -9,10 +10,12 @@ export const getBaseHeaders = () => {
       .replace("=", "");
   };
 
-  const private_key = readFileSync(
-    path.resolve(process.env.ENABLE_BANKING_CERT_FILE!),
-    "utf8"
+  const jsonPath = path.join(
+    process.cwd(),
+    process.env.ENABLE_BANKING_CERT_FILE!
   );
+
+  const private_key = readFileSync(jsonPath, "utf8");
   const iat = Math.floor(new Date().getTime() / 1000);
   const jwtBody = {
     iss: "enablebanking.com",
