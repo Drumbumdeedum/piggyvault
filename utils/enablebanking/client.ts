@@ -9,10 +9,15 @@ export const getBaseHeaders = () => {
       .replace("=", "");
   };
 
-  const jsonPath = path.join(
+  let jsonPath = path.join(
     process.cwd(),
     process.env.ENABLE_BANKING_CERT_FILE!
   );
+
+  console.log("###########");
+  console.log("HERE IT IS:");
+  console.log(process.env.ENABLE_BANKING_CERT_FILE!);
+  console.log(jsonPath);
 
   const private_key = readFileSync(jsonPath, "utf8");
   const iat = Math.floor(new Date().getTime() / 1000);
