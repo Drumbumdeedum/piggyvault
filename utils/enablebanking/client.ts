@@ -1,5 +1,6 @@
 import jwa from "jwa";
 import { readFileSync } from "fs";
+import path from "path";
 
 export const getBaseHeaders = () => {
   const jsonBase64 = (data: any) => {
@@ -7,8 +8,9 @@ export const getBaseHeaders = () => {
       .toString("base64")
       .replace("=", "");
   };
+
   const private_key = readFileSync(
-    process.env.ENABLE_BANKING_CERT_FILE!,
+    path.resolve(process.env.ENABLE_BANKING_CERT_FILE!),
     "utf8"
   );
   const iat = Math.floor(new Date().getTime() / 1000);
