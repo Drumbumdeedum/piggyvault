@@ -106,13 +106,12 @@ const CashBalanceBox = () => {
         <CardContent className="p-0 w-full h-full">
           <div className="relative flex flex-col h-full gap-6 p-5">
             <div className="flex-1 flex flex-col gap-2">
-              <p className="font-semibold flex items-center gap-2">
+              <div className="font-semibold flex items-center gap-2">
                 <Coins size="22" />
                 <p className="flex-1">Cash</p>
-
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <Button
                         className="justify-start p-1 h-auto w-auto"
                         onClick={() => setShowAddCashBalanceDialog(true)}
@@ -127,7 +126,7 @@ const CashBalanceBox = () => {
                 </TooltipProvider>
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <Button
                         variant="secondary"
                         className="justify-start p-1 h-auto w-auto"
@@ -141,7 +140,7 @@ const CashBalanceBox = () => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              </p>
+              </div>
               <Separator />
               <ScrollArea className="h-[14rem]">
                 <div className="flex flex-col">
