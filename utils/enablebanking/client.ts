@@ -8,8 +8,10 @@ export const getBaseHeaders = () => {
       .toString("base64")
       .replace("=", "");
   };
-  let jsonPath = path.resolve(process.env.ENABLE_BANKING_CERT_FILE!);
-  const private_key = readFileSync(jsonPath, "utf8");
+  const private_key = readFileSync(
+    process.env.ENABLE_BANKING_CERT_FILE!,
+    "utf8"
+  );
   const iat = Math.floor(new Date().getTime() / 1000);
   const jwtBody = {
     iss: "enablebanking.com",
