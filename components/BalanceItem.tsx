@@ -17,7 +17,7 @@ const BalanceItem = ({
     }, 1000);
   }, [current_balance]);
   return (
-    <div className="p-3 rounded-lg bg-card text-card-foreground shadow">
+    <div className="p-3 my-1 rounded-lg bg-card text-card-foreground shadow">
       {balance_name && (
         <p className="text-xs font-semibold mb-2">{balance_name}</p>
       )}
