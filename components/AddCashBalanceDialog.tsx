@@ -79,7 +79,7 @@ const AddCashBalanceDialog = ({
                 name="amount"
                 render={({ field }) => (
                   <div>
-                    <FormLabel htmlFor="Balance">Balance</FormLabel>
+                    <FormLabel htmlFor="Amount">Amount</FormLabel>
                     <div className="flex w-full flex-col">
                       <FormControl>
                         <Input id="amount_input" type="number" {...field} />
