@@ -3,7 +3,6 @@
 import { getBaseHeaders } from "@/utils/enablebanking/client";
 import { encodedRedirect } from "@/utils/utils";
 import { getLoggedInUser } from "../auth.actions";
-import { revalidatePath } from "next/cache";
 import {
   filterDuplicates,
   getMonthRange,
@@ -19,7 +18,6 @@ import {
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
   updateAccountSyncedAt,
   createTransaction,
-  readTransactionsByUserId,
   readLastTransactionsByAccountId,
 } from "./db.actions";
 import { getUserById, updateUserSyncedAt } from "../user.actions";
@@ -258,19 +256,6 @@ const getAccountTotalBalances = async (
   return balances;
 };
 
-// TODO: remove this function after refactoring updateRequired
-export const fetchTransactionsByUserId = async (user_id: string) => {
-  const user = await getUserById(user_id);
-  if (!user) return;
-  const transactions = await readTransactionsByUserId(user_id);
-  /* let updateRequired = haveMinutesPassedSinceDate({
-    date: user.synced_at,
-    minutesPassed: 10,
-  }); */
-  /* if (updateRequired)  */
-  return transactions;
-};
-
 export const fetchAccountsByUserId = async (user_id: string) => {
   const user = await getUserById(user_id);
   if (!user) return;
@@ -326,6 +311,10 @@ export const fetchTransactionsSinceLastTransaction = async () => {
           });
         });
       }
+      await updateAccountTotalBalance({
+        account_id: account.account_id,
+        user_id: user.id,
+      });
     });
     await updateUserSyncedAt(user.id);
   }
