@@ -1,6 +1,7 @@
 import jwa from "jwa";
 import { readFileSync } from "fs";
 import path from "path";
+import { createRequire } from "module";
 
 export const getBaseHeaders = () => {
   const jsonBase64 = (data: any) => {
@@ -9,14 +10,10 @@ export const getBaseHeaders = () => {
       .replace("=", "");
   };
 
-  let jsonPath = path.join(
-    process.cwd(),
-    process.env.ENABLE_BANKING_CERT_FILE!
-  );
+  let jsonPath = path.resolve(process.env.ENABLE_BANKING_CERT_FILE!);
 
   console.log("###########");
   console.log("HERE IT IS:");
-  console.log(process.env.ENABLE_BANKING_CERT_FILE!);
   console.log(jsonPath);
 
   const private_key = readFileSync(jsonPath, "utf8");
