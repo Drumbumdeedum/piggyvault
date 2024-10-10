@@ -19,15 +19,61 @@ import { Skeleton } from "./ui/skeleton";
 import { useUser } from "@/lib/stores/user";
 import { createBrowserClient } from "@supabase/ssr";
 import { readTransactionsByUserId } from "@/lib/actions/enablebanking/db.actions";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const TransactionsTable = () => {
+export const columns: ColumnDef<Transaction>[] = [
+  {
+    accessorKey: "created_at",
+    header: "Date",
+  },
+  {
+    accessorKey: "creditor.name",
+    header: "Creditor",
+  },
+  {
+    accessorKey: "debtor.name",
+    header: "Debtor",
+  },
+  {
+    accessorKey: "transaction.remittance_information",
+    header: "Details",
+  },
+  {
+    accessorKey: "transaction_amount.amount",
+    header: "Amount",
+  },
+  {
+    accessorKey: "transaction_amount.currency",
+    header: "Currency",
+  },
+];
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+function TransactionsTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
   const user_id = useUser((state: any) => state.id);
-  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -51,7 +97,7 @@ const TransactionsTable = () => {
         (payload) => {
           if (payload && payload.new) {
             setTransactions((current) => [
-              payload.new as TransactionResponse,
+              payload.new as Transaction,
               ...current,
             ]);
           }
@@ -64,7 +110,52 @@ const TransactionsTable = () => {
   }, []);
 
   return (
-    <Table>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+  /* <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">Date</TableHead>
@@ -162,8 +253,7 @@ const TransactionsTable = () => {
               );
             })}
       </TableBody>
-    </Table>
-  );
-};
+    </Table> */
+}
 
 export default TransactionsTable;
