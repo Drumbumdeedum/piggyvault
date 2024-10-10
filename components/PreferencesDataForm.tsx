@@ -7,7 +7,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { preferredCurrencySchema } from "@/validations/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -31,26 +30,22 @@ const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const PreferencesDataForm = () => {
+const PreferencesDataForm = ({
+  default_currency,
+}: {
+  default_currency: string;
+}) => {
   const user_id = useUser((state) => state.id);
-  const default_currency = useUser((state) => state.default_currency);
   const updateDefaultCurrency = useUser((state) => state.updateDefaultCurrency);
-
   const preferredCurrencyFormSchema = preferredCurrencySchema();
   const preferredCurrencyForm = useForm<
     z.infer<typeof preferredCurrencyFormSchema>
   >({
     resolver: zodResolver(preferredCurrencyFormSchema),
     defaultValues: {
-      currency: "",
+      currency: default_currency,
     },
   });
-
-  useEffect(() => {
-    if (default_currency) {
-      preferredCurrencyForm.setValue("currency", default_currency);
-    }
-  }, [default_currency]);
 
   useEffect(() => {
     const channel = supabase
@@ -60,7 +55,6 @@ const PreferencesDataForm = () => {
         { event: "UPDATE", schema: "public", table: "users" },
         (payload) => {
           if (payload && payload.new && payload.new.default_currency) {
-            console.log(payload.new);
             updateDefaultCurrency(payload.new.default_currency);
           }
         }
@@ -96,10 +90,10 @@ const PreferencesDataForm = () => {
                 </FormLabel>
                 <div className="flex flex-row gap-2 w-full">
                   <div className="flex flex-1 flex-col gap-1 min-w-96">
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="h-10">
-                          <SelectValue placeholder="Select a currency"></SelectValue>
+                          <SelectValue></SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
