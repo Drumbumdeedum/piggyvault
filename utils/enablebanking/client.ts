@@ -1,7 +1,6 @@
 import jwa from "jwa";
 import { readFileSync } from "fs";
 import path from "path";
-import fs from "fs";
 
 export const getBaseHeaders = () => {
   const jsonBase64 = (data: any) => {
