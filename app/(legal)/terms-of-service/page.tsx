@@ -176,7 +176,7 @@ export default async function Index() {
       </p>
       <p>
         For any questions or concerns, please contact us at:
-        support@piggyvault.me.
+        hello@piggyvault.me.
       </p>
     </div>
   );
