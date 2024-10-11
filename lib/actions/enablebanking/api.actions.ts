@@ -18,7 +18,6 @@ import {
   updateAccountConnectionSessionIdByUserIdAndAuthCode,
   updateAccountSyncedAt,
   createTransaction,
-  readTransactionsByUserId,
   readLastTransactionsByAccountId,
 } from "./db.actions";
 import { getUserById, updateUserSyncedAt } from "../user.actions";
