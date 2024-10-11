@@ -6,43 +6,43 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "../ui/card";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { CircleMinus, CirclePlus, Coins } from "lucide-react";
-import AddCashBalanceDialog from "./AddCashBalanceDialog";
-import CreateCashTransactionDialog from "./CreateCashTransactionDialog";
-import { ScrollArea } from "./ui/scroll-area";
+import { Button } from "../ui/button";
+import { CircleMinus, CirclePlus, PiggyBank } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
 import BalanceItem from "./BalanceItem";
-import { Separator } from "./ui/separator";
+import AddSavingsBalanceDialog from "./AddSavingsBalanceDialog";
+import SavingsWithdrawalDialog from "./SavingsWithdrawalDialog";
+import { Separator } from "../ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
+} from "../ui/tooltip";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const CashBalanceBox = () => {
+const SavingsBalanceBox = () => {
   const cashAccounts = useAccounts((s) => s.accounts);
   const updateAccountBalance = useAccounts((s) => s.updateAccountBalance);
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
+  const [showAddSavingsBalanceDialog, setShowAddSavingsBalanceDialog] =
     useState<boolean>(false);
-  const [showCreateCashTransactionDialog, setShowCreateCashTransactionDialog] =
+  const [showSavingsWithdrawalDialog, setShowSavingsWithdrawalDialog] =
     useState<boolean>(false);
 
   useEffect(() => {
     if (cashAccounts) {
       setAccounts(
         cashAccounts.filter(
-          (account) => account.account_type === "cash_account"
+          (account) => account.account_type === "savings_account"
         )
       );
     }
@@ -50,7 +50,7 @@ const CashBalanceBox = () => {
 
   useEffect(() => {
     const channel = supabase
-      .channel("update_cash_balance_channel")
+      .channel("update_savings_balance_channel")
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "accounts" },
@@ -73,7 +73,7 @@ const CashBalanceBox = () => {
 
   useEffect(() => {
     const channel = supabase
-      .channel("insert_cash_account_channel")
+      .channel("insert_savings_account_channel")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "accounts" },
@@ -81,7 +81,7 @@ const CashBalanceBox = () => {
           if (
             payload &&
             payload.new &&
-            payload.new.account_type === "cash_account"
+            payload.new.account_type === "savings_account"
           ) {
             setAccounts((prevAccounts) => [
               ...prevAccounts,
@@ -98,34 +98,34 @@ const CashBalanceBox = () => {
 
   return (
     <>
-      <AddCashBalanceDialog
-        open={showAddCashBalanceDialog}
-        setOpen={setShowAddCashBalanceDialog}
-        cashAccounts={cashAccounts}
+      <AddSavingsBalanceDialog
+        open={showAddSavingsBalanceDialog}
+        setOpen={setShowAddSavingsBalanceDialog}
+        savingsAccounts={accounts}
       />
-      <CreateCashTransactionDialog
-        open={showCreateCashTransactionDialog}
-        setOpen={setShowCreateCashTransactionDialog}
-        cashAccounts={cashAccounts}
+      <SavingsWithdrawalDialog
+        open={showSavingsWithdrawalDialog}
+        setOpen={setShowSavingsWithdrawalDialog}
+        savingsAccounts={accounts}
       />
       <Card className="w-full max-h-[30rem]">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <CardTitle>
             <div className="font-semibold flex items-center gap-2">
-              <Coins size="22" />
-              <p className="flex-1">Cash</p>
+              <PiggyBank size="22" />
+              <p className="flex-1">Savings</p>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       className="justify-start p-1 h-auto w-auto"
-                      onClick={() => setShowAddCashBalanceDialog(true)}
+                      onClick={() => setShowAddSavingsBalanceDialog(true)}
                     >
                       <CirclePlus size="18" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Add cash balance</p>
+                    <p>Add savings balance</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -135,34 +135,33 @@ const CashBalanceBox = () => {
                     <Button
                       variant="secondary"
                       className="justify-start p-1 h-auto w-auto"
-                      onClick={() => setShowCreateCashTransactionDialog(true)}
+                      onClick={() => setShowSavingsWithdrawalDialog(true)}
                     >
                       <CircleMinus size="18" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Create cash transaction</p>
+                    <p>Withdraw money</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
           </CardTitle>
-          <CardDescription>Total cash balance</CardDescription>
+          <CardDescription>Total savings balance</CardDescription>
           <Separator />
         </CardHeader>
-        <CardContent className="">
+        <CardContent>
           <ScrollArea className="shadow-inner rounded-xl max-h-[16rem] flex flex-col overflow-y-auto">
-            <div className="flex flex-col">
-              {accounts.map((account, index) => {
-                return (
-                  <BalanceItem
-                    key={index}
-                    current_balance={account.current_balance}
-                    currency={account.currency}
-                  />
-                );
-              })}
-            </div>
+            {accounts.map((account, index) => {
+              return (
+                <BalanceItem
+                  key={index}
+                  current_balance={account.current_balance}
+                  currency={account.currency}
+                  balance_name={account.institution_name}
+                />
+              );
+            })}
           </ScrollArea>
         </CardContent>
       </Card>
@@ -170,4 +169,4 @@ const CashBalanceBox = () => {
   );
 };
 
-export default CashBalanceBox;
+export default SavingsBalanceBox;

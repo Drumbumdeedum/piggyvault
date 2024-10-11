@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AnimatedCounter from "./util/AnimatedCounter";
+import AnimatedCounter from "../util/AnimatedCounter";
 
 import {
   Card,
@@ -9,11 +9,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import CustomPieChart from "./CustomPieChart";
+} from "../ui/card";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
 import { useUser } from "@/lib/stores/user";
+import CustomPieChart from "./CustomPieChart";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

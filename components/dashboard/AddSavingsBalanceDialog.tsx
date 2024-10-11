@@ -1,3 +1,5 @@
+"use client";
+
 import { Dispatch, SetStateAction } from "react";
 import {
   Dialog,
@@ -5,66 +7,67 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from "../ui/dialog";
 import {
   Form,
   FormControl,
   FormField,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import FormSubmitButton from "./core/FormSubmitButton";
+} from "../ui/form";
+import FormSubmitButton from "../core/FormSubmitButton";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Textarea } from "./ui/textarea";
-import { updateCashBalanceSchema } from "@/validations/balance";
-import { createCashTransactionAndUpdateCashBalance } from "@/lib/actions/cash/api.actions";
+} from "../ui/select";
+import { updateSavingsBalanceSchema } from "@/validations/balance";
+import { updateSavingsBalance } from "@/lib/actions/savings/api.actions";
 
-const CreateCashTransactionDialog = ({
+const AddSavingsBalanceDialog = ({
   open,
   setOpen,
-  cashAccounts,
+  savingsAccounts,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  cashAccounts: Account[];
+  savingsAccounts: Account[];
 }) => {
-  const formSchema = updateCashBalanceSchema();
+  const formSchema = updateSavingsBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: undefined,
       account_id: undefined,
-      note: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { account_id, amount, note } = values;
-    await createCashTransactionAndUpdateCashBalance({
-      account_id,
-      amount,
-      note,
-    });
+    const { amount, account_id } = values;
+    await updateSavingsBalance({ account_id, amount });
     form.reset();
     setOpen(false);
   }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        form.reset();
+        setOpen(!open);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New cash transaction</DialogTitle>
+          <DialogTitle>Add savings balance</DialogTitle>
           <DialogDescription>
-            Create a new cash transaction in your selected currency
+            Add a savings balance amount to your selected savings account
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -102,7 +105,7 @@ const CreateCashTransactionDialog = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {cashAccounts.map((account, index) => {
+                          {savingsAccounts.map((account, index) => {
                             return (
                               <SelectItem key={index} value={account.id}>
                                 {account.balance_name}
@@ -116,28 +119,7 @@ const CreateCashTransactionDialog = ({
                   </div>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="note"
-                render={({ field }) => (
-                  <div>
-                    <FormLabel htmlFor="Note">Note</FormLabel>
-                    <div className="flex w-full flex-col">
-                      <FormControl>
-                        <Textarea
-                          id="note_text-area"
-                          placeholder="Note"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </div>
-                )}
-              />
-              <FormSubmitButton className="mt-4">
-                Create cash transaction
-              </FormSubmitButton>
+              <FormSubmitButton className="mt-4">Add money</FormSubmitButton>
             </div>
           </form>
         </Form>
@@ -146,4 +128,4 @@ const CreateCashTransactionDialog = ({
   );
 };
 
-export default CreateCashTransactionDialog;
+export default AddSavingsBalanceDialog;

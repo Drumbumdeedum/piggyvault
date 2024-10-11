@@ -44,8 +44,8 @@ export const formatAmount = (value: number) => {
   return `${integerPart},${decimalPart}`;
 };
 
-export const shortenString = (value: string) => {
-  return `${value.substring(0, 19)}${value.length > 19 ? "..." : ""}`;
+export const shortenString = (value: string, limit: number = 19) => {
+  return `${value.substring(0, limit)}${value.length > limit ? "..." : ""}`;
 };
 
 export const trimWhiteSpace = (input: string) => {

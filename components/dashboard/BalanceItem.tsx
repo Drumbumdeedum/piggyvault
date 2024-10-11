@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AnimatedCounter from "./util/AnimatedCounter";
+import AnimatedCounter from "../util/AnimatedCounter";
 
 const BalanceItem = ({
   current_balance,
