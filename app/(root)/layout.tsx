@@ -10,7 +10,7 @@ export default function RootLayout({
     <main className="flex h-screen w-full">
       <Sidebar />
       <div className="flex size-full flex-col">
-        <div className="flex flex-row-reverse bg-muted-foreground/20 h-16 items-center justify-between p-5 sm:p-8 md:hidden">
+        <div className="flex flex-row-reverse bg-muted-foreground/10 h-16 items-center justify-between p-5 sm:p-8 md:hidden">
           <MobileNavigation />
         </div>
         {children}

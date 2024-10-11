@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { CircleMinus, CirclePlus, PiggyBank } from "lucide-react";
@@ -102,62 +108,61 @@ const SavingsBalanceBox = () => {
         setOpen={setShowSavingsWithdrawalDialog}
         savingsAccounts={accounts}
       />
-      <Card className="w-[16rem] h-[20rem]">
-        <CardContent className="p-0 w-full h-full">
-          <div className="relative flex flex-col h-full gap-6 p-5">
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="font-semibold flex items-center gap-2">
-                <PiggyBank size="22" />
-                <p className="flex-1">Savings</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className="justify-start p-1 h-auto w-auto"
-                        onClick={() => setShowAddSavingsBalanceDialog(true)}
-                      >
-                        <CirclePlus size="18" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add savings balance</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        className="justify-start p-1 h-auto w-auto"
-                        onClick={() => setShowSavingsWithdrawalDialog(true)}
-                      >
-                        <CircleMinus size="18" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Withdraw money</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <Separator />
-              <ScrollArea className="h-[14rem] shadow-inner rounded-xl">
-                <div className="flex flex-col">
-                  {accounts.map((account, index) => {
-                    return (
-                      <BalanceItem
-                        key={index}
-                        current_balance={account.current_balance}
-                        currency={account.currency}
-                        balance_name={account.institution_name}
-                      />
-                    );
-                  })}
-                </div>
-              </ScrollArea>
+      <Card className="w-full max-h-[30rem]">
+        <CardHeader>
+          <CardTitle>
+            <div className="font-semibold flex items-center gap-2">
+              <PiggyBank size="22" />
+              <p className="flex-1">Savings</p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      className="justify-start p-1 h-auto w-auto"
+                      onClick={() => setShowAddSavingsBalanceDialog(true)}
+                    >
+                      <CirclePlus size="18" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add savings balance</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      className="justify-start p-1 h-auto w-auto"
+                      onClick={() => setShowSavingsWithdrawalDialog(true)}
+                    >
+                      <CircleMinus size="18" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Withdraw money</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-          </div>
+          </CardTitle>
+          <CardDescription>Total savings balance</CardDescription>
+          <Separator />
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="shadow-inner rounded-xl max-h-[16rem] flex flex-col overflow-y-auto">
+            {accounts.map((account, index) => {
+              return (
+                <BalanceItem
+                  key={index}
+                  current_balance={account.current_balance}
+                  currency={account.currency}
+                  balance_name={account.institution_name}
+                />
+              );
+            })}
+          </ScrollArea>
         </CardContent>
       </Card>
     </>

@@ -8,12 +8,23 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { getLastCharOfNumber } from "@/lib/utils";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 const CustomPieChart = ({
   items,
 }: {
   items: { label: string; value: number }[];
 }) => {
+  const [windowWidth, setWindowWidth] = useState<number>(0);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setWindowWidth(window.innerWidth);
+    }
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   const mappedChartData = items.map((item, index) => {
     return {
       label: item.label,
@@ -30,11 +41,12 @@ const CustomPieChart = ({
       color: `hsl(var(--chart-${getLastCharOfNumber(index)}))`,
     };
   });
+
   return (
-    <div className="w-64 h-64 my-auto">
+    <div className="w-72 h-72 xl:w-48 xl:h-48 my-auto">
       <ChartContainer
         config={mappedChartConfig}
-        className="mx-auto aspect-square max-h-[250px]"
+        className="mx-auto aspect-square"
       >
         <PieChart>
           <ChartTooltip content={<ChartTooltipContent />} />
@@ -43,7 +55,7 @@ const CustomPieChart = ({
             data={mappedChartData}
             dataKey="value"
             nameKey="label"
-            innerRadius={50}
+            innerRadius={windowWidth >= 1280 ? 40 : 70}
             strokeWidth={3}
             paddingAngle={5}
           />

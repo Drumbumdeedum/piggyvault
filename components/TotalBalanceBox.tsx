@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import AnimatedCounter from "./util/AnimatedCounter";
 
-import { Card, CardContent } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import CustomPieChart from "./CustomPieChart";
 import { createBrowserClient } from "@supabase/ssr";
 import { useAccounts } from "@/lib/stores/accounts";
@@ -89,24 +95,31 @@ export const TotalBalanceBox = () => {
   }, []);
 
   return (
-    <Card className="w-[16rem] h-[20rem]">
-      <CardContent className="p-0 w-full">
-        <div className="flex p-5 w-full">
-          <div className="w-full">
-            <p className="font-semibold">{default_currency} balance summary:</p>
-            <div className="text-xl font-bold">
-              <AnimatedCounter amount={totalCurrentBalance} />
-            </div>
-            <div className="flex justify-center items-center w-full">
-              <CustomPieChart
-                items={accounts.map((account) => {
-                  return {
-                    label: account.institution_name,
-                    value: account.current_balance,
-                  };
-                })}
-              />
-            </div>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-xl">Balance overview</CardTitle>
+        <CardDescription>
+          Total balance across all accounts for your default currency
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex justify-center items-center">
+          <CustomPieChart
+            items={accounts.map((account) => {
+              return {
+                label: account.institution_name,
+                value: account.current_balance,
+              };
+            })}
+          />
+        </div>
+        <h2 className="text-xs font-semibold">Total:</h2>
+        <div className="flex gap-2 items-center">
+          <p className="font-medium text-muted-foreground">
+            {default_currency}
+          </p>
+          <div className="text-lg font-bold">
+            <AnimatedCounter amount={totalCurrentBalance} />
           </div>
         </div>
       </CardContent>
