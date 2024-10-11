@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { CircleMinus, CirclePlus, Coins } from "lucide-react";
@@ -102,61 +108,62 @@ const CashBalanceBox = () => {
         setOpen={setShowCreateCashTransactionDialog}
         cashAccounts={cashAccounts}
       />
-      <Card className="w-[16rem] h-[20rem]">
-        <CardContent className="p-0 w-full h-full">
-          <div className="relative flex flex-col h-full gap-6 p-5">
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="font-semibold flex items-center gap-2">
-                <Coins size="22" />
-                <p className="flex-1">Cash</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className="justify-start p-1 h-auto w-auto"
-                        onClick={() => setShowAddCashBalanceDialog(true)}
-                      >
-                        <CirclePlus size="18" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add cash balance</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        className="justify-start p-1 h-auto w-auto"
-                        onClick={() => setShowCreateCashTransactionDialog(true)}
-                      >
-                        <CircleMinus size="18" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Create cash transaction</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <Separator />
-              <ScrollArea className="h-[14rem] shadow-inner rounded-xl">
-                <div className="flex flex-col">
-                  {accounts.map((account, index) => {
-                    return (
-                      <BalanceItem
-                        key={index}
-                        current_balance={account.current_balance}
-                        currency={account.currency}
-                      />
-                    );
-                  })}
-                </div>
-              </ScrollArea>
+      <Card className="w-full max-h-[30rem]">
+        <CardHeader>
+          <CardTitle>
+            <div className="font-semibold flex items-center gap-2">
+              <Coins size="22" />
+              <p className="flex-1">Cash</p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      className="justify-start p-1 h-auto w-auto"
+                      onClick={() => setShowAddCashBalanceDialog(true)}
+                    >
+                      <CirclePlus size="18" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add cash balance</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      className="justify-start p-1 h-auto w-auto"
+                      onClick={() => setShowCreateCashTransactionDialog(true)}
+                    >
+                      <CircleMinus size="18" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Create cash transaction</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-          </div>
+          </CardTitle>
+          <CardDescription>Total cash balance</CardDescription>
+          <Separator />
+        </CardHeader>
+        <CardContent className="">
+          <ScrollArea className="shadow-inner rounded-xl max-h-[16rem] flex flex-col overflow-y-auto">
+            <div className="flex flex-col">
+              {accounts.map((account, index) => {
+                return (
+                  <BalanceItem
+                    key={index}
+                    current_balance={account.current_balance}
+                    currency={account.currency}
+                  />
+                );
+              })}
+            </div>
+          </ScrollArea>
         </CardContent>
       </Card>
     </>
