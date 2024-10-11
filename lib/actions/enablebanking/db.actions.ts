@@ -240,6 +240,27 @@ export const readTransactionsByUserId = async (
   return data;
 };
 
+export const readRecentTransactionsByUserId = async (
+  user_id: string
+): Promise<Transaction[]> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", user_id)
+    .order("value_date", { ascending: false })
+    .range(0, 10);
+  if (error) {
+    console.log("Error while reading transactions.", error);
+    return [];
+  }
+  if (!data) {
+    console.log("Error while reading transactions.");
+    return [];
+  }
+  return data;
+};
+
 export const readLastTransactionsByAccountId = async (account_id: string) => {
   const supabase = createClient();
   const { data, error } = await supabase

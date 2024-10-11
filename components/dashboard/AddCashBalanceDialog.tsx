@@ -7,26 +7,26 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import {
   Form,
   FormControl,
   FormField,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import FormSubmitButton from "./core/FormSubmitButton";
+} from "../ui/form";
+import FormSubmitButton from "../core/FormSubmitButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../ui/select";
 import { updateCashBalance } from "@/lib/actions/cash/api.actions";
 import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 import { updateCashBalanceSchema } from "@/validations/balance";

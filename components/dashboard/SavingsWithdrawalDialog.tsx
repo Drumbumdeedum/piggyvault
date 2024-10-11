@@ -7,30 +7,30 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import {
   Form,
   FormControl,
   FormField,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import FormSubmitButton from "./core/FormSubmitButton";
+} from "../ui/form";
+import FormSubmitButton from "../core/FormSubmitButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../ui/select";
 import { updateSavingsBalanceSchema } from "@/validations/balance";
 import { updateSavingsBalance } from "@/lib/actions/savings/api.actions";
 
-const AddSavingsBalanceDialog = ({
+const SavingsWithdrawalDialog = ({
   open,
   setOpen,
   savingsAccounts,
@@ -50,7 +50,7 @@ const AddSavingsBalanceDialog = ({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { amount, account_id } = values;
-    await updateSavingsBalance({ account_id, amount });
+    await updateSavingsBalance({ account_id, amount: -amount });
     form.reset();
     setOpen(false);
   }
@@ -65,9 +65,9 @@ const AddSavingsBalanceDialog = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add savings balance</DialogTitle>
+          <DialogTitle>Withdraw money</DialogTitle>
           <DialogDescription>
-            Add a savings balance amount to your selected savings account
+            Withdraw an amount from your selected savings account
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -88,6 +88,7 @@ const AddSavingsBalanceDialog = ({
                   </div>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="account_id"
@@ -119,7 +120,9 @@ const AddSavingsBalanceDialog = ({
                   </div>
                 )}
               />
-              <FormSubmitButton className="mt-4">Add money</FormSubmitButton>
+              <FormSubmitButton className="mt-4">
+                Withdraw money
+              </FormSubmitButton>
             </div>
           </form>
         </Form>
@@ -128,4 +131,4 @@ const AddSavingsBalanceDialog = ({
   );
 };
 
-export default AddSavingsBalanceDialog;
+export default SavingsWithdrawalDialog;

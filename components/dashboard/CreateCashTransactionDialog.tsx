@@ -1,5 +1,3 @@
-"use client";
-
 import { Dispatch, SetStateAction } from "react";
 import {
   Dialog,
@@ -7,67 +5,66 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "../ui/dialog";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
   FormField,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import FormSubmitButton from "./core/FormSubmitButton";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Input } from "./ui/input";
+} from "../ui/form";
+import { Input } from "../ui/input";
+import FormSubmitButton from "../core/FormSubmitButton";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { updateSavingsBalanceSchema } from "@/validations/balance";
-import { updateSavingsBalance } from "@/lib/actions/savings/api.actions";
+} from "../ui/select";
+import { Textarea } from "../ui/textarea";
+import { updateCashBalanceSchema } from "@/validations/balance";
+import { createCashTransactionAndUpdateCashBalance } from "@/lib/actions/cash/api.actions";
 
-const SavingsWithdrawalDialog = ({
+const CreateCashTransactionDialog = ({
   open,
   setOpen,
-  savingsAccounts,
+  cashAccounts,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  savingsAccounts: Account[];
+  cashAccounts: Account[];
 }) => {
-  const formSchema = updateSavingsBalanceSchema();
+  const formSchema = updateCashBalanceSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: undefined,
       account_id: undefined,
+      note: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { amount, account_id } = values;
-    await updateSavingsBalance({ account_id, amount: -amount });
+    const { account_id, amount, note } = values;
+    await createCashTransactionAndUpdateCashBalance({
+      account_id,
+      amount,
+      note,
+    });
     form.reset();
     setOpen(false);
   }
-
   return (
-    <Dialog
-      open={open}
-      onOpenChange={() => {
-        form.reset();
-        setOpen(!open);
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Withdraw money</DialogTitle>
+          <DialogTitle>New cash transaction</DialogTitle>
           <DialogDescription>
-            Withdraw an amount from your selected savings account
+            Create a new cash transaction in your selected currency
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -88,7 +85,6 @@ const SavingsWithdrawalDialog = ({
                   </div>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="account_id"
@@ -106,7 +102,7 @@ const SavingsWithdrawalDialog = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {savingsAccounts.map((account, index) => {
+                          {cashAccounts.map((account, index) => {
                             return (
                               <SelectItem key={index} value={account.id}>
                                 {account.balance_name}
@@ -120,8 +116,27 @@ const SavingsWithdrawalDialog = ({
                   </div>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <div>
+                    <FormLabel htmlFor="Note">Note</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Textarea
+                          id="note_text-area"
+                          placeholder="Note"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  </div>
+                )}
+              />
               <FormSubmitButton className="mt-4">
-                Withdraw money
+                Create cash transaction
               </FormSubmitButton>
             </div>
           </form>
@@ -131,4 +146,4 @@ const SavingsWithdrawalDialog = ({
   );
 };
 
-export default SavingsWithdrawalDialog;
+export default CreateCashTransactionDialog;
