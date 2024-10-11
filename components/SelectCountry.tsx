@@ -28,7 +28,10 @@ const SelectCountry = () => {
   };
   return (
     <>
-      <Button onClick={() => router.push("/")} className="mb-6 flex gap-2">
+      <Button
+        onClick={() => router.push("/accounts")}
+        className="mb-6 flex gap-2"
+      >
         <ChevronLeft size="20" />
         Back
       </Button>
