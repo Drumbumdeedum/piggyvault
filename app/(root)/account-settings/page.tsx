@@ -1,6 +1,5 @@
 import PersonalDataForm from "@/components/PersonalDataForm";
 import PreferencesData from "@/components/PreferencesData";
-import PreferencesDataForm from "@/components/PreferencesDataForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getLoggedInUser } from "@/lib/actions/auth.actions";
