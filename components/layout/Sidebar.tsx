@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { House, ArrowRightLeft, Settings, Wallet } from "lucide-react";
 import { Button } from "../ui/button";
 
-const sidebarLinks = [
+export const sidebarLinks = [
   {
     base: "/",
     route: "/",

@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -32,6 +33,7 @@ export default function TransactionsDataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState<any>([]);
 
   const table = useReactTable({
     data,
@@ -40,21 +42,20 @@ export default function TransactionsDataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
     state: {
-      columnFilters,
+      globalFilter,
     },
   });
   return (
     <div className="rounded-md border">
       <div className="flex items-center p-4">
+        <Search className="mr-2" />
         <Input
-          placeholder="Filter creditor"
-          value={
-            (table.getColumn("creditor")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("creditor")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search"
+          value={globalFilter}
+          onChange={(e) => table.setGlobalFilter(String(e.target.value))}
           className="max-w-sm"
         />
       </div>

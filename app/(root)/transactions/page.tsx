@@ -15,7 +15,6 @@ const page = async () => {
   if (!user) return;
   const data = await getData(user.id);
   fetchTransactionsSinceLastTransaction();
-
   return (
     <div className="p-5">
       <InitUser user={user} />
