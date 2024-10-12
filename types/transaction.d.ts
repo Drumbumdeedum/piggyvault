@@ -98,4 +98,5 @@ declare type Transaction = {
   };
   note: string;
   transaction_id: string;
+  category: string;
 };

@@ -56,6 +56,10 @@ export const getCompositeId = (transaction: TransactionResponse) => {
   return `${transaction.transaction_amount.amount}-${transaction.transaction_amount.currency}-${transaction.booking_date}-${transaction.value_date}-${transaction.credit_debit_indicator}-${trimWhiteSpace(parseStringify(transaction.remittance_information.join()))}`;
 };
 
+export const getTransactionString = (transaction: TransactionResponse) => {
+  return `${trimWhiteSpace(parseStringify(transaction.remittance_information.join()))} ${transaction.creditor ? transaction.creditor.name : ""}`;
+};
+
 export const haveMinutesPassedSinceDate = ({
   date,
   minutesPassed,
