@@ -9,7 +9,8 @@ export async function getUserById(user_id: string) {
   const { data, error } = await supabase
     .from("users")
     .select()
-    .eq("id", user_id);
+    .eq("id", user_id)
+    .single();
   if (error) {
     console.log("Error fetching user from database.", error);
     return;
@@ -18,7 +19,7 @@ export async function getUserById(user_id: string) {
     console.log("Error fetching user from database.");
     return;
   }
-  return data[0];
+  return data;
 }
 
 export const updateFirstNameByUserId = async ({
@@ -30,12 +31,13 @@ export const updateFirstNameByUserId = async ({
     .from("users")
     .update({ first_name })
     .eq("id", user_id)
-    .select("first_name");
+    .select("first_name")
+    .single();
   if (error) {
     console.log("Error updating first name.", error);
     return;
   }
-  return parseStringify(data[0].first_name);
+  return parseStringify(data.first_name);
 };
 
 export const updateLastNameByUserId = async ({
@@ -47,12 +49,13 @@ export const updateLastNameByUserId = async ({
     .from("users")
     .update({ last_name })
     .eq("id", user_id)
-    .select("last_name");
+    .select("last_name")
+    .single();
   if (error) {
     console.log("Error updating last name.", error);
     return;
   }
-  return parseStringify(data[0].last_name);
+  return parseStringify(data.last_name);
 };
 
 export const updateUserSyncedAt = async (user_id: string) => {
@@ -63,7 +66,8 @@ export const updateUserSyncedAt = async (user_id: string) => {
     .from("users")
     .update({ synced_at: dateString })
     .eq("id", user_id)
-    .select("*");
+    .select("*")
+    .single();
   if (error) {
     console.log("Error updating user synced_at date.", error);
     return;
@@ -72,7 +76,7 @@ export const updateUserSyncedAt = async (user_id: string) => {
     console.log("Error updating user synced_at date.");
     return;
   }
-  return parseStringify(data[0]);
+  return parseStringify(data);
 };
 
 export const updateDefaultCurrencyByUserId = async ({
@@ -84,10 +88,11 @@ export const updateDefaultCurrencyByUserId = async ({
     .from("users")
     .update({ default_currency })
     .eq("id", user_id)
-    .select("default_currency");
+    .select("default_currency")
+    .single();
   if (error) {
     console.log("Error updating default currency.", error);
     return;
   }
-  return parseStringify(data[0].default_currency);
+  return parseStringify(data.default_currency);
 };

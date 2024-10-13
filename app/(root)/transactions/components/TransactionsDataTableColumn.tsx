@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmount, formatDate } from "@/lib/utils";
+import { formatAmount } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -11,6 +11,12 @@ export const columns: ColumnDef<Transaction>[] = [
       transaction.value_date
         ? transaction.value_date
         : transaction.booking_date,
+  },
+  {
+    id: "category",
+    header: "Category",
+    accessorFn: (transaction) =>
+      transaction.category ? transaction.category : "",
   },
   {
     id: "creditor",
