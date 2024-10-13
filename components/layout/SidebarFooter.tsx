@@ -3,6 +3,7 @@
 import { signOutAction } from "@/lib/actions/auth.actions";
 import { LogOut } from "lucide-react";
 import { Button } from "../ui/button";
+import { ThemeSwitcher } from "../core/ThemeSwitcher";
 
 const SidebarFooter = () => {
   const signout = async () => {
@@ -16,6 +17,7 @@ const SidebarFooter = () => {
           Sign out
         </Button>
       </div>
+      <ThemeSwitcher />
     </footer>
   );
 };

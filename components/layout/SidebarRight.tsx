@@ -15,11 +15,6 @@ const SidebarRight = () => {
       <div className="flex-grow">
         <LinkedAccountsList />
       </div>
-      <footer>
-        <div className="flex flex-row-reverse flex-end">
-          <ThemeSwitcher />
-        </div>
-      </footer>
     </motion.aside>
   );
 };

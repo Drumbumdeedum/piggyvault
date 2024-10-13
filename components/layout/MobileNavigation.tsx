@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import { sidebarLinks } from "./Sidebar";
 import { Button } from "../ui/button";
 import { PiggyBank } from "lucide-react";
+import { ThemeSwitcher } from "../core/ThemeSwitcher";
 
 const MobileNavigation = () => {
   const pathName = usePathname();
@@ -31,7 +32,7 @@ const MobileNavigation = () => {
             alt="Menu icon"
           />
         </SheetTrigger>
-        <SheetContent side="left" className="border-none bg-white">
+        <SheetContent side="left" className="border-none">
           <SheetHeader>
             <SheetTitle>
               <Link
@@ -46,27 +47,32 @@ const MobileNavigation = () => {
           </SheetHeader>
           <div className="flex h-[calc(100vh-72px)] flex-col justify-between overflow-y-auto">
             <SheetClose asChild>
-              <nav className="flex h-full flex-col gap-3 pt-6">
-                {sidebarLinks.map((sidebarLink) => {
-                  const isActive =
-                    pathName === sidebarLink.base ||
-                    (sidebarLink.base !== "/" &&
-                      pathName.startsWith(`${sidebarLink.base}`));
-                  return (
-                    <SheetClose key={sidebarLink.label} asChild>
-                      <Link key={sidebarLink.label} href={sidebarLink.route}>
-                        <Button
-                          variant={isActive ? "default" : "ghost"}
-                          className="w-full justify-start items-center gap-2"
-                        >
-                          <div>{sidebarLink.icon}</div>
-                          <p>{sidebarLink.label}</p>
-                        </Button>
-                      </Link>
-                    </SheetClose>
-                  );
-                })}
-              </nav>
+              <>
+                <nav className="flex h-full flex-col gap-3 pt-6">
+                  {sidebarLinks.map((sidebarLink) => {
+                    const isActive =
+                      pathName === sidebarLink.base ||
+                      (sidebarLink.base !== "/" &&
+                        pathName.startsWith(`${sidebarLink.base}`));
+                    return (
+                      <SheetClose key={sidebarLink.label} asChild>
+                        <Link key={sidebarLink.label} href={sidebarLink.route}>
+                          <Button
+                            variant={isActive ? "default" : "ghost"}
+                            className="w-full justify-start items-center gap-2"
+                          >
+                            <div>{sidebarLink.icon}</div>
+                            <p>{sidebarLink.label}</p>
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                    );
+                  })}
+                </nav>
+                <footer>
+                  <ThemeSwitcher />
+                </footer>
+              </>
             </SheetClose>
           </div>
         </SheetContent>
