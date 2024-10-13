@@ -22,6 +22,11 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,20 +91,47 @@ export default function TransactionsDataTable<TData, TValue>({
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => {
+                  const date = row.getAllCells()[0].getValue() as string;
+                  const category = row.getAllCells()[1].getValue() as string;
+                  const vendor = row.getAllCells()[2].getValue() as string;
+                  const details = row.getAllCells()[3].getValue() as string;
+                  const amount = row.getAllCells()[4].getValue() as string;
                   return (
                     <TableCell
                       key={cell.id}
                       className={cn(
+                        "cursor-pointer",
                         cell.id.includes("details") &&
-                          "text-nowrap max-w-72 overflow-clip text-ellipsis",
+                          "text-nowrap max-w-72 overflow-clip text-ellipsis cursor-pointer",
                         cell.id.includes("creditor") &&
                           "text-nowrap max-w-32 overflow-clip text-ellipsis",
                         cell.id.includes("amount") && "text-right"
                       )}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                      {cell.id.includes("details") ? (
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-96">
+                            <p>Date: {date}</p>
+                            <p>Category: {category}</p>
+                            <p>Amount: {amount}</p>
+                            <p>Vendor: {vendor}</p>
+                            <p>Details:</p>
+                            <p className="text-wrap">{details}</p>
+                          </HoverCardContent>
+                        </HoverCard>
+                      ) : (
+                        <>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </>
                       )}
                     </TableCell>
                   );
