@@ -20,9 +20,11 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     id: "creditor",
-    header: "Creditor",
+    header: "Vendor / Recipient",
     accessorFn: (transaction) =>
-      transaction.creditor ? transaction.creditor.name : "",
+      transaction.creditor && transaction.creditor.name
+        ? transaction.creditor.name
+        : "",
   },
   {
     id: "details",
