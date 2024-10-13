@@ -108,7 +108,7 @@ const SavingsBalanceBox = () => {
         setOpen={setShowSavingsWithdrawalDialog}
         savingsAccounts={accounts}
       />
-      <Card className="w-full max-h-[30rem]">
+      <Card className="w-full md:max-h-[30rem]">
         <CardHeader className="pb-3">
           <CardTitle>
             <div className="font-semibold flex items-center gap-2">
@@ -151,7 +151,7 @@ const SavingsBalanceBox = () => {
           <Separator />
         </CardHeader>
         <CardContent>
-          <ScrollArea className="shadow-inner rounded-xl max-h-[16rem] flex flex-col overflow-y-auto">
+          <ScrollArea className="shadow-inner rounded-xl md:max-h-[22rem] xl:max-h-[18rem] flex flex-col overflow-y-auto">
             {accounts.map((account, index) => {
               return (
                 <BalanceItem

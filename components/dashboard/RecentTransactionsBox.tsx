@@ -29,7 +29,7 @@ const RecentTransactionsBox = ({
         <Separator />
       </CardHeader>
       <CardContent>
-        <ScrollArea className="shadow-inner rounded-xl max-h-[16rem] flex flex-col overflow-y-auto">
+        <ScrollArea className="shadow-inner rounded-xl md:max-h-[22rem] xl:max-h-[18rem] flex flex-col overflow-y-auto">
           {transactions.map((transaction, index) => {
             return (
               <HoverCard key={index}>
