@@ -72,7 +72,8 @@ export const readAccountConnectionByUserIdAndAuthCode = async ({
     .from("account_connections")
     .select("*")
     .eq("user_id", user_id)
-    .eq("auth_code", auth_code);
+    .eq("auth_code", auth_code)
+    .single();
 
   if (error) {
     console.log("Error while retrieving account_connection", error);
@@ -82,7 +83,7 @@ export const readAccountConnectionByUserIdAndAuthCode = async ({
     console.log("Error while retrieving account_connection");
     return;
   }
-  return data[0];
+  return data;
 };
 
 export const createAccountConnection = async ({
@@ -96,7 +97,8 @@ export const createAccountConnection = async ({
   const { data, error } = await supabase
     .from("account_connections")
     .insert({ user_id: user_id, auth_code })
-    .select();
+    .select()
+    .single();
 
   if (error) {
     console.log("Error while creating account connection:", error);
@@ -106,7 +108,7 @@ export const createAccountConnection = async ({
     console.log("Error while creating account connection:");
     return;
   }
-  return data[0];
+  return data;
 };
 
 export const createAccount = async ({
@@ -154,7 +156,8 @@ export const updateAccountBalanceAndBalanceName = async ({
     })
     .eq("user_id", user_id)
     .eq("account_id", account_id)
-    .select("*");
+    .select("*")
+    .single();
   if (error) {
     console.log("Error while updating account balance.", error);
     return;
@@ -163,7 +166,7 @@ export const updateAccountBalanceAndBalanceName = async ({
     console.log("Error while updating account balance.");
     return;
   }
-  return data[0];
+  return data;
 };
 
 export const updateAccountSyncedAt = async (id: string) => {
@@ -177,7 +180,8 @@ export const updateAccountSyncedAt = async (id: string) => {
       synced_at: dateString,
     })
     .eq("id", id)
-    .select("*");
+    .select("*")
+    .single();
 
   if (error) {
     console.log("Error while updating account sync date.", error);
@@ -187,7 +191,7 @@ export const updateAccountSyncedAt = async (id: string) => {
     console.log("Error while updating account sync date.");
     return;
   }
-  return data[0];
+  return data;
 };
 
 export const createTransaction = async ({
@@ -208,7 +212,8 @@ export const createTransaction = async ({
       user_id,
       account_id,
     })
-    .select("*");
+    .select("*")
+    .single();
   if (error) {
     console.log("Error while creating transaction.", error);
     return;
@@ -217,7 +222,7 @@ export const createTransaction = async ({
     console.log("Error while creating transaction.");
     return;
   }
-  return data[0];
+  return data;
 };
 
 export const readTransactionsByUserId = async (
@@ -228,6 +233,27 @@ export const readTransactionsByUserId = async (
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
+    .order("value_date", { ascending: false });
+  if (error) {
+    console.log("Error while reading transactions.", error);
+    return [];
+  }
+  if (!data) {
+    console.log("Error while reading transactions.");
+    return [];
+  }
+  return data;
+};
+
+export const readUncategorizedTransactionsByUserId = async (
+  user_id: string
+): Promise<Transaction[]> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", user_id)
+    .eq("category", null)
     .order("value_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
@@ -277,4 +303,34 @@ export const readLastTransactionsByAccountId = async (account_id: string) => {
     return;
   }
   return data[0];
+};
+
+export const updateTransactionCategory = async ({
+  user_id,
+  transaction_id,
+  category,
+}: {
+  user_id: string;
+  transaction_id: string;
+  category: string;
+}) => {
+  const supabase = createClient();
+  console.log("UPDATING TRANSACTION: ", transaction_id);
+  console.log("UPDATING CATEGORY: ", category);
+  const { data, error } = await supabase
+    .from("transactions")
+    .update({ category })
+    .eq("id", transaction_id)
+    .eq("user_id", user_id)
+    .select("*")
+    .single();
+  if (error) {
+    console.log("Error while updating transaction category.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while updating transaction category.");
+    return;
+  }
+  console.log(data);
 };

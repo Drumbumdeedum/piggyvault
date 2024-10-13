@@ -29,4 +29,5 @@ export const defaultCategories = [
   "money_transfer",
   "cash_withdrawal",
   "transportation",
+  "medication",
 ];

@@ -34,7 +34,8 @@ export const readCashAccountsByUserIdAndCurrency = async ({
     .select("*")
     .eq("user_id", user_id)
     .eq("currency", currency)
-    .eq("account_type", "cash_account");
+    .eq("account_type", "cash_account")
+    .single();
   if (error) {
     console.log("Error while retrieving cash accounts.", error);
     return;
@@ -43,7 +44,7 @@ export const readCashAccountsByUserIdAndCurrency = async ({
     console.log("Error while retrieving cash accounts.");
     return;
   }
-  return data[0] as Account;
+  return data as Account;
 };
 
 export const createCashAccount = async ({
@@ -65,7 +66,8 @@ export const createCashAccount = async ({
       institution_name: `${currency} cash balance`,
       currency,
     })
-    .select("*");
+    .select("*")
+    .single();
 
   if (error) {
     console.log("Error while creating cash accounts.", error);
@@ -75,7 +77,7 @@ export const createCashAccount = async ({
     console.log("Error while creating cash accounts.");
     return;
   }
-  return data[0] as Account;
+  return data as Account;
 };
 
 export const updateCashAccountCurrentBalance = async ({
@@ -92,7 +94,8 @@ export const updateCashAccountCurrentBalance = async ({
       current_balance,
     })
     .eq("id", id)
-    .select("*");
+    .select("*")
+    .single();
   if (error) {
     console.log("Error while updating account balance.", error);
     return;
@@ -101,7 +104,7 @@ export const updateCashAccountCurrentBalance = async ({
     console.log("Error while updating account balance.");
     return;
   }
-  return data[0] as Account;
+  return data as Account;
 };
 
 export const createCashTransaction = async ({

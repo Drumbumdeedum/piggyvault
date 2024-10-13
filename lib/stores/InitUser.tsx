@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { useUser } from "./user";
 import { readAccountsByUserId } from "../actions/enablebanking/db.actions";
 import { useAccounts } from "./accounts";
+import { categorizeTransactions } from "../actions/gemini/api.actions";
+import { syncTransactionsSinceLastTransaction } from "../actions/enablebanking/api.actions";
 
 export default function InitUser({ user }: { user: User }) {
   const initState = useRef(false);
@@ -24,6 +26,8 @@ export default function InitUser({ user }: { user: User }) {
     };
     if (!initState.current) {
       initUser();
+      categorizeTransactions();
+      syncTransactionsSinceLastTransaction();
     }
     initState.current = true;
   }, []);

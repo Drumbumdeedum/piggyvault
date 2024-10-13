@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -32,7 +33,6 @@ export default function TransactionsDataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState<any>([]);
-
   const table = useReactTable({
     data,
     columns,
@@ -62,7 +62,10 @@ export default function TransactionsDataTable<TData, TValue>({
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={cn(header.id.includes("amount") && "text-right")}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -84,7 +87,16 @@ export default function TransactionsDataTable<TData, TValue>({
               >
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        cell.id.includes("details") &&
+                          "text-nowrap max-w-72 overflow-clip text-ellipsis",
+                        cell.id.includes("creditor") &&
+                          "text-nowrap max-w-32 overflow-clip text-ellipsis",
+                        cell.id.includes("amount") && "text-right"
+                      )}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

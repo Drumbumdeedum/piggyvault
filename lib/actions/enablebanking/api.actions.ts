@@ -256,32 +256,7 @@ const getAccountTotalBalances = async (
   return balances;
 };
 
-export const fetchAccountsByUserId = async (user_id: string) => {
-  const user = await getUserById(user_id);
-  if (!user) return;
-  let accounts = await readBankAccountsByUserId(user_id);
-  /* let updateRequired = haveMinutesPassedSinceDate({
-    date: user.synced_at,
-    minutesPassed: 10,
-  }); */
-  let updateRequired = false;
-  if (accounts && updateRequired) {
-    const updatedAccounts = await Promise.all(
-      accounts.map(async (account) => {
-        await updateAccountSyncedAt(account.account_id);
-        return await updateAccountTotalBalance({
-          user_id,
-          account_id: account.account_id,
-        });
-      })
-    );
-    accounts = updatedAccounts.flat();
-  }
-  await updateUserSyncedAt(user_id);
-  return accounts;
-};
-
-export const fetchTransactionsSinceLastTransaction = async () => {
+export const syncTransactionsSinceLastTransaction = async () => {
   const user = await getLoggedInUser();
   if (!user) return;
 

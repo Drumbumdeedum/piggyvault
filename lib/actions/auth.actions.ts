@@ -115,9 +115,10 @@ export async function getLoggedInUser() {
       const dbUser = await supabase
         .from("users")
         .select()
-        .eq("email", user.email);
+        .eq("email", user.email)
+        .single();
       if (dbUser && dbUser.data) {
-        return parseStringify(dbUser.data[0]);
+        return parseStringify(dbUser.data);
       }
       return null;
     }
