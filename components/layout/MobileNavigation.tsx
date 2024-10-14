@@ -15,7 +15,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarLinks } from "./Sidebar";
 import { Button } from "../ui/button";
-import { PiggyBank } from "lucide-react";
+import { Menu, PiggyBank } from "lucide-react";
 import { ThemeSwitcher } from "../core/ThemeSwitcher";
 
 const MobileNavigation = () => {
@@ -24,13 +24,7 @@ const MobileNavigation = () => {
     <section className="w-full max-w-[264px] flex justify-end">
       <Sheet>
         <SheetTrigger>
-          <Image
-            className="cursor-pointer"
-            src="/icons/hamburger.svg"
-            width={30}
-            height={30}
-            alt="Menu icon"
-          />
+          <Menu size="30" />
         </SheetTrigger>
         <SheetContent side="left" className="border-none">
           <SheetHeader>
