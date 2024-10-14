@@ -30,23 +30,21 @@ const supabase = createBrowserClient(
 );
 
 const CashBalanceBox = () => {
-  const cashAccounts = useAccounts((s) => s.accounts);
+  const accounts = useAccounts((s) => s.accounts);
   const updateAccountBalance = useAccounts((s) => s.updateAccountBalance);
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [cashAccounts, setCashAccounts] = useState<Account[]>([]);
   const [showAddCashBalanceDialog, setShowAddCashBalanceDialog] =
     useState<boolean>(false);
   const [showCreateCashTransactionDialog, setShowCreateCashTransactionDialog] =
     useState<boolean>(false);
 
   useEffect(() => {
-    if (cashAccounts) {
-      setAccounts(
-        cashAccounts.filter(
-          (account) => account.account_type === "cash_account"
-        )
+    if (accounts) {
+      setCashAccounts(
+        accounts.filter((account) => account.account_type === "cash_account")
       );
     }
-  }, [cashAccounts]);
+  }, [accounts]);
 
   useEffect(() => {
     const channel = supabase
@@ -83,7 +81,7 @@ const CashBalanceBox = () => {
             payload.new &&
             payload.new.account_type === "cash_account"
           ) {
-            setAccounts((prevAccounts) => [
+            setCashAccounts((prevAccounts) => [
               ...prevAccounts,
               payload.new as Account,
             ]);
@@ -108,7 +106,7 @@ const CashBalanceBox = () => {
         setOpen={setShowCreateCashTransactionDialog}
         cashAccounts={cashAccounts}
       />
-      <Card className="w-full max-h-[30rem]">
+      <Card className="w-full md:max-h-[30rem]">
         <CardHeader className="pb-3">
           <CardTitle>
             <div className="font-semibold flex items-center gap-2">
@@ -153,7 +151,7 @@ const CashBalanceBox = () => {
         <CardContent className="">
           <ScrollArea className="shadow-inner rounded-xl md:max-h-[22rem] xl:max-h-[18rem] flex flex-col overflow-y-auto">
             <div className="flex flex-col">
-              {accounts.map((account, index) => {
+              {cashAccounts.map((account, index) => {
                 return (
                   <BalanceItem
                     key={index}

@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { updateCashBalance } from "@/lib/actions/cash/api.actions";
-import { enableBankingCurrencies } from "@/constants/enablebankingCountries";
 import { updateCashBalanceSchema } from "@/validations/balance";
 
 const AddCashBalanceDialog = ({
@@ -48,6 +47,8 @@ const AddCashBalanceDialog = ({
       account_id: undefined,
     },
   });
+
+  //console.log(cashAccounts);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { account_id, amount } = values;
