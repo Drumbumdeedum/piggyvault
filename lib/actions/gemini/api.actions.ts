@@ -10,7 +10,6 @@ import { getLoggedInUser } from "../auth.actions";
 import { getTransactionString, trimWhiteSpace } from "@/lib/utils";
 
 export const categorizeTransactions = async () => {
-  console.log("Start categorization.");
   const user = await getLoggedInUser();
   const transactions = await readUncategorizedTransactionsByUserId(user.id);
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);

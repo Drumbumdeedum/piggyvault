@@ -253,7 +253,7 @@ export const readUncategorizedTransactionsByUserId = async (
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
-    .eq("category", null)
+    .is("category", null)
     .order("value_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
