@@ -19,6 +19,8 @@ import {
   updateAccountSyncedAt,
   createTransaction,
   readLastTransactionsByAccountId,
+  readTransactionByEntryReference,
+  updateTransactionStatus,
 } from "./db.actions";
 import { getUserById, updateUserSyncedAt } from "../user.actions";
 
@@ -279,11 +281,29 @@ export const syncTransactionsSinceLastTransaction = async () => {
           date_from: lastTransaction.created_at,
         });
         newTransactions.transactions.forEach(async (transaction) => {
-          await createTransaction({
-            transaction,
-            user_id: user.id,
-            account_id: account.account_id,
-          });
+          if (transaction.entry_reference && transaction.status !== "BOOK") {
+            const dbTransaction = await readTransactionByEntryReference(
+              transaction.entry_reference
+            );
+            if (dbTransaction) {
+              await updateTransactionStatus({
+                user_id: dbTransaction.user_id,
+                transaction,
+              });
+            } else {
+              await createTransaction({
+                transaction,
+                user_id: user.id,
+                account_id: account.account_id,
+              });
+            }
+          } else {
+            await createTransaction({
+              transaction,
+              user_id: user.id,
+              account_id: account.account_id,
+            });
+          }
         });
       }
       await updateAccountTotalBalance({

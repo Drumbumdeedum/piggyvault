@@ -225,6 +225,37 @@ export const createTransaction = async ({
   return data;
 };
 
+export const updateTransactionStatus = async ({
+  user_id,
+  transaction,
+}: {
+  user_id: string;
+  transaction: TransactionResponse;
+}) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .update({
+      status: transaction.status,
+      value_date: transaction.value_date,
+      transaction_amount: transaction.value_date,
+      composite_id: getCompositeId(transaction),
+    })
+    .eq("entry_reference", transaction.entry_reference)
+    .eq("user_id", user_id)
+    .select("*")
+    .single();
+  if (error) {
+    console.log("Error while creating transaction.", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while creating transaction.");
+    return;
+  }
+  return data;
+};
+
 export const readTransactionsByUserId = async (
   user_id: string
 ): Promise<Transaction[]> => {
@@ -333,4 +364,20 @@ export const updateTransactionCategory = async ({
     return;
   }
   console.log(data);
+};
+
+export const readTransactionByEntryReference = async (
+  entry_reference: string
+) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("entry_reference", entry_reference)
+    .single();
+  if (error) {
+    console.log("Error while reading transaction by entry reference.", error);
+    return;
+  }
+  return data;
 };

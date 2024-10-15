@@ -5,12 +5,26 @@ import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Transaction>[] = [
   {
-    id: "date",
-    header: "Date",
+    id: "booking_date",
+    header: "Transaction date",
     accessorFn: (transaction) =>
-      transaction.value_date
-        ? transaction.value_date
-        : transaction.booking_date,
+      transaction.booking_date ? transaction.booking_date : "",
+  },
+  {
+    id: "value_date",
+    header: "Processed date",
+    accessorFn: (transaction) =>
+      transaction.value_date ? transaction.value_date : "",
+  },
+  {
+    id: "status",
+    header: "Status",
+    accessorFn: (transaction) =>
+      transaction.status === "BOOK"
+        ? "Processed"
+        : transaction.status === "PDNG"
+          ? "Pending"
+          : "Unknown",
   },
   {
     id: "category",
