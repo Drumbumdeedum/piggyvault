@@ -131,6 +131,7 @@ export const createCashTransaction = async ({
       value_date: bookingDate,
       remittance_information: [note],
       account_id: `cash_account_${user_id}`,
+      status: "BOOK",
     })
     .select("*")
     .single();
