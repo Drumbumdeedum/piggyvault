@@ -41,9 +41,12 @@ const RecentTransactionsBox = ({
                       </p>
                       <p className="text-[8px]">
                         {shortenString(
-                          transaction.remittance_information.reduce(
-                            (curr, result) => (result = result.concat(curr))
-                          ),
+                          transaction &&
+                            transaction.remittance_information.length
+                            ? transaction.remittance_information.reduce(
+                                (curr, result) => (result = result.concat(curr))
+                              )
+                            : "",
                           14
                         )}
                       </p>
@@ -66,9 +69,11 @@ const RecentTransactionsBox = ({
                 <HoverCardContent>
                   <div>
                     <div>
-                      {transaction.remittance_information.reduce(
-                        (curr, result) => (result = result.concat(curr))
-                      )}
+                      {transaction && transaction.remittance_information.length
+                        ? transaction.remittance_information.reduce(
+                            (curr, result) => (result = result.concat(curr))
+                          )
+                        : ""}
                     </div>
                   </div>
                 </HoverCardContent>

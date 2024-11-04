@@ -36,7 +36,7 @@ export const connectAccount = async ({
   countryCode: string;
 }) => {
   const base_headers = getBaseHeaders();
-  const validUntilDays = 10;
+  const validUntilDays = 1;
   const validUntil = new Date(
     new Date().getTime() + validUntilDays * 24 * 60 * 60 * 1000
   );

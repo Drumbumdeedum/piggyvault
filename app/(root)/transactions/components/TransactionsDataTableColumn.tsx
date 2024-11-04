@@ -44,9 +44,11 @@ export const columns: ColumnDef<Transaction>[] = [
     id: "details",
     header: "Details",
     accessorFn: (transaction) =>
-      transaction.remittance_information.reduce(
-        (curr, result) => (result = result.concat(curr))
-      ),
+      transaction && transaction.remittance_information.length
+        ? transaction.remittance_information.reduce(
+            (curr, result) => (result = result.concat(curr))
+          )
+        : "",
   },
   {
     id: "amount",
