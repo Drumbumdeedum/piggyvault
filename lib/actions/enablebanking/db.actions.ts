@@ -44,16 +44,19 @@ export const updateAccountConnectionSessionIdByUserIdAndAuthCode = async ({
   user_id,
   auth_code,
   session_id,
+  valid_until,
 }: {
   user_id: string;
   auth_code: string;
   session_id: string;
+  valid_until: string;
 }) => {
   const supabase = createClient();
   await supabase
     .from("account_connections")
     .update({
       session_id,
+      valid_until,
     })
     .eq("user_id", user_id)
     .eq("auth_code", auth_code)
@@ -74,6 +77,24 @@ export const readAccountConnectionByUserIdAndAuthCode = async ({
     .eq("user_id", user_id)
     .eq("auth_code", auth_code)
     .single();
+
+  if (error) {
+    console.log("Error while retrieving account_connection", error);
+    return;
+  }
+  if (!data) {
+    console.log("Error while retrieving account_connection");
+    return;
+  }
+  return data;
+};
+
+export const readAccountConnectionsByUserId = async (user_id: string) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("account_connections")
+    .select("*")
+    .eq("user_id", user_id);
 
   if (error) {
     console.log("Error while retrieving account_connection", error);
@@ -208,6 +229,11 @@ export const createTransaction = async ({
     .from("transactions")
     .insert({
       ...transaction,
+      booking_date: transaction.booking_date
+        ? transaction.booking_date
+        : transaction.value_date
+          ? transaction.value_date
+          : null,
       composite_id: getCompositeId(transaction),
       user_id,
       account_id,
@@ -264,7 +290,7 @@ export const readTransactionsByUserId = async (
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
-    .order("value_date", { ascending: false });
+    .order("booking_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
     return [];
@@ -285,7 +311,7 @@ export const readUncategorizedTransactionsByUserId = async (
     .select("*")
     .eq("user_id", user_id)
     .is("category", null)
-    .order("value_date", { ascending: false });
+    .order("booking_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
     return [];
@@ -305,7 +331,7 @@ export const readRecentTransactionsByUserId = async (
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
-    .order("value_date", { ascending: false })
+    .order("booking_date", { ascending: false })
     .range(0, 10);
   if (error) {
     console.log("Error while reading transactions.", error);

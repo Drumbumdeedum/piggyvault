@@ -54,6 +54,6 @@ export const columns: ColumnDef<Transaction>[] = [
     id: "amount",
     header: "Amount",
     accessorFn: (transaction) =>
-      `${transaction.credit_debit_indicator === "CRDT" ? "+" : "-"}${formatAmount(parseFloat(transaction.transaction_amount.amount))} ${transaction.transaction_amount.currency}`,
+      `${transaction.credit_debit_indicator === "CRDT" ? "+" : "-"}${formatAmount(parseFloat(transaction.transaction_amount ? transaction.transaction_amount.amount : "0.00"))} ${transaction.transaction_amount ? transaction.transaction_amount.currency : ""}`,
   },
 ];

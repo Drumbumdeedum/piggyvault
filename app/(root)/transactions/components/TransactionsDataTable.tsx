@@ -92,10 +92,10 @@ export default function TransactionsDataTable<TData, TValue>({
               >
                 {row.getVisibleCells().map((cell) => {
                   const date = row.getAllCells()[0].getValue() as string;
-                  const category = row.getAllCells()[1].getValue() as string;
-                  const vendor = row.getAllCells()[2].getValue() as string;
-                  const details = row.getAllCells()[3].getValue() as string;
-                  const amount = row.getAllCells()[4].getValue() as string;
+                  const category = row.getAllCells()[3].getValue() as string;
+                  const vendor = row.getAllCells()[4].getValue() as string;
+                  const details = row.getAllCells()[5].getValue() as string;
+                  const amount = row.getAllCells()[6].getValue() as string;
                   return (
                     <TableCell
                       key={cell.id}

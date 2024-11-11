@@ -21,6 +21,7 @@ import {
   readLastTransactionsByAccountId,
   readTransactionByEntryReference,
   updateTransactionStatus,
+  readAccountConnectionsByUserId,
 } from "./db.actions";
 import { getUserById, updateUserSyncedAt } from "../user.actions";
 
@@ -36,7 +37,7 @@ export const connectAccount = async ({
   countryCode: string;
 }) => {
   const base_headers = getBaseHeaders();
-  const validUntilDays = 1;
+  const validUntilDays = 90;
   const validUntil = new Date(
     new Date().getTime() + validUntilDays * 24 * 60 * 60 * 1000
   );
@@ -169,6 +170,7 @@ const createOrRetrieveSession = async ({
     await updateAccountConnectionSessionIdByUserIdAndAuthCode({
       user_id,
       session_id: postSessionBody.session_id,
+      valid_until: postSessionBody.access.valid_until,
       auth_code,
     });
   }
@@ -266,37 +268,49 @@ export const syncTransactionsSinceLastTransaction = async () => {
   if (!accounts) {
     return;
   }
+
   let updateRequired = haveMinutesPassedSinceDate({
     date: user.synced_at,
     minutesPassed: 60,
   });
+
+  /* const account_connections = await readAccountConnectionsByUserId(user.id);
+  account_connections?.map(async (account_connection) => {
+    const sessionData = await getSessionData(account_connection.session_id);
+    console.log(sessionData);
+
+    if (sessionData.status !== "AUTHORIZED") {
+      createOrRetrieveSession({
+        user_id: user.id,
+        auth_code: account_connection.auth_code,
+      });
+    }
+  }); */
+
   if (updateRequired) {
     accounts.forEach(async (account) => {
       const lastTransaction = await readLastTransactionsByAccountId(
         account.account_id
       );
-      if (lastTransaction) {
-        const newTransactions = await getTransactionsAfterDate({
-          account_id: account.account_id,
-          date_from: lastTransaction.created_at,
-        });
-        newTransactions.transactions.forEach(async (transaction) => {
-          if (transaction.entry_reference && transaction.status !== "BOOK") {
-            const dbTransaction = await readTransactionByEntryReference(
-              transaction.entry_reference
-            );
-            if (dbTransaction) {
-              await updateTransactionStatus({
-                user_id: dbTransaction.user_id,
-                transaction,
-              });
-            } else {
-              await createTransaction({
-                transaction,
-                user_id: user.id,
-                account_id: account.account_id,
-              });
-            }
+
+      const { startDate } = getMonthRange(3);
+      const date_from = lastTransaction
+        ? lastTransaction.created_at
+        : startDate;
+      const newTransactions = await getTransactionsAfterDate({
+        account_id: account.account_id,
+        date_from,
+      });
+      newTransactions.transactions.forEach(async (transaction) => {
+        if (transaction.entry_reference && transaction.status !== "BOOK") {
+          const dbTransaction = await readTransactionByEntryReference(
+            transaction.entry_reference
+          );
+          if (dbTransaction) {
+            await updateTransactionStatus({
+              user_id: dbTransaction.user_id,
+              transaction,
+            });
           } else {
             await createTransaction({
               transaction,
@@ -304,8 +318,14 @@ export const syncTransactionsSinceLastTransaction = async () => {
               account_id: account.account_id,
             });
           }
-        });
-      }
+        } else {
+          await createTransaction({
+            transaction,
+            user_id: user.id,
+            account_id: account.account_id,
+          });
+        }
+      });
       await updateAccountTotalBalance({
         account_id: account.account_id,
         user_id: user.id,
@@ -455,6 +475,25 @@ const getTransactions = async ({
   if (!accountTransactionsResponse.ok) {
     console.log(
       `Error ${accountTransactionsResponse.status} while fetching account transactions.`,
+      result
+    );
+  }
+  return result;
+};
+
+const getSessionData = async (session_id: string) => {
+  const base_headers = getBaseHeaders();
+  const sessionDataResponse = await fetch(
+    `${ENABLE_BANKING_BASE_URL}/sessions/${session_id}`,
+    {
+      method: "GET",
+      headers: base_headers,
+    }
+  );
+  const result = await sessionDataResponse.json();
+  if (!sessionDataResponse.ok) {
+    console.log(
+      `Error ${sessionDataResponse.status} while fetching sesssion data.`,
       result
     );
   }
