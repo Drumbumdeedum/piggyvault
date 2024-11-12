@@ -21,9 +21,10 @@ import {
   readLastTransactionsByAccountId,
   readTransactionByEntryReference,
   updateTransactionStatus,
-  readAccountConnectionsByUserId,
+  readTransactionsByUserId,
+  readDebitTransactionsByUserId,
 } from "./db.actions";
-import { getUserById, updateUserSyncedAt } from "../user.actions";
+import { updateUserSyncedAt } from "../user.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
@@ -498,4 +499,25 @@ const getSessionData = async (session_id: string) => {
     );
   }
   return result;
+};
+
+export const getCategoryChartData = async (userId: string) => {
+  const transactions = await readDebitTransactionsByUserId(userId);
+  const grouped = transactions.reduce((acc: any, transaction) => {
+    const { category, transaction_amount } = transaction;
+    const amount = parseFloat(transaction_amount.amount);
+    if (!acc[category]) {
+      acc[category] = 0;
+    }
+    // TODO: refactor to use multiple currencies
+    if (transaction_amount.currency === "HUF") {
+      acc[category] += amount;
+    }
+    return acc;
+  }, {});
+  const groupedTransactions = Object.keys(grouped).map((category) => ({
+    label: category,
+    amount: grouped[category],
+  }));
+  return groupedTransactions.sort((a, b) => b.amount - a.amount);
 };
