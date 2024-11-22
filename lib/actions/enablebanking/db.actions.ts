@@ -219,10 +219,12 @@ export const createTransaction = async ({
   transaction,
   user_id,
   account_id,
+  category = "undefined",
 }: {
   transaction: TransactionResponse;
   user_id: string;
   account_id: string;
+  category?: string;
 }) => {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -237,6 +239,7 @@ export const createTransaction = async ({
       composite_id: getCompositeId(transaction),
       user_id,
       account_id,
+      category,
     })
     .select("*")
     .single();

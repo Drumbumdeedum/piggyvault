@@ -25,6 +25,10 @@ import {
   readDebitTransactionsByUserId,
 } from "./db.actions";
 import { updateUserSyncedAt } from "../user.actions";
+import {
+  categorizeTransactions,
+  getCategoryFromTransaction,
+} from "../gemini/api.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
@@ -109,11 +113,15 @@ export const completeAccountConnection = async ({
         account_type: "bank_account",
       });
 
-      await getTransactionsOfPastMonths({ user_id, account_id, nrOfMonths: 3 });
+      await getTransactionsOfPastMonths({
+        user_id,
+        account_id,
+        nrOfMonths: 1,
+      });
       await updateAccountTotalBalance({ user_id, account_id });
+      await updateUserSyncedAt(user_id);
     })
   );
-  await updateUserSyncedAt(user_id);
   return encodedRedirect(
     "success",
     "/accounts",
@@ -359,11 +367,9 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
           }
         )
       );
-      await updateAccountSyncedAt(account.id);
       return accountTransactions.transactions;
     })
   );
-  await updateUserSyncedAt(user_id);
   return transactions.flat();
 };
 
@@ -392,10 +398,12 @@ const getTransactionsOfPastMonths = async ({
         });
         Promise.all(
           result.transactions.map(async (transaction: TransactionResponse) => {
+            const category = await getCategoryFromTransaction(transaction);
             await createTransaction({
               transaction,
               user_id,
               account_id: account_id,
+              category,
             });
           })
         );

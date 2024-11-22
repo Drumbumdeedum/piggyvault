@@ -57,7 +57,6 @@ const CustomPieChart = ({
             nameKey="label"
             innerRadius={windowWidth >= 1280 ? 40 : 70}
             strokeWidth={3}
-            paddingAngle={5}
           />
         </PieChart>
       </ChartContainer>
