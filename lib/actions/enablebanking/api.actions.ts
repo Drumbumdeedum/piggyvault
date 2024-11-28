@@ -21,9 +21,14 @@ import {
   readLastTransactionsByAccountId,
   readTransactionByEntryReference,
   updateTransactionStatus,
-  readAccountConnectionsByUserId,
+  readTransactionsByUserId,
+  readDebitTransactionsByUserId,
 } from "./db.actions";
-import { getUserById, updateUserSyncedAt } from "../user.actions";
+import { updateUserSyncedAt } from "../user.actions";
+import {
+  categorizeTransactions,
+  getCategoryFromTransaction,
+} from "../gemini/api.actions";
 
 const { ENABLE_BANKING_REDIRECT_URI, ENABLE_BANKING_BASE_URL } = process.env;
 
@@ -108,11 +113,15 @@ export const completeAccountConnection = async ({
         account_type: "bank_account",
       });
 
-      await getTransactionsOfPastMonths({ user_id, account_id, nrOfMonths: 3 });
+      await getTransactionsOfPastMonths({
+        user_id,
+        account_id,
+        nrOfMonths: 1,
+      });
       await updateAccountTotalBalance({ user_id, account_id });
+      await updateUserSyncedAt(user_id);
     })
   );
-  await updateUserSyncedAt(user_id);
   return encodedRedirect(
     "success",
     "/accounts",
@@ -358,11 +367,9 @@ export const fetchAndUpdateTransactions = async (user_id: string) => {
           }
         )
       );
-      await updateAccountSyncedAt(account.id);
       return accountTransactions.transactions;
     })
   );
-  await updateUserSyncedAt(user_id);
   return transactions.flat();
 };
 
@@ -391,10 +398,12 @@ const getTransactionsOfPastMonths = async ({
         });
         Promise.all(
           result.transactions.map(async (transaction: TransactionResponse) => {
+            const category = await getCategoryFromTransaction(transaction);
             await createTransaction({
               transaction,
               user_id,
               account_id: account_id,
+              category,
             });
           })
         );
@@ -498,4 +507,25 @@ const getSessionData = async (session_id: string) => {
     );
   }
   return result;
+};
+
+export const getCategoryChartData = async (userId: string) => {
+  const transactions = await readDebitTransactionsByUserId(userId);
+  const grouped = transactions.reduce((acc: any, transaction) => {
+    const { category, transaction_amount } = transaction;
+    const amount = parseFloat(transaction_amount.amount);
+    if (!acc[category]) {
+      acc[category] = 0;
+    }
+    // TODO: refactor to use multiple currencies
+    if (transaction_amount.currency === "HUF") {
+      acc[category] += amount;
+    }
+    return acc;
+  }, {});
+  const groupedTransactions = Object.keys(grouped).map((category) => ({
+    label: category,
+    amount: grouped[category],
+  }));
+  return groupedTransactions.sort((a, b) => b.amount - a.amount);
 };

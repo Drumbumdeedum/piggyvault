@@ -219,10 +219,12 @@ export const createTransaction = async ({
   transaction,
   user_id,
   account_id,
+  category = "undefined",
 }: {
   transaction: TransactionResponse;
   user_id: string;
   account_id: string;
+  category?: string;
 }) => {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -237,6 +239,7 @@ export const createTransaction = async ({
       composite_id: getCompositeId(transaction),
       user_id,
       account_id,
+      category,
     })
     .select("*")
     .single();
@@ -290,6 +293,7 @@ export const readTransactionsByUserId = async (
     .from("transactions")
     .select("*")
     .eq("user_id", user_id)
+    .neq("status", "PDNG")
     .order("booking_date", { ascending: false });
   if (error) {
     console.log("Error while reading transactions.", error);
@@ -372,8 +376,6 @@ export const updateTransactionCategory = async ({
   category: string;
 }) => {
   const supabase = createClient();
-  console.log("UPDATING TRANSACTION: ", transaction_id);
-  console.log("UPDATING CATEGORY: ", category);
   const { data, error } = await supabase
     .from("transactions")
     .update({ category })
@@ -404,6 +406,27 @@ export const readTransactionByEntryReference = async (
   if (error) {
     console.log("Error while reading transaction by entry reference.", error);
     return;
+  }
+  return data;
+};
+
+export const readDebitTransactionsByUserId = async (
+  user_id: string
+): Promise<Transaction[]> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", user_id)
+    .eq("credit_debit_indicator", "DBIT")
+    .neq("status", "PDNG");
+  if (error) {
+    console.log("Error while reading transactions.", error);
+    return [];
+  }
+  if (!data) {
+    console.log("Error while reading transactions.");
+    return [];
   }
   return data;
 };

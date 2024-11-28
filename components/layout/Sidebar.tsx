@@ -10,6 +10,7 @@ import {
   Settings,
   Wallet,
   PiggyBank,
+  ChartLine,
 } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -25,6 +26,12 @@ export const sidebarLinks = [
     route: "/transactions",
     label: "Transactions",
     icon: <ArrowRightLeft size="18" />,
+  },
+  {
+    base: "/charts",
+    route: "/charts",
+    label: "Charts",
+    icon: <ChartLine size="18" />,
   },
   {
     base: "/accounts",

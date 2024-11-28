@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { getLastCharOfNumber } from "@/lib/utils";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 const CustomPieChart = ({
   items,
@@ -57,7 +57,6 @@ const CustomPieChart = ({
             nameKey="label"
             innerRadius={windowWidth >= 1280 ? 40 : 70}
             strokeWidth={3}
-            paddingAngle={5}
           />
         </PieChart>
       </ChartContainer>
