@@ -21,7 +21,6 @@ import {
   readLastTransactionsByAccountId,
   readTransactionByEntryReference,
   updateTransactionStatus,
-  readTransactionsByUserId,
   readDebitTransactionsByUserId,
 } from "./db.actions";
 import { updateUserSyncedAt } from "../user.actions";
