@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
-  console.log("Cron job triggered");
+  console.log("CRON JOB TRIGGERED");
 
   const supabase = createClient();
   const users = await supabase
@@ -10,7 +10,7 @@ export async function GET() {
 
   console.log(`USER COUNT: ${users.count}`);
 
-  return new Response(JSON.stringify({ message: "Cron job executed" }), {
+  return new Response(JSON.stringify({ message: "CRON JOB EXECUTED" }), {
     status: 200,
     headers: {
       "Content-Type": "application/json"
