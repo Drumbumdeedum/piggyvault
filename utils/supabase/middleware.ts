@@ -2,6 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const updateSession = async (request: NextRequest) => {
+
+  // Skip API routes
+  const { pathname } = request.nextUrl
+  if (pathname.startsWith('/api/cron')) {
+    return NextResponse.next()
+  }
+
   try {
     let response = NextResponse.next({
       request: {
